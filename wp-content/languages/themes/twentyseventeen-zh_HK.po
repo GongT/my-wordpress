@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Themes - Twenty Seventeen package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2017-01-03 08:48:05+0000\n"
+"PO-Revision-Date: 2017-06-09 08:47:35+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,43 +19,51 @@ msgstr "「貳零壹柒」專注於商業網站，提供了一個可自訂各部
 msgid "Twenty Seventeen"
 msgstr "貳零壹柒"
 
-#: template-parts/header/site-branding.php:31
-#: template-parts/navigation/navigation-top.php:20
+#: functions.php:326
+msgid "Add widgets here to appear in your sidebar on blog posts and archive pages."
+msgstr "在這裏添加小工具以在你的文章及存檔頁面側邊欄中顯示。"
+
+#: functions.php:324 sidebar.php:18
+msgid "Blog Sidebar"
+msgstr "網誌側邊欄"
+
+#: template-parts/header/site-branding.php:34
+#: template-parts/navigation/navigation-top.php:31
 msgid "Scroll down to content"
 msgstr "向下捲動至內容"
 
-#: functions.php:159
+#: functions.php:167
 msgctxt "Theme starter content"
 msgid "Coffee"
 msgstr "咖啡"
 
-#: functions.php:155
+#: functions.php:163
 msgctxt "Theme starter content"
 msgid "Sandwich"
 msgstr "三文治"
 
-#: functions.php:151
+#: functions.php:159
 msgctxt "Theme starter content"
 msgid "Espresso"
 msgstr "特濃咖啡"
 
-#: inc/custom-header.php:117
+#: inc/custom-header.php:126
 msgid "Pause background video"
 msgstr "暫停背景影片"
 
-#: inc/custom-header.php:116
+#: inc/custom-header.php:125
 msgid "Play background video"
 msgstr "播放背景影片"
 
-#: inc/template-tags.php:154
+#: inc/template-tags.php:151
 msgid "Front Page Section %1$s Placeholder"
 msgstr "首頁區塊 %1$s 佔位符號"
 
-#: inc/customizer.php:80
-msgid "When the two column layout is assigned, the page title is in one column and content is in the other."
+#: inc/customizer.php:99
+msgid "When the two-column layout is assigned, the page title is in one column and content is in the other."
 msgstr "當指派兩個欄位佈局時，頁面標題在一欄，內容則在另一欄中。"
 
-#: single.php:32
+#: single.php:34
 msgid "Next Post"
 msgstr "下篇文章"
 
@@ -63,21 +71,21 @@ msgstr "下篇文章"
 msgid "Posts"
 msgstr "文章"
 
-#: inc/template-tags.php:88
+#: inc/template-tags.php:89
 msgid "Tags"
 msgstr "標籤"
 
-#: inc/template-tags.php:84
+#: inc/template-tags.php:85
 msgid "Categories"
 msgstr "分類"
 
 #. translators: used between list items, there is a space after the comma
-#: inc/template-tags.php:65
+#: inc/template-tags.php:66
 msgid ", "
 msgstr ", "
 
 #. translators: %s: post date
-#: inc/template-tags.php:51
+#: inc/template-tags.php:52
 msgid "<span class=\"screen-reader-text\">Posted on</span> %s"
 msgstr "<span class=\"screen-reader-text\">發表於</span> %s"
 
@@ -94,82 +102,85 @@ msgstr "請定義一個 SVG 圖示檔名。"
 msgid "Please define default parameters in the form of an array."
 msgstr "請以陣列格式定義預設參數。"
 
-#: inc/customizer.php:108
+#: inc/customizer.php:131
 msgid "Select pages to feature in each area from the dropdowns. Add an image to a section by setting a featured image in the page editor. Empty sections will not be displayed."
 msgstr "從下拉式選單選擇要在每個區域中顯示的頁面。透過頁面編輯器新增、設定精選圖片。留空區域將不會顯示。"
 
 #. translators: %d is the front page section number
-#: inc/customizer.php:107
+#: inc/customizer.php:130
 msgid "Front Page Section %d Content"
 msgstr "首頁區塊 %d 內容"
 
-#: inc/customizer.php:83 inc/customizer.php:130
+#: inc/customizer.php:102 inc/customizer.php:158
 msgid "Two Column"
 msgstr "雙欄式"
 
-#: inc/customizer.php:82 inc/customizer.php:129
+#: inc/customizer.php:101 inc/customizer.php:157
 msgid "One Column"
 msgstr "單欄式"
 
-#: inc/customizer.php:77
+#: inc/customizer.php:96
 msgid "Page Layout"
 msgstr "頁面版型"
 
-#: inc/customizer.php:66
+#: inc/customizer.php:81
 msgid "Theme Options"
 msgstr "佈景主題選項"
 
-#: inc/customizer.php:50
+#: inc/customizer.php:59
 msgid "Custom"
 msgstr "自訂"
 
-#: inc/customizer.php:48
+#: inc/customizer.php:57
 msgid "Light"
 msgstr "亮色"
 
-#: inc/customizer.php:46
+#: inc/customizer.php:55
 msgid "Color Scheme"
 msgstr "色調"
 
-#: inc/custom-header.php:49
+#: inc/custom-header.php:54
 msgid "Default Header Image"
 msgstr "預設頁首圖片"
 
-#: functions.php:335
+#: functions.php:348
 msgid "Footer 2"
 msgstr "頁尾（二）"
 
-#: functions.php:327 functions.php:337
+#: functions.php:338 functions.php:350
 msgid "Add widgets here to appear in your footer."
 msgstr "在此新增小工具以顯示於你的頁尾。"
 
-#: functions.php:325
+#: functions.php:336
 msgid "Footer 1"
 msgstr "頁尾1"
 
-#: functions.php:269
+#. Translators: If there are characters in your language that are not supported
+#. by Libre Franklin, translate this to 'off'. Do not translate into your own
+#. language.
+#: functions.php:277
 msgctxt "Libre Franklin font: on or off"
 msgid "on"
 msgstr "off"
 
-#: functions.php:63 functions.php:183
+#: functions.php:64 functions.php:191
 #: template-parts/navigation/navigation-top.php:12
 msgid "Top Menu"
 msgstr "頂部選單"
 
-#: comments.php:60
+#: comments.php:62
 msgid "Reply"
 msgstr "回覆"
 
-#: template-parts/post/content-none.php:27
+#: template-parts/post/content-none.php:28
 msgid "It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help."
 msgstr "沒有找到你要的內容。也許你可以搜尋一下看看。"
 
-#: search.php:50
+#: search.php:54
 msgid "Sorry, but nothing matched your search terms. Please try again with some different keywords."
 msgstr "抱歉，沒東西符合你的搜尋條件。請試試其他不同關鍵字。"
 
-#: template-parts/post/content-none.php:23
+#: template-parts/post/content-none.php:24
 msgid "Ready to publish your first post? <a href=\"%1$s\">Get started here</a>."
 msgstr "準備好發表你的第一篇文章了嗎？<a href=\"%1$s\">從這裡開始</a>。"
 
@@ -177,29 +188,29 @@ msgstr "準備好發表你的第一篇文章了嗎？<a href=\"%1$s\">從這裡�
 msgid "Nothing Found"
 msgstr "什麼都沒找到"
 
-#: single.php:31
+#: single.php:33
 msgid "Previous Post"
 msgstr "上一篇文章"
 
-#: comments.php:66 single.php:31
+#: comments.php:71 single.php:33
 msgid "Previous"
 msgstr "前"
 
-#: comments.php:67 single.php:32
+#: comments.php:72 single.php:34
 msgid "Next"
 msgstr "後"
 
-#: searchform.php:19
+#: searchform.php:20
 msgctxt "submit button"
 msgid "Search"
 msgstr "搜尋"
 
-#: searchform.php:18
+#: searchform.php:19
 msgctxt "placeholder"
 msgid "Search &hellip;"
 msgstr "搜尋 &hellip;"
 
-#: searchform.php:16
+#: searchform.php:17
 msgctxt "label"
 msgid "Search for:"
 msgstr "搜尋："
@@ -209,20 +220,20 @@ msgid "Search Results for: %s"
 msgstr "%s 的搜尋結果："
 
 #. translators: %s: Name of current post
-#: functions.php:362 template-parts/page/content-front-page-panels.php:43
-#: template-parts/page/content-front-page.php:44
-#: template-parts/post/content-audio.php:82
-#: template-parts/post/content-gallery.php:68
-#: template-parts/post/content-image.php:58
-#: template-parts/post/content-video.php:80 template-parts/post/content.php:56
+#: functions.php:378 template-parts/page/content-front-page-panels.php:45
+#: template-parts/page/content-front-page.php:42
+#: template-parts/post/content-audio.php:84
+#: template-parts/post/content-gallery.php:71
+#: template-parts/post/content-image.php:61
+#: template-parts/post/content-video.php:83 template-parts/post/content.php:57
 msgid "Continue reading<span class=\"screen-reader-text\"> \"%s\"</span>"
 msgstr "繼續閱讀<span class=\"screen-reader-text\"> \"%s\"</span>"
 
-#: inc/customizer.php:49
+#: inc/customizer.php:58
 msgid "Dark"
 msgstr "暗色"
 
-#: inc/back-compat.php:39 inc/back-compat.php:51 inc/back-compat.php:66
+#: inc/back-compat.php:39 inc/back-compat.php:52 inc/back-compat.php:68
 msgid "Twenty Seventeen requires at least WordPress version 4.7. You are running version %s. Please upgrade and try again."
 msgstr "「貳零壹柒」只能在 WordPress 4.7 或更新版本使用。你正在使用 %s 版。請升級然後重試一次。"
 
@@ -231,15 +242,15 @@ msgstr "「貳零壹柒」只能在 WordPress 4.7 或更新版本使用。你正
 msgid "Edit<span class=\"screen-reader-text\"> \"%s\"</span>"
 msgstr "編輯<span class=\"screen-reader-text\"> \"%s\"</span>"
 
-#: template-parts/page/content-page.php:25
-#: template-parts/post/content-audio.php:87
-#: template-parts/post/content-gallery.php:73
-#: template-parts/post/content-image.php:63
-#: template-parts/post/content-video.php:85 template-parts/post/content.php:61
+#: template-parts/page/content-page.php:26
+#: template-parts/post/content-audio.php:91
+#: template-parts/post/content-gallery.php:78
+#: template-parts/post/content-image.php:68
+#: template-parts/post/content-video.php:90 template-parts/post/content.php:64
 msgid "Pages:"
 msgstr "頁面："
 
-#: template-parts/navigation/navigation-top.php:13
+#: template-parts/navigation/navigation-top.php:17
 msgid "Menu"
 msgstr "選單"
 
@@ -247,23 +258,15 @@ msgstr "選單"
 msgid "Skip to content"
 msgstr "跳至內容"
 
-#: functions.php:445
+#: functions.php:467
 msgid "Collapse child menu"
 msgstr "收起子選單"
 
-#: functions.php:444
+#: functions.php:466
 msgid "Expand child menu"
 msgstr "展開子選單"
 
-#: functions.php:317
-msgid "Add widgets here to appear in your sidebar."
-msgstr "在這裡加入小工具來讓它顯示於側邊欄。"
-
-#: functions.php:315
-msgid "Sidebar"
-msgstr "側邊欄"
-
-#: functions.php:64 functions.php:194
+#: functions.php:65 functions.php:202
 msgid "Social Links Menu"
 msgstr "社群鏈結選單"
 
@@ -271,34 +274,34 @@ msgstr "社群鏈結選單"
 msgid "Proudly powered by %s"
 msgstr "本站使用 %s 架設"
 
-#. #-#-#-#-#  twentyseventeen.pot (Twenty Seventeen 1.2)  #-#-#-#-#
+#. #-#-#-#-#  twentyseventeen.pot (Twenty Seventeen 1.5)  #-#-#-#-#
 #. Author URI of the plugin/theme
 #: template-parts/footer/site-info.php:13
 msgid "https://wordpress.org/"
 msgstr "https://zh-hk.wordpress.org/"
 
-#: footer.php:25
+#: footer.php:26
 msgid "Footer Social Links Menu"
 msgstr "頁尾社群鏈結選單"
 
-#: comments.php:75
+#: comments.php:82
 msgid "Comments are closed."
 msgstr "評論已關閉。"
 
 #. translators: 1: number of comments, 2: post title
-#: comments.php:40
+#: comments.php:41
 msgctxt "comments title"
 msgid "%1$s Reply to &ldquo;%2$s&rdquo;"
 msgid_plural "%1$s Replies to &ldquo;%2$s&rdquo;"
 msgstr[0] "%2$s 有 &ldquo; %1$s 則評論 &rdquo;"
 
 #. translators: %s: post title
-#: comments.php:36
+#: comments.php:37
 msgctxt "comments title"
 msgid "One Reply to &ldquo;%s&rdquo;"
 msgstr "「%s」有一則評論"
 
-#: archive.php:47 index.php:52 search.php:45
+#: archive.php:50 index.php:54 search.php:47
 msgid "Page"
 msgstr "頁"
 
@@ -310,11 +313,11 @@ msgstr "糟糕！找不到該頁面。"
 msgid "It looks like nothing was found at this location. Maybe try a search?"
 msgstr "看來這裡什麼也沒有。或許試試搜尋？"
 
-#: archive.php:45 index.php:50 search.php:43
+#: archive.php:48 index.php:52 search.php:45
 msgid "Previous page"
 msgstr "上一頁"
 
-#: archive.php:46 index.php:51 search.php:44
+#: archive.php:49 index.php:53 search.php:46
 msgid "Next page"
 msgstr "下一頁"
 
