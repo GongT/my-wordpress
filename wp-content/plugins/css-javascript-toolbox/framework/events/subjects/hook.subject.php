@@ -78,8 +78,8 @@ abstract class CJTEEWordpressHook extends CJTEESubject {
 		$return = parent::init($name, $target, $defintion, $includes);
 		$this->hookName = strtolower("{$this->definition['targetClass']}_{$name}");
 		// Register Wordpress Filter,
-		add_action($this->getHookName(), array(&$this, 'trigger'), 10, count($this->getDefinition('parameters')));
-		add_action($this->getInstanceHookName(), array(&$this, 'trigger'), 10, count($this->getDefinition('parameters')));
+		@add_action($this->getHookName(), array(&$this, 'trigger'), 10, count($this->getDefinition('parameters')));
+		@add_action($this->getInstanceHookName(), array(&$this, 'trigger'), 10, count($this->getDefinition('parameters')));
 		return $return;
 	}
 	
