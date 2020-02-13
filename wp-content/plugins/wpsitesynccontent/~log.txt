@@ -1,9 +1,0 @@
-2020-02-13 08:11:54#14 - SyncActivate::plugin_activation(false):37
-2020-02-13 08:11:54#14 - SyncActivate::plugin_activation():38 multisite=FALSE
-2020-02-13 08:11:54#14 - SyncActivate::plugin_activation():61 single site activation
-2020-02-13 08:11:54#14 - SyncActivate::create_database_tables():275
-2020-02-13 08:11:54#14 - SyncActivate::create_database_tables():316 sql=ALTER TABLE `wp_spectrom_sync_log`
-				ADD COLUMN `type` VARCHAR(4) NOT NULL DEFAULT 'recv' AFTER `target_user`
-2020-02-13 08:11:54#14 - SyncActivate::create_database_tables():320 - done
-2020-02-13 08:30:26#79 - WPSiteSyncContent::filter_upgrader_download() package='https://downloads.wordpress.org/theme/wordstar.4.3.zip'
-2020-02-13 08:30:26#79 - WPSiteSyncContent::filter_unique_filename() filename=wordstar.4.3-t9k5qd.tmp ext=.tmp dir=/tmp/

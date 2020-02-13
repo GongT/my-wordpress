@@ -1,7 +1,4 @@
 <?php
-/** Enable W3 Total Cache */
-define('WP_CACHE', true); // Added by W3 Total Cache
-
 
 /**
  * The base configuration for WordPress
@@ -83,11 +80,7 @@ define('RELOCATE', false);
 define('FORCE_SSL_ADMIN', true);
 
 
-if ($_SERVER['SERVER_PORT'] == 443) {
-	define('WP_HOME', 'https://' . $_SERVER['HTTP_HOST'] . '/');
-} else {
-	define('WP_HOME', 'https://' . $_SERVER['HTTP_HOST'] . ':' . $_SERVER['SERVER_PORT'] . '/');
-}
+define('WP_HOME', 'https://' . $_SERVER['HTTP_HOST']);
 define('WP_SITEURL', WP_HOME);
 
 define('WP_PROXY_HOST', '10.0.0.1');
