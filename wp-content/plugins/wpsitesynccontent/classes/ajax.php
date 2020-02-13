@@ -57,45 +57,51 @@ SyncDebug::log(__METHOD__."('{$operation}')");
 		}
 		// TODO: check nonce
 
-		do_action('spectrom_sync_api_action_before', $operation, $response, $this);		// helpful in handling multiple targets #50
+		if (SyncOptions::has_cap()) {
+			do_action('spectrom_sync_api_action_before', $operation, $response, $this);		// helpful in handling multiple targets #50
 
-		switch ($operation) {
-		case 'activate':
-		case 'deactivate':
-			$name = $this->post('extension');
-			$lic = new SyncLicensing();
-			if ('activate' === $operation)
-				$res = $lic->activate($name);
-			else
-				$res = $lic->deactivate($name);
-			$status = $lic->get_status($name);
-			$response->success(TRUE);
-			$response->set('status', $status);
-			if (isset($res['message']))
-				$response->set('message', __('License Key status: ', 'wpsitesynccontent') . $res['message']);
-			if (isset($res['status']))
-				$response->set('status', $res['status']);
-			else
-				$response->set('status', 'unknown');
-			break;
-		case 'push':
-			$this->push($response);
-			break;
-		case 'upload_media':
-			$this->upload_media($response);
-			break;
-		case 'verify_connection':
-			$this->verify_connection($response);
-			break;
-		default:
-			// allow add-ons a chance to handle their own AJAX request operation types
-			if (FALSE === apply_filters('spectrom_sync_ajax_operation', FALSE, $operation, $response)) {
-				// No method found, fallback to error message.
-				$response->error_code(SyncApiRequest::ERROR_EXTENSION_MISSING, $operation);
-				$response->error(sprintf(__('Method `%s` not found.', 'wpsitesynccontent'), $operation));
+			switch ($operation) {
+			case 'activate':
+			case 'deactivate':
+				$name = $this->post('extension');
+				$key = $this->post('key');
+				$lic = new SyncLicensing();
+				if (32 === strlen($key)) {
+					$lic->set_key($name, $key);
+				}
+				if ('activate' === $operation)
+					$res = $lic->activate($name);
+				else
+					$res = $lic->deactivate($name);
+				$status = $lic->get_status($name);
+				$response->success(TRUE);
+				$response->set('status', $status);
+				if (isset($res['message']))
+					$response->set('message', __('License Key status: ', 'wpsitesynccontent') . $res['message']);
+				if (isset($res['status']))
+					$response->set('status', $res['status']);
+				else
+					$response->set('status', 'unknown');
+				break;
+			case 'push':
+				$this->push($response);
+				break;
+			case 'upload_media':
+				$this->upload_media($response);
+				break;
+			case 'verify_connection':
+				$this->verify_connection($response);
+				break;
+			default:
+				// allow add-ons a chance to handle their own AJAX request operation types
+				if (FALSE === apply_filters('spectrom_sync_ajax_operation', FALSE, $operation, $response)) {
+					// No method found, fallback to error message.
+					$response->error_code(SyncApiRequest::ERROR_EXTENSION_MISSING, $operation);
+					$response->error(sprintf(__('Method `%s` not found.', 'wpsitesynccontent'), $operation));
+				}
 			}
+			do_action('spectrom_sync_api_action_after', $operation, $response, $this);			// helpful in handling multiple targets #50
 		}
-		do_action('spectrom_sync_api_action_after', $operation, $response, $this);			// helpful in handling multiple targets #50
 
 		// send the response to the browser
 //SyncDebug::log(__METHOD__.'() operation "' . $operation . '" returning ' . var_export($response, TRUE));
@@ -108,6 +114,7 @@ SyncDebug::log(__METHOD__."('{$operation}')");
 	 */
 	public function verify_connection(SyncApiResponse $response)
 	{
+		// TODO: rework and remove this if possible
 		$input = new SyncInput();
 		$settings = array_merge(
 			SyncOptions::get_all(), // get_option(SyncOptions::OPTION_NAME),
@@ -132,11 +139,8 @@ SyncDebug::log(__METHOD__."('{$operation}')");
 	 */
 	public function push(SyncApiResponse &$response)
 	{
-SyncDebug::log(__METHOD__.'()');
-
 		// TODO: move nonce check into dispatch() so it's centralized
 		if (!(wp_verify_nonce($this->post('_sync_nonce', ''), 'sync'))) {
-SyncDebug::log('- failed nonce check');
 			$response->success(FALSE);
 			$response->error_code(SyncApiRequest::ERROR_BAD_NONCE);
 			$response->send();
@@ -151,6 +155,7 @@ SyncDebug::log('- failed nonce check');
 			$response->success(TRUE);
 			$response->set('message', __('Content successfully sent to Target system.', 'wpsitesynccontent'));
 		} else {
+			do_action('spectrom_sync_push_api_response', $response);
 //			$response->copy($api_response);
 		}
 		return;

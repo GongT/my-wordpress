@@ -1,6 +1,6 @@
 <?php
 /**
-* 
+*
 */
 
 // No direct access allowed.
@@ -10,33 +10,33 @@ defined('ABSPATH') or die("Access denied");
 cssJSToolbox::import('tables:blocks.php');
 
 /**
-* 
+*
 */
 class CJTMetaboxModel {
-	
+
 	/** */
 	const STATE_CREATED = 'created';
 
 	/** */
 	const STATE_DELETED = 'deleted';
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	private $dbDriver = null;
-		
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $post = null;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $post
 	* @return CJTPostModel
 	*/
@@ -48,10 +48,10 @@ class CJTMetaboxModel {
 		// Instantiate MYSQL DB Driver object.
 		$this->dbDriver = new CJTMYSQLQueueDriver($GLOBALS['wpdb']);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $blockId
 	*/
 	public function create(& $pin = null) {
@@ -82,19 +82,19 @@ class CJTMetaboxModel {
 		// Chains!
 		return $this;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function delete() {
 		return $this->setState(self::STATE_DELETED);
 	}
-	
+
 	/**
 	* Check whether is the current post type
 	* can has CJT Block metabox?
-	* 
+	*
 	*/
 	public function doPost() {
 		// Get all post types selected by user.
@@ -103,10 +103,10 @@ class CJTMetaboxModel {
 		$allowedPostTypes = $metaboxSettings->postTypes;
 		return in_array($this->getPost()->post_type, $allowedPostTypes);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getMetaboxId() {
 		$metaboxId = get_post_meta($this->getPost()->ID, CJTBlocksTable::BLOCK_META_BOX_ID_META_NAME, true);
@@ -114,28 +114,28 @@ class CJTMetaboxModel {
 		$metaboxId = (int) $metaboxId;
 		return $metaboxId;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getPost() {
-		return $this->post;	
+		return $this->post;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function hasBlock() {
 		// If $postMeta seto to a blockId then it has block otherwise(0) it hasn't.
 		$metaboxStatus = get_post_meta($this->getPost()->ID, CJTBlocksTable::BLOCK_META_BOX_STATUS_META_NAME, true);
 		return ($metaboxStatus == self::STATE_CREATED);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function reservedMetaboxBlockId() {
 		// Reserved if only if not already taken!
@@ -149,20 +149,20 @@ class CJTMetaboxModel {
 		}
 		return $reservedId;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function save() {
 		$this->dbDriver->processQueue();
 		// Chains
 		return $this;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $state
 	*/
 	public function setState($state) {
@@ -171,5 +171,5 @@ class CJTMetaboxModel {
 		// Chaining!
 		return $this;
 	}
-	
+
 }  // End class.

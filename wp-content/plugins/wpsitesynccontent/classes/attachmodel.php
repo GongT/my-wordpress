@@ -20,13 +20,13 @@ class SyncAttachModel
 		$query = $wpdb->prepare($sql, $guid);
 		$res = $wpdb->get_results($query, OBJECT);
 SyncDebug::log(__METHOD__.'() sql=' . $query);
-SyncDebug::log(' - res=' . var_export($res, TRUE));
+SyncDebug::log(' - res=' . SyncDebug::arr_sanitize($res));
 
 		// check if not found and an extended search has been requested
 		if (0 === count($res) && $extended_search) {
 SyncDebug::log(__METHOD__.'():' . __LINE__ . ' performing extended search for ' . $guid);
 			$this->get_image_sizes();
-SyncDebug::log(' - image sizes: ' . var_export($this->_sizes, TRUE));
+
 			foreach ($this->_sizes as $img_size) {
 				$dims = '-' . $img_size . '.';
 				// check if there's a known image size suffix in the file name
@@ -35,7 +35,7 @@ SyncDebug::log(__METHOD__.'():' . __LINE__ . ' found image match for size ' . $i
 					$img_url = str_replace($dims, '.', $guid);
 SyncDebug::log(__METHOD__.'():' . __LINE__ . ' searching for ' . $img_url);
 					$res = $this->search_by_guid($img_url, FALSE);
-					if (0 !== count($res)) {
+					if (is_array($res) && 0 !== count($res)) {
 						$res[0]->orig_guid = $guid;
 SyncDebug::log(__METHOD__.'():' . __LINE__ . ' found a matching image: ' . $img_url);
 						return $res;			// set this for the loop below
@@ -51,12 +51,65 @@ SyncDebug::log(__METHOD__.'():' . __LINE__ . ' found a matching image: ' . $img_
 					$img_url = substr($guid, 0, $pos) . substr($guid, $ext);
 SyncDebug::log(__METHOD__.'():' . __LINE__ . ' img=' . $img_url);
 					$res = $this->search_by_guid($img_url, FALSE);
-					if (0 !== count($res))
+SyncDebug::log(__METHOD__.'():' . __LINE__ . ' res=' . var_export($res, TRUE));
+					if (is_array($res) && 0 !== count($res))
 						$res[0]->orig_guid = $guid;
 				}
 			}
 		}
 		return $res;
+	}
+
+	/**
+	 * Searches for an attachment by guid and by name
+	 * @param string $path The full name of the attachment to search for
+	 * @param string $year The four digit year of the attachment's post date
+	 * @param string $month The two digit month of the attachment's post date
+	 * @return int|boolean The postID of the attachment if found or FALSE if not found
+	 */
+	public function search($path, $year = '', $month = '')
+	{
+		$attach_id = $this->get_id_by_name($path);
+
+		if (FALSE === $attach_id) {
+			$search = $path;
+			if (!empty($month) && 2 === strlen($month))
+				$search = $month . '/' . $search;
+			if (!empty($yeat) && 4 === strlen($year))
+				$search = $year . '/' . $search;
+			$search = '/' . $search;
+
+			global $wpdb;
+			$sql = "SELECT *
+				FROM `{$wpdb->posts}`
+				WHERE `post_type`='attachment' AND `guid` LIKE %s
+				LIMIT 1";
+			$query = $wpdb->prepare($sql, '%' . $search);
+			$res = $wpdb->get_results($query, OBJECT);
+SyncDebug::log(__METHOD__.'():' . __LINE__ . ' sql=' . $query . ' res=' . var_export($res, TRUE));
+			if (NULL !== $res && isset($res[0]) && isset($res[0]->ID))
+				$attach_id = abs($res[0]->ID);
+SyncDebug::log(__METHOD__.'():' . __LINE__ . ' guid search=' . $attach_id);
+		}
+		return $attach_id;
+	}
+
+	/**
+	 * Retrieves an attachment's post ID based on it's name
+	 * @param string $name The name to search in the `post_name` column. No extension is included in this name.
+	 * @return int|boolean The post ID of the attachment if found or FALSE if not found
+	 */
+	public function get_id_by_name($name)
+	{
+		global $wpdb;
+		$sql = "SELECT `ID`
+				FROM `{$wpdb->posts}`
+				WHERE `post_name`=%s AND `post_type`='attachment'";
+		$res = $wpdb->get_col($stmt = $wpdb->prepare($sql, $name));
+SyncDebug::log(__METHOD__.'():' . __LINE__ . ' ' . $stmt . ' = ' . var_export($res, TRUE));
+		if (0 !== count($res))
+			return abs($res[0]);
+		return FALSE;
 	}
 
 	/**
@@ -94,6 +147,7 @@ SyncDebug::log(__METHOD__.'():' . __LINE__ . ' unrecognized image size: ' . var_
 				$size = $img_size['width'] . 'x' . $img_size['height'];
 				$this->_sizes[] = $size;
 			}
+SyncDebug::log(' - image sizes: ' . var_export($this->_sizes, TRUE));
 		}
 
 		return $this->_sizes;

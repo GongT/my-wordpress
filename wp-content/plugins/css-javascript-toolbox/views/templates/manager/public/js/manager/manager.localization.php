@@ -5,8 +5,8 @@
 */
 
 /**
-* Localization for Javascript cjtJQueryBlockI18N variable.
-* 
+* Localization for JavaScript cjtJQueryBlockI18N variable.
+*
 * Localization text for backups script.
 */
 return array(

@@ -1,6 +1,6 @@
 <?php
 /**
-* 
+*
 */
 
 // Disallow direct access.
@@ -12,7 +12,7 @@ cssJSToolbox::import('framework:mvc:controller-ajax.inc.php');
 /**
 * This class should replace any other controllers that
 * has methods for interacting with a single Block (e.g block-ajax!)
-* 
+*
 * All single Block actions (e.g edit, new and save) should be placed/moved here
 * in the future!
 */
@@ -20,14 +20,14 @@ class CJTCodeFilesController extends CJTAjaxController {
 
 	/**
 	* put your comment there...
-	* 	
+	*
 	* @var mixed
 	*/
 	protected $controllerInfo = array();
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function __construct() {
 		parent::__construct();
@@ -40,12 +40,12 @@ class CJTCodeFilesController extends CJTAjaxController {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function deleteAction() {
 		// Block id.
 		$blockId = (int) $_GET['blockId'];
-		$ids = $_GET['ids'];
+		$ids = (array) $_GET['ids'];
 		// Fetch code Blocks list.
 		$tblCodeFiles = new CJTBlockFilesTable(cssJSToolbox::getInstance()->getDBDriver());
 		// Delete all
@@ -61,7 +61,7 @@ class CJTCodeFilesController extends CJTAjaxController {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getListAction() {
 		// Block id.
@@ -86,7 +86,7 @@ class CJTCodeFilesController extends CJTAjaxController {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function saveAction() {
 		// Block id.
@@ -103,10 +103,10 @@ class CJTCodeFilesController extends CJTAjaxController {
 		// Return New CodeFile Data.
 		$this->response = (array) $tblCodeFiles->getData();
 	}
- 
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function switchAction() {
 		// Block id.

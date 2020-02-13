@@ -1,19 +1,19 @@
 <?php
 /**
-* 
+*
 */
 
 // Disallow direct access.
 defined('ABSPATH') or die("Access denied");
 
 /**
-* 
+*
 */
 class CJTInstaller extends CJTHookableClass {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function builtinAuthors() {
 		// Dependencies!
@@ -25,17 +25,17 @@ class CJTInstaller extends CJTHookableClass {
 		// Make sure built-in (attributes = 1) Wordpress author (id = 1) is there!
 		if (!$wpAuthor->get('id') || ($wpAuthor->get('attributes') != 1)) {
 			$wpAuthor->setData(array(
-				'id' => CJTAuthorTable::WORDPRESS_AUTHOR_ID, 
+				'id' => CJTAuthorTable::WORDPRESS_AUTHOR_ID,
 				'name' => 'Wordpress',
 				'attributes' => CJTAuthorTable::FLAG_SYS_AUTHOR)
 			)->save(true);
 		}
 		return $this;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function database() {
 		// Install Database structure!
@@ -43,14 +43,14 @@ class CJTInstaller extends CJTHookableClass {
 		CJTDBFileInstaller::getInstance(cssJSToolbox::resolvePath('includes:installer:installer:db:mysql:structure.sql'))->exec();
 		return $this;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function fileSystem() {
 		// Initializing!
-		$wpContentDir = 'wp-content';
+		$wpContentDir = end( explode( DIRECTORY_SEPARATOR, dirname( dirname( plugin_dir_path( CJTOOLBOX_PLUGIN_FILE ) ) ) ) );
 		$fSConfig = cssJSToolbox::$config->fileSystem;
 		// Directories to create!
 		$directories = array(
@@ -71,33 +71,37 @@ class CJTInstaller extends CJTHookableClass {
 		}
 		return $this;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function finalize() {
 		// Update version number.
-		update_option(CJTPlugin::DB_VERSION_OPTION_NAME, CJTPlugin::DB_VERSION);
+		if ( $this->crossCheckInstall() ) {
+			update_option(CJTPlugin::DB_VERSION_OPTION_NAME, CJTPlugin::DB_VERSION);
+			return false;
+		}
+
 		return $this;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public static function getInstance() {
 		return new CJTInstaller();
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function wordpressTemplates() {
 		// Dependencies!
 		cssJSToolbox::import(
-			'framework:db:mysql:xtable.inc.php', 
+			'framework:db:mysql:xtable.inc.php',
 			'includes:installer:installer::includes:templates:wordpress-queue.inc.php'
 		);
 		// Install Wordpress build-in templates (scripts shipped out with Wordpress installation)!
@@ -109,6 +113,13 @@ class CJTInstaller extends CJTHookableClass {
 			}
 		}
 		return $this;
+	}
+
+	public function crossCheckInstall()
+	{
+		CJTDBFileInstaller::getInstance(cssJsToolbox::resolvePath('includes:installer:installer:db:mysql:checker.sql'))->exec();
+
+		return true;
 	}
 
 } // End class.

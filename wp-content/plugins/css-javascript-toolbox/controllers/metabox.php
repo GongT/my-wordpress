@@ -11,17 +11,17 @@ cssJSToolbox::import('framework:mvc:controller-ajax.inc.php');
 
 /**
 * Controll Block metabox actions.
-* 
+*
 * @version 6.0
 * @package CJT
 * @subpackage Controllers
 * @author Ahmed Said
 */
 class CJTMetaboxController extends CJTAjaxController {
-	
+
 	/**
 	* Initialize post controller.
-	* 
+	*
 	* @return void
 	*/
 	public function __construct($_unused_hasView = null, $request = null) {
@@ -38,14 +38,37 @@ class CJTMetaboxController extends CJTAjaxController {
 			$this->registryAction('delete');
 		}
 		else if ($this->model->doPost()) {
+			$current_screen = get_current_screen();
 			// Add metabox.
-			$this->showMetabox();
+			// Hiding metabox for Gutenberg editors.
+			if ( ! $this->hasGutenberg() ) $this->showMetabox();
 		}
 	}
-	
+
+	/**
+	 * Check for Gutenberg editor.
+	 *
+	 * @return boolean
+	 */
+	public function hasGutenberg() {
+		if ( function_exists( 'is_gutenberg_page' ) &&
+				is_gutenberg_page()
+		) {
+			return true;
+		}
+		$current_screen = get_current_screen();
+		if ( method_exists( $current_screen, 'is_block_editor' ) &&
+				$current_screen->is_block_editor()
+		) {
+			// Gutenberg page on 5+.
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	* Create block metabox for specific post object.
-	* 
+	*
 	* @param integer Post id.
 	* @return array New block object consist of block id and new block metabox view content.
 	*/
@@ -65,15 +88,15 @@ class CJTMetaboxController extends CJTAjaxController {
 			$this->view = CJTView::create('blocks/metabox');
 			$this->view->setBlock(CJTModel::create('blocks')->getBlock($blockId, array('returnCodeFile' => true)));
 			$this->view->setSecurityToken($this->createSecurityToken());
-			// Send Javascript & CSS files needed for the metabox view to work.
+			// Send JavaScript & CSS files needed for the metabox view to work.
 			$this->response['references'] = self::getReferencesQueue();
 			$this->response['view'] = $this->view->setOption('customizeMetabox', true)->getTemplate('metabox');
 		}
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function deleteAction() {
 		// Get input vars.
@@ -92,19 +115,19 @@ class CJTMetaboxController extends CJTAjaxController {
 		// Push vars into the view.
 		$this->view->setBlock($block);
 		$this->view->setSecurityToken($this->createSecurityToken());
-		// Send Javascript & CSS files needed for the metabox view to work.
+		// Send JavaScript & CSS files needed for the metabox view to work.
 		$this->response['references'] = self::getReferencesQueue();
 		// create-metabox view content.
 		$this->response['view'] = $this->view->setOption('customizeMetabox', true)->getTemplate('create');
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	protected static function getReferencesQueue() {
 		$result = array();
-		/** 
+		/**
 		Get all scripts needed to be loaded for block metabox to work.
 		--------------------------------------------------------------
 		*	1. Suppress the output we need the SRC URLs not the HTML tags.
@@ -142,16 +165,16 @@ class CJTMetaboxController extends CJTAjaxController {
 		// Return references.
 		return $result;
 	}
-	
+
 	/**
 	* Select which metabox to load.
-	* 
-	* create-metabox view will be loaded if user doesnt 
+	*
+	* create-metabox view will be loaded if user doesnt
 	* created a block for current post yet.
-	* 
+	*
 	* metabox view will be loaded if there is a block
 	* already created for current post.
-	* 
+	*
 	* Callback for add_meta_boxes action.
 	*/
 	public function showMetabox() {
@@ -160,7 +183,7 @@ class CJTMetaboxController extends CJTAjaxController {
 		/// Get block id.
 		$metaboxId = $this->model->reservedMetaboxBlockId();
 		// User didn't create block for this post yet.
-		// Show create-metabox view.			
+		// Show create-metabox view.
 		if (!$this->model->hasBlock()) {
 			// Set view template name.
 			$viewName = 'create-metabox';
@@ -188,5 +211,5 @@ class CJTMetaboxController extends CJTAjaxController {
 		// Add metabox.
 		add_meta_box($this->view->getMetaboxId(), $this->view->getMetaboxName(), array(&$this->view, 'display'), $this->model->getPost()->post_type, 'normal');
 	}
-	
+
 } // End class.

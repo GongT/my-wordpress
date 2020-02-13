@@ -222,6 +222,9 @@ class TablePress_Table_Model extends TablePress_Model {
 	 * @return array Post.
 	 */
 	protected function _table_to_post( array $table, $post_id ) {
+		// Run filters on content in each cell and other fields.
+		$table = $this->filter_content( $table );
+
 		// Sanitize each cell, table name, and table description, if the user is not allowed to work with unfiltered HTML.
 		if ( ! current_user_can( 'unfiltered_html' ) ) {
 			$table = $this->sanitize( $table );
@@ -237,7 +240,7 @@ class TablePress_Table_Model extends TablePress_Model {
 			'post_title'     => $table['name'],
 			// 'post_author' => $table['author'],
 			'post_excerpt'   => $table['description'],
-			'post_content'   => wp_json_encode( $table['data'] ),
+			'post_content'   => wp_json_encode( $table['data'], TABLEPRESS_JSON_OPTIONS ),
 			'post_mime_type' => 'application/json',
 		);
 
@@ -380,8 +383,8 @@ class TablePress_Table_Model extends TablePress_Model {
 	 */
 	public function sanitize( array $table ) {
 		// Sanitize the table name and description.
-		$fields_to_sanitize = array( 'name', 'description' );
-		foreach ( $fields_to_sanitize as $field ) {
+		$fields = array( 'name', 'description' );
+		foreach ( $fields as $field ) {
 			$table[ $field ] = wp_kses_post( $table[ $field ] );
 		}
 
@@ -389,6 +392,44 @@ class TablePress_Table_Model extends TablePress_Model {
 		foreach ( $table['data'] as $row_idx => $row ) {
 			foreach ( $row as $column_idx => $cell_content ) {
 				$table['data'][ $row_idx ][ $column_idx ] = wp_kses_post( $cell_content ); // equals wp_filter_post_kses(), but without the unncessary slashes handling
+			}
+		}
+
+		return $table;
+	}
+
+	/**
+	 * Filter/modify the content of table cells and other fields, e.g. for security hardening.
+	 *
+	 * This is similar to the `sanitize()` method, but executed for all users.
+	 * In 1.10.0, adding `rel="noopener noreferrer"` to all HTML link elements like `<a target=` was added. See https://core.trac.wordpress.org/ticket/43187.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @param array $table Table.
+	 * @return array Filtered/modified table.
+	 */
+	public function filter_content( array $table ) {
+		/**
+		 * Filter whether the contents of table cells and fields should be filtered/modified.
+		 *
+		 * @since 1.10.0
+		 *
+		 * @param bool $filter Whether to filter the content of table cells and other fields. Default true.
+		 */
+		if ( ! apply_filters( 'tablepress_filter_table_cell_content', true ) ) {
+			return;
+		}
+
+		// Filter the table name and description.
+		$fields = array( 'name', 'description' );
+		foreach ( $fields as $field ) {
+			$table[ $field ] = wp_targeted_link_rel( $table[ $field ] );
+		}
+
+		foreach ( $table['data'] as $row_idx => $row ) {
+			foreach ( $row as $column_idx => $cell_content ) {
+				$table['data'][ $row_idx ][ $column_idx ] = wp_targeted_link_rel( $cell_content );
 			}
 		}
 
@@ -1009,7 +1050,7 @@ class TablePress_Table_Model extends TablePress_Model {
 	 * @return bool True on success, false on error.
 	 */
 	protected function _add_table_options( $post_id, array $options ) {
-		$options = wp_json_encode( $options );
+		$options = wp_json_encode( $options, TABLEPRESS_JSON_OPTIONS );
 		return $this->model_post->add_meta_field( $post_id, $this->table_options_field_name, $options );
 	}
 
@@ -1023,7 +1064,7 @@ class TablePress_Table_Model extends TablePress_Model {
 	 * @return bool True on success, false on error.
 	 */
 	protected function _update_table_options( $post_id, array $options ) {
-		$options = wp_json_encode( $options );
+		$options = wp_json_encode( $options, TABLEPRESS_JSON_OPTIONS );
 		return $this->model_post->update_meta_field( $post_id, $this->table_options_field_name, $options );
 	}
 
@@ -1053,7 +1094,7 @@ class TablePress_Table_Model extends TablePress_Model {
 	 * @return bool True on success, false on error.
 	 */
 	protected function _add_table_visibility( $post_id, array $visibility ) {
-		$visibility = wp_json_encode( $visibility );
+		$visibility = wp_json_encode( $visibility, TABLEPRESS_JSON_OPTIONS );
 		return $this->model_post->add_meta_field( $post_id, $this->table_visibility_field_name, $visibility );
 	}
 
@@ -1067,7 +1108,7 @@ class TablePress_Table_Model extends TablePress_Model {
 	 * @return bool True on success, false on error.
 	 */
 	protected function _update_table_visibility( $post_id, array $visibility ) {
-		$visibility = wp_json_encode( $visibility );
+		$visibility = wp_json_encode( $visibility, TABLEPRESS_JSON_OPTIONS );
 		return $this->model_post->update_meta_field( $post_id, $this->table_visibility_field_name, $visibility );
 	}
 

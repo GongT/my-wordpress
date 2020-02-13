@@ -1,89 +1,89 @@
 <?php
 /**
-* 
+*
 */
 
 /**
-* 
+*
 */
 abstract class CJTAjaxController extends CJTController {
-	
+
   /** */
 	const ACTION_PREFIX = 'wp_ajax_cjtoolbox_';
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $methodName;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $actionsMap = array();
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $defaultCapability = array('administrator');
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $impersonated = false;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	public $httpCode = '200 OK';
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	public $httpContentType = 'text/plain';
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $onauthorize = array('parameters' => array('authorized'));
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $onregisteraction  = array('parameters' => array('callback', 'action'));
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $onresponse =  array('hookType' => CJTWordpressEvents::HOOK_ACTION);
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	public $response = false;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function _doAction() {
 		// Authorize request.
@@ -150,7 +150,7 @@ abstract class CJTAjaxController extends CJTController {
 		  case 'text/plain':
 		  	echo json_encode($this->response);
 		  	break;
-		  	
+
 		  default :
 		  	echo $this->response;
 		}
@@ -159,24 +159,24 @@ abstract class CJTAjaxController extends CJTController {
 
 	/**
 	* Display templates manager form.
-	* 
+	*
 	*/
-	protected function displayAction() {		
+	protected function displayAction() {
 		// Return view.
 		$this->httpContentType = 'text/html';
 		$this->response = parent::displayAction();
 	}
-	
+
 	/**
 	* Redirect the request to another controller.
-	* 
+	*
 	* Why this method is created anyway is to allow
 	* deprecating old controllers and start to create new one
 	* a quiet manner!
-	* 
+	*
 	* The idea is to create the  new controller,  adding new Action there
-	* and redirect the call throught current deprecated controller.
-	* 
+	* and redirect the call through current deprecated controller.
+	*
 	* @param mixed $controller
 	*/
 	protected function redirect($controller) {
@@ -189,10 +189,10 @@ abstract class CJTAjaxController extends CJTController {
 		// Fire the action manually.
 		do_action($currentFilter);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $action
 	* @param mixed $priority
 	* @param mixed $paramsCount
@@ -204,7 +204,7 @@ abstract class CJTAjaxController extends CJTController {
 		add_action($action, $callback , $priority, $paramsCount);
 		return $this;
 	}
-	
+
 } // End class.
 
 // Hookable!

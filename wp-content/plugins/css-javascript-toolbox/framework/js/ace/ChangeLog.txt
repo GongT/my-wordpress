@@ -1,3 +1,81 @@
+2019.06.17 Version 1.4.5
+* improve scrolling and selection on mobile
+* improve type definitions
+
+2019.04.24 Version 1.4.4
+* add experimental command prompt
+* add chrystal, nim and nginx highlight rules
+* fix regression in vim mode on ios
+
+2019.02.21 Version 1.4.3
+* add sublime keybindings
+* add rtl option
+* implement ` and < textobjects in vim mode
+
+2018.11.21 Version 1.4.2
+* fix regression in vim mode
+* improve keyboard input handling on ipad and IE
+* add new syntax highlighters
+
+2018.08.07 Version 1.4.1
+* fix regression in autocomplete
+
+2018.08.06 Version 1.4.0
+
+* remove usage of innerHTML
+* improved handling of textinput for IME and mobile
+* add support for relative line numbers
+* improve autocompletion popup
+
+2018.03.26 Version 1.3.3
+* fix regession in static-highlight extension
+* use css animation for cursor blinking
+
+2018.03.21 Version 1.3.2
+* add experimental support for using ace-builds with webpack
+
+2018.02.11 Version 1.3.1
+
+* fixed regression with selectionChange event not firing some times
+* improved handling of non-ascii characters in vim normal mode
+
+2018.01.31 Version 1.3.0
+
+* added copy copyWithEmptySelection option
+* improved undoManager
+* improved settings_menu plugin
+* improved handling of files with very long lines
+* fixed bug with scrolling editor out of view in transformed elements
+
+2017.10.17 Version 1.2.9
+
+* added support for bidirectional text, with monospace font (Alex Shensis)
+* added support for emoji 😊
+
+* new language modes
+  - Red (Toomas Vooglaid)
+  - CSound (Nathan Whetsell)
+  - JSSM (John Haugeland)
+
+* New Themes
+  - Dracula (Austin Schwartz)
+
+2017.07.02 Version 1.2.8
+* Fixed small bugs in searchbox and autocompleter
+
+2017.06.18 Version 1.2.7
+
+* Added Support for arrow keys on external IPad keyboard (Emanuele Tamponi)
+* added match counter to searchbox extension
+
+- implemented higlighting of multiline strings in yaml mode (Maxim Trushin)
+- improved haml syntax highlighter (Andrés Álvarez)
+
+2016.12.03 Version 1.2.6
+
+* Fixed IME handling on new Chrome
+* Support for php 7 in the syntax checker
+
 2016.08.16 Version 1.2.5
 
 * Fixed regression in noconflict mode
@@ -11,7 +89,7 @@
 * Bugfixes
   - fix memory leak in setSession (Tyler Stalder)
   - double click not working on linux/mac
-  
+
 * new language modes
   - reStructuredText (Robin Jarry)
   - NSIS (Jan T. Sott)
@@ -35,7 +113,7 @@
 
 * new language modes
   - SQLServer (Morgan Yarbrough)
-  
+
 2015.04.03 Version 1.1.9
 
   - Small Enhancements and Bugfixes
@@ -44,14 +122,14 @@
 
 * API Changes
   - `editor.commands.commandKeyBinding` now contains direct map from keys to commands instead of grouping them by hashid
-  
+
 * New Features
   - Improved autoindent for html and php modes (Adam Jimenez)
   - Find All from searchbox (Colton Voege)
-  
+
 * new language modes
   - Elixir, Elm
- 
+
 2014.09.21 Version 1.1.7
 
 * Bugfixes
@@ -61,9 +139,9 @@
 2014.08.17 Version 1.1.6
 
 * Bugfixes
-  - fix regression in double tap to highlight 
+  - fix regression in double tap to highlight
   - Improved Latex Mode (Daniel Felder)
-  
+
 * API Changes
   - editor.destroy destroys editor.session too (call editor.setSession(null) to prevent that)
 
@@ -71,7 +149,7 @@
  - Praat (José Joaquín Atria)
  - Eiffel (Victorien Elvinger)
  - G-code (Adam Joseph Cook)
- 
+
 2014.07.09 Version 1.1.5
 
 * Bugfixes
@@ -79,7 +157,7 @@
 
 * new language modes
  - gitignore (Devon Carew)
- 
+
 2014.07.01 Version 1.1.4
 
 * New Features
@@ -97,7 +175,7 @@
   - Add ColdFusion behavior (Abram Adams)
   - add showLineNumbers option
   - Add html syntax checker (danyaPostfactum)
- 
+
 * new language modes
   - Gherkin (Patrick Nevels)
   - Smarty
@@ -116,7 +194,7 @@
   - add option to merge similar changes in undo history
   - add scrollPastEnd option
   - use html5 dragndrop for text dragging (danyaPostfactum)
-  
+
 * API Changes
   - fixed typo in HashHandler commmandManager
 
@@ -174,10 +252,10 @@
   - Added suppoert for Delete and SelectAll from context menu (danyaPostfactum)
 
   - Make wrapping behavior optional
-  - Selective bracket insertion/skipping 
-    
-  - Added commands for increase/decrease numbers, sort lines (Vlad Zinculescu)    
-  - Folding for Markdown, Lua, LaTeX    
+  - Selective bracket insertion/skipping
+
+  - Added commands for increase/decrease numbers, sort lines (Vlad Zinculescu)
+  - Folding for Markdown, Lua, LaTeX
   - Selective bracket insertion/skipping for C-like languages
 
 * Many new languages
@@ -186,19 +264,19 @@
   - FreeMarker (nguillaumin)
   - Tiny Mushcode (h3rb)
   - Velocity (Ryan Griffith)
-  - TOML (Garen Torikian) 
+  - TOML (Garen Torikian)
   - LSL (Nemurimasu Neiro, Builders Brewery)
   - Curly (Libo Cannici)
-  - vbScript (Jan Jongboom) 
-  - R (RStudio) 
+  - vbScript (Jan Jongboom)
+  - R (RStudio)
   - ABAP
   - Lucene (Graham Scott)
   - Haml (Garen Torikian)
-  - Objective-C (Garen Torikian) 
-  - Makefile (Garen Torikian) 
-  - TypeScript (Garen Torikian) 
-  - Lisp (Garen Torikian) 
-  - Stylus (Garen Torikian) 
+  - Objective-C (Garen Torikian)
+  - Makefile (Garen Torikian)
+  - TypeScript (Garen Torikian)
+  - Lisp (Garen Torikian)
+  - Stylus (Garen Torikian)
   - Dart (Garen Torikian)
 
 * Live syntax checks
@@ -206,9 +284,9 @@
   - Lua
 
 * New Themes
-  - Chaos 
-  - Terminal 
-   
+  - Chaos
+  - Terminal
+
 2012.09.17, Version 1.0.0
 
 * New Features
@@ -252,7 +330,7 @@
   - XCode
 
 * Many Small Enhancements and Bugfixes
- 
+
 2011.08.02, Version 0.2.0
 
 * Split view (Julian Viereck)
@@ -280,7 +358,7 @@
   - SVG
   - Textile (Kelley van Evert)
   - SCAD (Jacob Hansson)
-  
+
 * Live syntax checks
   - Lint for CSS using CSS Lint <http://csslint.net/>
   - CoffeeScript
@@ -316,7 +394,7 @@
 2011.02.14, Version 0.1.6
 
 * Floating Anchors
-  - An Anchor is a floating pointer in the document. 
+  - An Anchor is a floating pointer in the document.
   - Whenever text is inserted or deleted before the cursor, the position of
     the cursor is updated
   - Usesd for the cursor and selection
@@ -327,7 +405,7 @@
   - remove to end/start of line
   - split line
   - transpose letters
-* Refator markers  
+* Refator markers
   - Custom code can be used to render markers
   - Markers can be in front or behind the text
   - Markers are now stored in the session (was in the renderer)

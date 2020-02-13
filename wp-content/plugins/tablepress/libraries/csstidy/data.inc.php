@@ -63,6 +63,7 @@ $data['csstidy']['at_rules'] = array(
 	'import'            => 'iv',
 	'namespace'         => 'iv',
 	'media'             => 'at',
+	'supports'          => 'at',
 	'keyframes'         => 'at',
 	'-moz-keyframes'    => 'at',
 	'-o-keyframes'      => 'at',
@@ -449,8 +450,26 @@ $data['csstidy']['all_properties']['font-stretch'] = 'CSS2.0,CSS3.0';
 $data['csstidy']['all_properties']['font-style'] = 'CSS1.0,CSS2.0,CSS2.1,CSS3.0';
 $data['csstidy']['all_properties']['font-variant'] = 'CSS1.0,CSS2.0,CSS2.1,CSS3.0';
 $data['csstidy']['all_properties']['font-weight'] = 'CSS1.0,CSS2.0,CSS2.1,CSS3.0';
+$data['csstidy']['all_properties']['grid'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-area'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-auto-columns'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-auto-flow'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-auto-rows'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-column'] = 'CSS3.0';
 $data['csstidy']['all_properties']['grid-columns'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-column-end'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-column-gap'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-column-start'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-gap'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-row'] = 'CSS3.0';
 $data['csstidy']['all_properties']['grid-rows'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-row-end'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-row-gap'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-row-start'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-template'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-template-areas'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-template-columns'] = 'CSS3.0';
+$data['csstidy']['all_properties']['grid-template-rows'] = 'CSS3.0';
 $data['csstidy']['all_properties']['hanging-punctuation'] = 'CSS3.0';
 $data['csstidy']['all_properties']['height'] = 'CSS1.0,CSS2.0,CSS2.1,CSS3.0';
 $data['csstidy']['all_properties']['hyphenate-after'] = 'CSS3.0';
@@ -465,6 +484,8 @@ $data['csstidy']['all_properties']['image-rendering'] = 'CSS3.0';
 $data['csstidy']['all_properties']['image-resolution'] = 'CSS3.0';
 $data['csstidy']['all_properties']['inline-box-align'] = 'CSS3.0';
 $data['csstidy']['all_properties']['justify-content'] = 'CSS3.0';
+$data['csstidy']['all_properties']['justify-items'] = 'CSS3.0';
+$data['csstidy']['all_properties']['justify-self'] = 'CSS3.0';
 $data['csstidy']['all_properties']['left'] = 'CSS2.0,CSS2.1,CSS3.0';
 $data['csstidy']['all_properties']['letter-spacing'] = 'CSS1.0,CSS2.0,CSS2.1,CSS3.0';
 $data['csstidy']['all_properties']['line-break'] = 'CSS3.0';
@@ -656,7 +677,7 @@ $data['csstidy']['predefined_templates']['high_compression'][] = "\n";
 $data['csstidy']['predefined_templates']['high_compression'][] = "\n" . '<span class="format">}' . "\n" . '</span>';
 $data['csstidy']['predefined_templates']['high_compression'][] = '';
 $data['csstidy']['predefined_templates']['high_compression'][] = '<span class="comment">'; // before comment
-$data['csstidy']['predefined_templates']['high_compression'][] = '</span>'; // after comment
+$data['csstidy']['predefined_templates']['high_compression'][] = '</span>' . "\n"; // after comment
 $data['csstidy']['predefined_templates']['high_compression'][] = "\n";
 
 $data['csstidy']['predefined_templates']['highest_compression'][] = '<span class="at">';
@@ -671,7 +692,7 @@ $data['csstidy']['predefined_templates']['highest_compression'][] = '';
 $data['csstidy']['predefined_templates']['highest_compression'][] = '<span class="format">}</span>';
 $data['csstidy']['predefined_templates']['highest_compression'][] = '';
 $data['csstidy']['predefined_templates']['highest_compression'][] = '<span class="comment">'; // before comment
-$data['csstidy']['predefined_templates']['highest_compression'][] = '</span>'; // after comment
+$data['csstidy']['predefined_templates']['highest_compression'][] = '</span>' . "\n"; // after comment
 $data['csstidy']['predefined_templates']['highest_compression'][] = '';
 
 $data['csstidy']['predefined_templates']['low_compression'][] = '<span class="at">';
@@ -690,4 +711,4 @@ $data['csstidy']['predefined_templates']['low_compression'][] = '</span>' . "\n"
 $data['csstidy']['predefined_templates']['low_compression'][] = "\n";
 
 // Add TablePress specific modifications.
-require dirname( __FILE__ ) . '/data-tp.inc.php';
+require __DIR__ . '/data-tp.inc.php';

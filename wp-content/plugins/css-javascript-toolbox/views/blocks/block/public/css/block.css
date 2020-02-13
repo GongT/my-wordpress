@@ -1,8 +1,13 @@
-/* 
+/*
 	cjt-block is just a new added class so don't confuse about it
 	sometimes we need to use it instead of postbox class
 	like affecting only block box while running as Metabox inside edit post page!
 */
+
+b, strong {
+    color: #8c8c8c;
+}
+
 .cjt-block {min-width: 730px;}
 
 .waitingToLoad{display: none !important;}
@@ -14,9 +19,9 @@
 .postbox.cjt-block a,
 .postbox.cjt-block a:visited {color: #a0a0a0 !important;}
 
-.postbox.cjt-block a.active {color: #a5581b !important;}
+.postbox.cjt-block a.active {color: #005DA4 !important;}
 
-.postbox.cjt-block a:hover {color:  #c8671b !important;}
+.postbox.cjt-block a:hover {color:  #628ead !important;}
 
 .inside {color: #7c7c7c;}
 
@@ -25,7 +30,7 @@
 	display:none;
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
-	border-radius: 6px; 
+	border-radius: 6px;
 	border-color: #cccccc;
 }
 /* Use 6px radius instead of 3px */
@@ -42,8 +47,8 @@
 #cjtoolbox-admin #poststuff h3, .metabox-holder h3 {padding: 8px 10px;}
 /* Editor langauges list */
 .editor-langs {
-	position: absolute;  
-	z-index: 2;    
+	position: absolute;
+	z-index: 2;
 	width: 200px;
 	overflow: hidden;
 	margin-top: -2px;
@@ -60,11 +65,11 @@
 	width: 114px;
 }
 /** Toolbox **/
-.block-toolbox { 
+.block-toolbox {
 	height: 30px;
 	position: absolute;
 	right: 30px;
-	top: 0px; 
+	top: 0px;
 }
 .block-toolbox .icons-group {
 	display: inline-block;
@@ -72,6 +77,12 @@
 /* Push all icons by 1 pixel down  Put not  the info icon */
 .block-toolbox .icons-group.big-bar .cjt-tb-link{position: relative; top:1px}
 .block-toolbox .icons-group.big-bar .cjttbl-info{position: static;}
+.block-info .cjt-block-shortcode-text input {
+	background: transparent;
+    border: 0;
+    box-shadow: none;
+    width: 200px;
+}
 .block-toolbox .icons-group a.cjt-tb-link {
 	width: 24px;
 	height: 24px;
@@ -152,7 +163,7 @@
 	float: right;
 	width: 40px;
 	height: 350px;
-	top: 5px;	
+	top: 5px;
 	margin-left: 10px;
 	display: none;
 }
@@ -160,7 +171,7 @@
 .loading-block{
 	font-weight: bold;
 	font-size: 13px;
-	color: brown;	
+	color: #005da4;
 }
 
 /* Edit block name */
@@ -205,6 +216,15 @@ span.block-name {cursor: pointer; font-size: 15px;font-weight: normal;}
 .cjcontainer {min-width:700px;}
 .datablock {padding-top: 14px;}
 .datablock .code-editor { position: relative; width:auto; height:352px; }
+.cjt-info-bar {
+	font-size: 11px;
+	margin-top: 6px;
+	color: #b5b5b5;
+}
+.cjt-info-bar span:not(:last-child) {
+	margin-right: 20px;
+}
+
  a.button-secondary { float:left; }
 .linklist textarea { width:245px; font-size:11px; height:190px; }
 .cjtitle { float:left; width:245px; }
@@ -263,7 +283,7 @@ body.fullscreen #wpadminbar {display: none;} /** No admin menu */
 }
 
 div[contains=setMode],
-div[contains=setOptions], 
+div[contains=setOptions],
 div[contains=setMode],
 div[contains=setTheme]
 {display: none}

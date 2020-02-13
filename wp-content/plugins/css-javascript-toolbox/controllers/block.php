@@ -1,6 +1,6 @@
 <?php
 /**
-* 
+*
 */
 
 // Disallow direct access.
@@ -12,7 +12,7 @@ cssJSToolbox::import('framework:mvc:controller-ajax.inc.php');
 /**
 * This class should replace any other controllers that
 * has methods for interacting with a single Block (e.g block-ajax!)
-* 
+*
 * All single Block actions (e.g edit, new and save) should be placed/moved here
 * in the future!
 */
@@ -20,14 +20,14 @@ class CJTBlockController extends CJTAjaxController {
 
 	/**
 	* put your comment there...
-	* 	
+	*
 	* @var mixed
 	*/
 	protected $controllerInfo = array('model' => 'x-block', 'model_file' => 'xblock');
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function __construct() {
 		parent::__construct();
@@ -38,16 +38,16 @@ class CJTBlockController extends CJTAjaxController {
 		$this->registryAction('getCode');
 		$this->registryAction('downloadCodeFile');
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function downloadCodeFileAction() {
 		// BlockId, currentActiveFile.
-		$blockId = $_GET['blockId'];
-		$fileId = $_GET['fileId'];
-		$returnAs = $_GET['returnAs'];
+		$blockId = sanitize_text_field( $_GET['blockId'] );
+		$fileId = sanitize_text_field( $_GET['fileId']  );
+		$returnAs = sanitize_text_field( $_GET['returnAs'] );
 		// Get current File Code.
 		$tblCodeFile = new CJTBlockFilesTable(cssJSToolbox::getInstance()->getDBDriver());
 		$codeFile =	$tblCodeFile->set('id', $fileId)
@@ -77,7 +77,7 @@ class CJTBlockController extends CJTAjaxController {
 
 	/**
 	* Query single block based on the provided criteria!
-	* 
+	*
 	*/
 	public function getBlockByAction() {
 		// Initialize.
@@ -88,33 +88,33 @@ class CJTBlockController extends CJTAjaxController {
 		// Query Block.
 		$this->response = array_intersect_key((array) $this->model->getBlockBy(), $returns);
 	}
-	
+
 	/**
 	* Get assigment panel objects page.
-	* 
+	*
 	*/
 	public function getAPOPAction() {
 		// Read inputs.
 		$iPerPage = (int) $_GET['iPerPage'];
 		$blockId = (int) $_GET['block'];
-		$oTypeParams = $_GET['typeParams'];
-		$offset = $_GET['index'];
+		$oTypeParams = (array) $_GET['typeParams'];
+		$offset = (int) $_GET['index'];
 		$assignedOnly = ($_GET['assignedOnly'] == 'false') ? false : true;
 		$initialize = ($_GET['initialize'] == 'false') ? false : true;
 		// Get the corresponding type object
 		// for handling the request.
-		$typeName = $oTypeParams['targetType'];
+		$typeName = (string) $oTypeParams['targetType'];
 		/**
 		* put your comment there...
-		* 
+		*
 		* @var CJT_Models_Block_Assignmentpanel_Base
 		*/
 		$typeObject = CJT_Models_Block_Assignmentpanel_Base
-								::getInstance($assignedOnly, 
+								::getInstance($assignedOnly,
 															$typeName,
-															$offset, 
-															$iPerPage, 
-															$blockId, 
+															$offset,
+															$iPerPage,
+															$blockId,
 															$oTypeParams);
 		// Fetch next page.
 		$items = $typeObject->getItems();
@@ -124,18 +124,18 @@ class CJTBlockController extends CJTAjaxController {
 		// Return count only when the list is activated for
 		// the first time.
 		if ($initialize) {
-			$this->response['total'] = $typeObject->getTotalCount();	
+			$this->response['total'] = $typeObject->getTotalCount();
 		}
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @deprecated this is just a redirect to the CJTBlockContoller::getAction().
 	*/
 	protected function loadUrlAction() {
 		// Read inputs.
-		$url = $_GET['url'];
+		$url = (string) $_GET['url'];
 		// Read URL.
 		$response = wp_remote_get($url);
 		if ($error = $response instanceof WP_Error) {

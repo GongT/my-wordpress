@@ -11,11 +11,11 @@ cssJSToolbox::import('framework:mvc:controller-ajax.inc.php');
 
 /**
 * Serve blocks page Ajax requests.
-* 
+*
 * The Actions resident here is global for only the blocks page, its not
 * for a specific/single block. You can find single block
 * actions in block-ajax.php file.
-* 
+*
 * @deprecated DONT ADD MORE ACTIONS  HERE!
 * @author Ahmed Said
 * @version 6
@@ -24,14 +24,14 @@ class CJTBlocksAjaxController extends CJTAjaxController {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $controllerInfo = array('model' => 'blocks');
-	
+
 	/**
 	* Initialize controller object.
-	* 
+	*
 	* @see CJTController for more details
 	* @return void
 	*/
@@ -44,23 +44,23 @@ class CJTBlocksAjaxController extends CJTAjaxController {
 		$this->registryAction('saveOrder');
 		$this->registryAction('loadBlock');
 	}
-	
+
 	/**
 	* Create new block.
-	* 
+	*
 	* Once this method is called a new block is saved into
 	* the database.
-	* 
+	*
 	* Call this method using GET method with the following parameters.
 	* 	- array ids Ids for all the available blocks.
 	* 	- [name] string Block name.
 	* 	- [state] string Block state.
 	* 	- [location] string Block hook location.
-	* 
+	*
 	* Response body is array with the following elements.
 	* 	- integer id New block id.
 	* 	- string view Block HTML code.
-	* 
+	*
 	* @return void
 	*/
 	public function createBlockAction($blockId = null, $blockType = null, $pinPoint = null, $viewName = null) {
@@ -100,7 +100,7 @@ class CJTBlocksAjaxController extends CJTAjaxController {
 		$blocksModel->save();
 		// Read newly added block from database.
 		$newBlockData = $blocksModel->getBlock($blockId, array('returnCodeFile' => true));
-		
+
 		if ($newBlockData === null) {
 			throw new Exception('Could not add new block!!!');
 		}
@@ -113,23 +113,23 @@ class CJTBlocksAjaxController extends CJTAjaxController {
 				$blockView->setBlock($block);
 				$response['view'] = $blockView->getTemplate('new');
 			}
-			$response['id'] = $blockId;	
+			$response['id'] = $blockId;
 			// Set response object.
-			$this->response = $response;		
+			$this->response = $response;
 		}
 	}
-	
+
 	/**
 	* Get view content through ajax request.
-	* 
+	*
 	* The method is useful for requesting Popup forms through ajax (e.g ThickBox).
 	* You can request any view specified in the $allowedViews array.
-	* 
+	*
 	* Call this method using GET method with the following parameters.
 	* 	- viewName string Name of the view.
-	* 
+	*
 	* Response body is the view content string.
-	* 
+	*
 	* @return void
 	*/
 	public function getViewAction() {
@@ -168,7 +168,7 @@ class CJTBlocksAjaxController extends CJTAjaxController {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function loadBlockAction() {
 		// Block Id.
@@ -180,68 +180,68 @@ class CJTBlocksAjaxController extends CJTAjaxController {
 		$view->getTemplate('default');
 		$this->response = $view->structuredContent;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
-	public function saveBlocksAction() 
+	public function saveBlocksAction()
 	{
 		$response = array();
-		
+
 		// Blocks are sent ins single array list.
 		$blocksToSave = filter_input( INPUT_POST, 'blocks', FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY );
 		$calculatePinPoint = ( bool ) filter_input( INPUT_POST, 'calculatePinPoint', FILTER_SANITIZE_NUMBER_INT );
 		$createRevision = ( bool ) filter_input( INPUT_POST, 'createRevision', FILTER_SANITIZE_NUMBER_INT );
-		
-		// For any reason that cause Client/Javascript to send empty blocks,
+
+		// For any reason that cause Client/JavaScript to send empty blocks,
 		// make sure we're save.
-		if ( is_array( $blocksToSave ) && ! empty( $blocksToSave ) ) 
+		if ( is_array( $blocksToSave ) && ! empty( $blocksToSave ) )
 		{
-			
-			foreach ( $blocksToSave as $id => $postedblockPartialData ) 
+
+			foreach ( $blocksToSave as $id => $postedblockPartialData )
 			{
 				// Push block id into block data.
 				$blockData = ( object ) $postedblockPartialData;
 				$blockData->id = $id;
-				
+
 				// Recalculate pinPoint field value.
 				! $calculatePinPoint or ( CJTBlockModel::arrangePins( $blockData ) && CJTBlockModel::calculateBlockPinPoint( $blockData ) );
-				
+
 				// Create block revision.
 				! $createRevision or $this->model->addRevision( $id, $blockData->activeFileId );
-				
+
 				// Set lastModified field to current time.
 				$blockData->lastModified = current_time( 'mysql' );
-				
+
 				// Update database.
 				$this->model->update( $blockData, $calculatePinPoint );
 				$this->model->save();
-				
+
 				// Send the changes properties back to client.
-				foreach ( $postedblockPartialData as $property => $value ) 
+				foreach ( $postedblockPartialData as $property => $value )
 				{
 					$response[ $id ][ $property ][ 'value' ] = $value;
 				}
-				
+
 			}
-			
+
 		}
-		
+
 		// Delete other blocks.
 		empty( $_POST[ 'deletedBlocks' ] ) or $this->model->delete( $_POST[ 'deletedBlocks' ] );
-		
+
 		// Save changes.
 		$this->model->save();
-		
+
 		// Set response.
 		$this->response = $response;
-		
+
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function saveOrderAction() {
 		// Read order.
@@ -250,5 +250,5 @@ class CJTBlocksAjaxController extends CJTAjaxController {
 		$this->model->setOrder($order);
 		$this->response = array('order' => $order, 'state' => 'saved');
 	}
-	
+
 } // End class.

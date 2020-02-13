@@ -1,78 +1,78 @@
 <?php
 /**
-* 
+*
 */
 
 // Import dependencies.
 require_once 'subject.interface.php';
 
 /**
-* 
+*
 */
 abstract class CJTEESubject implements CJTEEISubject, Countable, ArrayAccess {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $definition;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var CJTIncludes
 	*/
 	protected $includes;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $name;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $observers = array();
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $result;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $target;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function count() {
 		return count($this->observers);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $name
 	*/
 	public function getDefinition($name) {
-		return isset($this->definition[$name]) ? $this->definition[$name] : null;
+		return isset($this->definition[$name]) ? $this->definition[$name] : [];
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public static function getInstance($name, $target, $definition, $includes) {
 		// Instantiate!
@@ -82,18 +82,18 @@ abstract class CJTEESubject implements CJTEEISubject, Countable, ArrayAccess {
 		$subject->init($name, $target, $definition, $includes);
 		return $subject;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getName() {
-		return $this->name;	
+		return $this->name;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $callback
 	*/
 	public function getObserver($callback) {
@@ -103,26 +103,26 @@ abstract class CJTEESubject implements CJTEEISubject, Countable, ArrayAccess {
 		$observer = call_user_func(array($this->getDefinition('observerClass'), 'getInstance'), $this, $callback);
 		return $observer;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getResult() {
-		return $this->result;	
+		return $this->result;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getTarget() {
-		return $this->target;	
+		return $this->target;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	protected function init($name, $target, $definition, $includes) {
 		$this->name = $name;
@@ -131,10 +131,10 @@ abstract class CJTEESubject implements CJTEEISubject, Countable, ArrayAccess {
 		$this->includes = $includes;
 		return $this;
 	}
-	  
+
 	  /**
 	  * put your comment there...
-	  *                                                                                                 
+	  *
 	  * @param mixed $params
 	  */
 	protected function initResultArray($params) {
@@ -144,34 +144,34 @@ abstract class CJTEESubject implements CJTEEISubject, Countable, ArrayAccess {
 		//--- cancel for now !! array_unshift($this->result['params'], $this, $this->target);
 		$this->result['return'] = false;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $callback
 	*/
 	public function offsetExists($callback) {
 		$key = null;
-		
+
 		// Check existance!
 		return isset($this->observers[$key]);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $callback
 	*/
 	public function offsetGet($callback) {
 		$key = null;
-		
+
 		// Return observer!
 		return $this->observers[$key];
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $key
 	* @param mixed $callback
 	*/
@@ -181,10 +181,10 @@ abstract class CJTEESubject implements CJTEEISubject, Countable, ArrayAccess {
 		// Add to observers list!
 		$this->observers[$key] = $observer;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $callback
 	*/
 	public function offsetUnset($callback) {
@@ -193,28 +193,28 @@ abstract class CJTEESubject implements CJTEEISubject, Countable, ArrayAccess {
 		// Just remove from observers list!
 		unset($this->observers[$key]);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	protected function prepareResultParameters() {
 		// No changes should happen for the general observer parameters!
 		return;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $observer
 	*/
 	protected function processFilter($observer) {
 		return true; // Always call observer!
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function trigger() {
 		// Read parameters.
@@ -226,12 +226,12 @@ abstract class CJTEESubject implements CJTEEISubject, Countable, ArrayAccess {
 				$this->result['params']['observer'] = $observer;
 				$this->result['return'] = call_user_func_array(array($observer, 'trigger'), $this->result['params']);
 				// Prepare parameters based on the previous call result!
-				$this->prepareResultParameters();				
+				$this->prepareResultParameters();
 			}
 			next($this->observers);
 		}
 		// Return last result!
 		return $this->result['return'];
 	}
-	
+
 } // End class.

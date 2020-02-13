@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: CSS & Javascript Toolbox V6\n"
+"Project-Id-Version: CSS & JavaScript Toolbox V6\n"
 "POT-Creation-Date: 2015-11-19 20:53+0200\n"
 "PO-Revision-Date: 2015-11-19 20:53+0200\n"
 "Last-Translator: CJT Team <support@css-javascript-toolbox.com>\n"
@@ -18,7 +18,7 @@ msgstr ""
 #: /access.points/dashboardmetabox.accesspoint.php:31
 #: /access.points/manage.accesspoint.php:44
 #: /access.points/manage.accesspoint.php:45
-msgid "CSS & Javascript Toolbox"
+msgid "CSS & JavaScript Toolbox"
 msgstr ""
 
 #: /access.points/extensions.accesspoint.php:53
@@ -104,7 +104,7 @@ msgid ""
 "\tas the error is not handled we cannot tell if the previous operation is "
 "executed successed or not!\n"
 "\tTo help us fixing those kind of issues you can check the error details and "
-"submit it throught CJT Web site!\n"
+"submit it through CJT Web site!\n"
 "\n"
 "\n"
 "\tWould you like to check the error details?"
@@ -112,7 +112,7 @@ msgstr ""
 
 #: /framework/js/ajax/cjt-server/cjt-server.localization.php:17
 msgid ""
-"Its heighly recomended to send us the error details so we can enahce CJT "
+"Its heighly recommended to send us the error details so we can enhance CJT "
 "products!\n"
 "\tThis error is not saved anywhere and you cant reach it again!\n"
 "\n"
@@ -180,7 +180,7 @@ msgstr "Revision"
 #: /locals/strings.inc.php:21
 #: /models/fields/template-types.php:21
 msgid "javascript"
-msgstr "Javascript"
+msgstr "JavaScript"
 
 #: /locals/strings.inc.php:22
 #: /models/fields/template-types.php:20
@@ -487,9 +487,9 @@ msgstr ""
 
 #: /views/setup/activation-form/public/js/default/default.localization.php:13
 msgid ""
-"External request need to be made to to css-javascript-toolbox offical web "
+"External request need to be made to to css-javascript-toolbox official web "
 "site! The operation will take an effect once its successed! You can always "
-"deactivate license key throught this form!\n"
+"deactivate license key through this form!\n"
 "\n"
 "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
 "\t\t\t\t\t\t\tAre you sure would you like to process?"
@@ -497,9 +497,9 @@ msgstr ""
 
 #: /views/setup/activation-form/public/js/default/default.localization.php:15
 msgid ""
-"External request need to be made to to css-javascript-toolbox offical web "
+"External request need to be made to to css-javascript-toolbox official web "
 "site! The operation will take an effect once its successed! You can always "
-"activate license key throught this form!\n"
+"activate license key through this form!\n"
 "\n"
 "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
 "\t\t\t\t\t\t\tAre you sure would you like to process?"
@@ -603,7 +603,7 @@ msgid "Could not deactivate License Key due to the server error!"
 msgstr ""
 
 #: /views/setup/activation-form/public/js/default/default.localization.php:48
-msgid "The ckeck operation detects that the provided key is a valid key!"
+msgid "The check operation detects that the provided key is a valid key!"
 msgstr ""
 
 #: /views/setup/activation-form/public/js/default/default.localization.php:49
@@ -616,13 +616,13 @@ msgstr ""
 
 #: /views/setup/activation-form/public/js/default/default.localization.php:51
 msgid ""
-"The ckeck operation detects that the provided key is a valid key! The key is "
+"The check operation detects that the provided key is a valid key! The key is "
 "not being activated yet."
 msgstr ""
 
 #: /views/setup/activation-form/public/js/default/default.localization.php:52
 msgid ""
-"The ckeck operation detects that the provided key is a valid key! The "
+"The check operation detects that the provided key is a valid key! The "
 "license key need to be activated from the CJT Website."
 msgstr ""
 

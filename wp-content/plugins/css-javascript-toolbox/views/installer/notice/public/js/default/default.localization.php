@@ -5,8 +5,8 @@
 */
 
 /**
-* Localization for Javascript  variable.
-* 
+* Localization for JavaScript  variable.
+*
 * Localization text for backups script.
 */
 return array(

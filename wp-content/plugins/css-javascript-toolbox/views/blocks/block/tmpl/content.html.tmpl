@@ -1,10 +1,19 @@
 <?php
 /**
-* 
+*
 */
 
 // Disallow direct access.
 defined('ABSPATH') or die("Access denied");
+$block = $this->getBlock($this->block->id, [],  ['id', 'name', 'pinPoint', 'links', 'expressions', 'created']);
+$inPages = isset( $block->pages ) ? $block->pages : [];
+$inPosts = isset( $block->posts ) ? $block->posts : [];
+$inCats = isset( $block->categories ) ? $block->categories : [];
+$inTags = isset( $block->post_tags ) ? $block->post_tags : [];
+$inAux = [];
+$inLinks = ! empty( $block->links ) ? explode( "\n", $block->links ) : [];
+$inExps = ! empty( $block->expressions ) ? explode( "\n", $block->expressions ) : [];
+$allAssignment = array_merge( $inPages, $inPosts, $inCats, $inTags, $inLinks, $inExps );
 ?>
 <?php
 	    // Add activeFileId into codeFile object.
@@ -26,6 +35,14 @@ defined('ABSPATH') or die("Access denied");
 <?php 	echo $this->getTemplate('editor-toolbox', array(), 'tmpl/templates'); ?>
 				<div class="datablock">
 					<div id="editor-<?php echo $this->block->id ?>" class="code-editor"><?php echo htmlentities($this->block->file->code, null, 'UTF-8') ?></div>
+
+					<div class="cjt-info-bar">
+						<span>Code Block ID: <strong><?php echo $this->block->id; ?></strong></span>
+						<span>Assignments: <strong><?php echo count( $allAssignment ); ?></strong></span>
+						<span>User: <strong><?php echo get_userdata( $this->block->owner )->display_name; ?></strong></span>
+						<span>Created: <strong><?php echo date( 'd-m-Y, H:i', strtotime( $this->block->created ) ); ?></strong></span>
+						<span>Modified: <strong><?php echo date( 'd-m-Y, H:i', strtotime( $this->block->lastModified ) ); ?></strong></span>
+					</div>
 				</div>
 			</div>
 		</div>

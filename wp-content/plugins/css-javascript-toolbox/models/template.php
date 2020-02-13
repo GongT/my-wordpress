@@ -1,40 +1,40 @@
 <?php
 /**
-* 
+*
 */
 
 // Disllow direct access.
 defined('ABSPATH') or die('Access denied');
 
 /**
-* 
+*
 */
 class CJTTemplateModel extends CJTHookableClass {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	public $inputs;
 
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $onloadcodefile = array('parameters' => array('code', 'item'));
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $onqueryitem = array('parameters' => array('query'));
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $code
 	*/
 	public function decryptCode($encodedCode) {
@@ -44,10 +44,10 @@ class CJTTemplateModel extends CJTHookableClass {
 		$code = base64_decode($code64);
 		return $code;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $code
 	*/
 	public function encryptCode($code) {
@@ -57,10 +57,10 @@ class CJTTemplateModel extends CJTHookableClass {
 		$encodedCode = "<?php defined(\"ABS_PATH\") or die(\"Access Denied\"); '{$code64}'; ?>";
 		return $encodedCode;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $name
 	*/
 	public function exists($name) {
@@ -71,23 +71,23 @@ class CJTTemplateModel extends CJTHookableClass {
 		return (($existsItem = $this->getTemplateBy()) && property_exists($existsItem, 'id') && $existsItem->id) ?
 									$existsItem : FALSE;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getItem() {
 		$tManager = CJTModel::create('templates-manager');
 		$query = $tManager->getItemsQuery();
-		$query['select'] = 'SELECT t.id, 
+		$query['select'] = 'SELECT t.id,
 																					t.queueName,
-																					t.name, 
-																					t.type, 
-																					t.description, 
-																					t.creationDate, 
+																					t.name,
+																					t.type,
+																					t.description,
+																					t.creationDate,
 																					t.keywords,
 																					r.dateCreated lastModified,
-																					t.state, 
+																					t.state,
 																					a.name author,
 																					r.changeLog,
 																					r.version,
@@ -109,10 +109,10 @@ class CJTTemplateModel extends CJTHookableClass {
 		// Return PHP StdClass object.
 		return $item;
 	}
-	
+
 	/**
 	* Query Block based on the passed paramaters.
-	* 
+	*
 	*/
 	public function getTemplateBy() {
 		// import dependencies.
@@ -125,7 +125,7 @@ class CJTTemplateModel extends CJTHookableClass {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function save() {
 		// import libraries.
@@ -138,16 +138,17 @@ class CJTTemplateModel extends CJTHookableClass {
 		// Load template data is exists (load), change values (setData).
 		$template = CJTxTable::getInstance('template');
 		if ($saveId) {
-			$template->set('id', $saveId)->load();																																
+			$template->set('id', $saveId)->load();
 		}
 		$template->setData($this->inputs['item']['template'])
 						 ->setQueueName();
 		$templateDirName = $template->get('queueName');
-		$templateDir = "wp-content/{$fSConfig->contentDir}/{$fSConfig->templatesDir}/{$templateDirName}";
+		$contentDir = end( explode( DIRECTORY_SEPARATOR, dirname( dirname( plugin_dir_path( CJTOOLBOX_PLUGIN_FILE ) ) ) ) );
+		$templateDir = "$contentDir/{$fSConfig->contentDir}/{$fSConfig->templatesDir}/{$templateDirName}";
 		if (!$template->get('id')) { // Add new Template
-			// Search for author for the current local Wordpress user. 
+			// Search for author for the current local Wordpress user.
 			// If not created in the Authors table create one! If created get the ID!
-			$author = CJTxTable::getInstance('author', null, "SELECT * FROM #__cjtoolbox_authors 
+			$author = CJTxTable::getInstance('author', null, "SELECT * FROM #__cjtoolbox_authors
 													 WHERE name = '{$currentUser->user_login}'
 													 AND (attributes & 2);");
 			// Create Wordpress user in Authors table.
@@ -179,9 +180,9 @@ class CJTTemplateModel extends CJTHookableClass {
 																											FROM #__cjtoolbox_template_revisions
 																											WHERE templateId = {$template->get('id')}")->revisionNo));
 		// Checki if there is a previous revision and if there is changes!!
-		$lastRevision = CJTxTable::getInstance('template-revision', null, 
-			"SELECT * 
-			 FROM #__cjtoolbox_template_revisions 
+		$lastRevision = CJTxTable::getInstance('template-revision', null,
+			"SELECT *
+			 FROM #__cjtoolbox_template_revisions
 			 WHERE templateId = {$template->get('id')} AND revisionNo = {$lastRevisionNo}"
 		);
 		// Only add Revision if it has any field changed!
@@ -229,7 +230,7 @@ class CJTTemplateModel extends CJTHookableClass {
 		// Return revision object.
 		return $revision->getData();
 	}
-	
+
 } // End class.
 
 // Hookable!

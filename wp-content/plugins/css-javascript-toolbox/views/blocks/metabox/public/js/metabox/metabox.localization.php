@@ -5,8 +5,8 @@
 */
 
 /**
-* Localization for Javascript cjtMetaboxI18N variable.
-* 
+* Localization for JavaScript cjtMetaboxI18N variable.
+*
 * Localization text for backups script.
 */
 return array(

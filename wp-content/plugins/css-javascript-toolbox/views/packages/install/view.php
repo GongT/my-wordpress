@@ -1,47 +1,47 @@
 <?php
 /**
-* 
+*
 */
 
 // No direct access.
 defined('ABSPATH') or die('Access denied');
 
 /**
-* 
+*
 */
 class CJTPackagesInstallView extends CJTView {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $moduleParamName;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $uploaderModuleName;
 
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $uploaderActionName;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $uploaderControllerName;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $tpl
 	*/
 	public function display($tpl = null) {
@@ -53,15 +53,15 @@ class CJTPackagesInstallView extends CJTView {
 		// Display form.
 		echo $this->getTemplate($tpl);
 	}
-	
+
 	/**
-	* Output Javascript files requirred to Add-New-Block view to run.
-	* 
+	* Output JavaScript files requirred to Add-New-Block view to run.
+	*
 	* @return void
 	*/
 	public function enququeScripts() {
 		// Use related scripts.
-		self::useScripts(__CLASS__, 
+		self::useScripts(__CLASS__,
 			'jquery',
 			'thickbox',
 			'jquery-serialize-object',
@@ -69,10 +69,10 @@ class CJTPackagesInstallView extends CJTView {
 			'views:packages:install:public:js:{CJT-}install'
 		);
 	}
-	
+
 	/**
 	* Output CSS files required to Add-New-Block view.
-	* 
+	*
 	* @return void
 	*/
 	public function enququeStyles() {
@@ -84,7 +84,7 @@ class CJTPackagesInstallView extends CJTView {
 			'views:packages:install:public:css:{CJT-}install'
 		);
 	}
-	
+
 } // End class.
 
 // Hookable!!

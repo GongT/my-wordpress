@@ -1,58 +1,58 @@
 <?php
 /**
-* 
+*
 */
 
 /**
-* 
+*
 */
 class CJT_Framework_Wordpress_Feed {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $feed;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $fields;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $path;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $site;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $site
 	* @param mixed $path
 	* @return CJT_Framework_Wordpress_Feed
 	*/
-	public function __construct($site, $path, $fields) 
+	public function __construct($site, $path, $fields)
     {
-		
+
 		$this->site =& $site;
 		$this->path =& $path;
 		$this->fields = $fields;
-        
+
 		# Request server => get raw XML feed
 		$feed = wp_remote_get( "http://{$this->site}/{$this->path}" );
-    
+
 		# Getting XML content
 		$xmlContent = ( is_array( $feed ) && ( $feed[ 'response' ][ 'code' ] == 200 ) ) ?
 									wp_remote_retrieve_body( $feed ) :
@@ -61,17 +61,17 @@ class CJT_Framework_Wordpress_Feed {
 											<item>
 												<title>ERROR !!!</title>
 												<description>ERROR Fetching data from CJT Server</description>
-												<link>http://css-javascript-toolbox.com/</link>
+												<link>https://css-javascript-toolbox.com/</link>
 											</item>
 										</channel>
 									</cjterrorrequest>';
 		# Creating feed
 		$this->feed = new SimpleXMLElement($xmlContent);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getAllItems() {
 		// Initialize.
@@ -88,12 +88,12 @@ class CJT_Framework_Wordpress_Feed {
 			$items[] = $item;
 		}
 		# Return items.
-		return $items;	
+		return $items;
 	}
 
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $count
 	*/
 	public function getLatestItems($count) {
@@ -117,20 +117,20 @@ class CJT_Framework_Wordpress_Feed {
 			$items[] = $item;
 		}
 		# Return items.
-		return $items;		
+		return $items;
 	}
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	protected function getPath() {
 		return $this->path;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getSite() {
 		return $this->site;
@@ -138,7 +138,7 @@ class CJT_Framework_Wordpress_Feed {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function isError() {
 		return !$this->feed || $this->feed->channel->attributes()->cjt_error;

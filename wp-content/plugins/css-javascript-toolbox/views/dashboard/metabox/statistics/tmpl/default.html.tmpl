@@ -1,12 +1,12 @@
 <?php
-  
+
   $latestNew = $this->feed['news'][0];
-  
-  
+
+
   # Format pubDate: Month day Year
   $latestNew['pubDate'] = date_create($latestNew['pubDate']);
   $latestNew['pubDate'] = $latestNew['pubDate']->format('M j Y');
-  
+
   # Add th for day
   $latestNew['pubDate'] = explode(' ', $latestNew['pubDate']);
   $latestNew['pubDate'][1] = "{$latestNew['pubDate'][1]}th";
@@ -59,10 +59,10 @@
 <hr />
 <div id="cjt-statcs-metabox-info">
 	<span class="cjt-support-us-link">
-<?php echo cssJSToolbox::getText('Upgrade to') ?>: <a target="_blank" href="http://css-javascript-toolbox.com/pricing/"><?php echo cssJSToolbox::getText('CJT Core and CJT PLUS') ?></a>
+<?php echo cssJSToolbox::getText('Upgrade to') ?>: <a target="_blank" href="https://css-javascript-toolbox.com/pricing/"><?php echo cssJSToolbox::getText('CJT Core and CJT PLUS') ?></a>
     </span>
     <span class="cjt-support-us-link">
-<?php echo cssJSToolbox::getText('Learn with') ?>: <a target="_blank" href="http://css-javascript-toolbox.com/documentation/"><?php echo cssJSToolbox::getText('CJT Online Help') ?></a>    
+<?php echo cssJSToolbox::getText('Learn with') ?>: <a target="_blank" href="https://css-javascript-toolbox.com/documentation/"><?php echo cssJSToolbox::getText('CJT Online Help') ?></a>
     </span>
     <div class="cjt-stat-metabox-version">
         <span><?php echo cssJSToolbox::getText('Version') ?>:&nbsp;&nbsp;<?php echo CJTPlugin::VERSION; ?></span>

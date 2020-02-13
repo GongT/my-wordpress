@@ -1,6 +1,6 @@
 <?php
 /**
-* 
+*
 */
 
 // Disllow direct access.
@@ -8,27 +8,27 @@ defined('ABSPATH') or die('Access denied');
 
 // Import dependencies.
 cssJSToolbox::import('framework:db:mysql:xtable.inc.php');
-		
+
 /**
-* 
+*
 */
 class CJTPackageModel extends CJTHookableClass {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $params = array();
 
 	/**
 	* Delete single package.
-	* 
+	*
 	* This method is going to delete the package
 	* and all the templates and blocks associated to it,
 	* therefor it'll unlink/break-down the relationship
 	* between those templates and blocks.
-	* 
+	*
 	* @param Integer Package Id.
 	* @return CJTPackageModel Return $this.
 	*/
@@ -36,8 +36,8 @@ class CJTPackageModel extends CJTHookableClass {
 		// Initialize.
 		$modelTemplates = CJTModel::getInstance('templates-manager');
 		$dbd = cssJSToolbox::getInstance()->getDBDriver();
-		$assoObjectsQueryTmp = 'SELECT objectId 
-																								FROM #__cjtoolbox_package_objects 
+		$assoObjectsQueryTmp = 'SELECT objectId
+																								FROM #__cjtoolbox_package_objects
 																								WHERE packageId = %d AND objectType = "%s" AND relType = "%s";';
 		// Delete the package.
 		CJTxTable::getInstance('package')
@@ -65,7 +65,7 @@ class CJTPackageModel extends CJTHookableClass {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $packageName
 	*/
 	public function exists($packageName) {
@@ -79,7 +79,7 @@ class CJTPackageModel extends CJTHookableClass {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getFileContent() {
 		// Get package ID.
@@ -97,7 +97,7 @@ class CJTPackageModel extends CJTHookableClass {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $name
 	*/
 	public function getParam($name) {
@@ -106,7 +106,7 @@ class CJTPackageModel extends CJTHookableClass {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $package
 	*/
 	public function save($package) {
@@ -115,10 +115,10 @@ class CJTPackageModel extends CJTHookableClass {
 										->setData($package)
 										->save()->get('id');
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $name
 	* @param mixed $value
 	*/

@@ -1,40 +1,40 @@
 <?php
 /**
-* 
+*
 */
 
 // No direct access.
 defined('ABSPATH') or die('Access denied');
 
 /**
-* 
+*
 */
 class CJTTemplatesTemplateView extends CJTView {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $isNew;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	public $item;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $onprepareitem = array('parameters' => array('item', 'isNew'));
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $tpl
 	*/
 	public function display($tpl = null) {
@@ -62,15 +62,15 @@ class CJTTemplatesTemplateView extends CJTView {
 		$this->item = $this->onprepareitem($this->item, $this->isNew);
 		echo $this->getTemplate($tpl)	;
 	}
-	
+
 	/**
-	* Output Javascript files requirred to Add-New-Block view to run.
-	* 
+	* Output JavaScript files requirred to Add-New-Block view to run.
+	*
 	* @return void
 	*/
 	public function enququeScripts() {
 		// Use related scripts.
-		self::useScripts(__CLASS__, 
+		self::useScripts(__CLASS__,
 			'jquery',
 			'thickbox',
 			'jquery-serialize-object',
@@ -81,10 +81,10 @@ class CJTTemplatesTemplateView extends CJTView {
 			'views:templates:template:public:js:{CJT-}template'
 		);
 	}
-	
+
 	/**
 	* Output CSS files required to Add-New-Block view.
-	* 
+	*
 	* @return void
 	*/
 	public function enququeStyles() {
@@ -97,7 +97,7 @@ class CJTTemplatesTemplateView extends CJTView {
 			'views:templates:template:public:css:{CJT-}default'
 		);
 	}
-	
+
 } // End class.
 
 // Hookable!!

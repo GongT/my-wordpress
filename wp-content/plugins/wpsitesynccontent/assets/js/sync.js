@@ -1,7 +1,7 @@
 /*
- * @copyright Copyright (C) 2014-2016 SpectrOMtech.com. - All Rights Reserved.
- * @author SpectrOMtech.com <SpectrOMtech.com>
- * @url https://wpsitesync.com/license
+ * @copyright Copyright (C) 2015-2019 WPSiteSync.com. - All Rights Reserved.
+ * @author WPSiteSync.com <hello@WPSiteSync.com>
+ * @url https://wpsitesync.com/
  * The PHP code portions are distributed under the GPL license. If not otherwise stated, all images,
  * manuals, cascading style sheets, and included JavaScript *are NOT GPL*, and are released under the
  * SpectrOMtech Proprietary Use License v1.0
@@ -9,7 +9,7 @@
  */
 
 /**
- * Javascript handlers for SYNC running on the post editor page
+ * Javascript handlers for WPSiteSync running on the post editor page
  * @since 1.0
  * @author SpectrOMtech
  */
@@ -18,12 +18,15 @@ function WPSiteSyncContent()
 	this.inited = false;
 	this.$content = null;
 	this.disable = false;
+	this.set_message_selector = '#sync-message';	// default selector for displaying messages
 	this.post_id = null;
 	this.original_value = '';
 	this.nonce = jQuery('#_sync_nonce').val();
 	this.push_xhr = null;
-	this.push_callback = null;					// callback to perform push; returns true to continue processing; false to stop processing
-	this.pull_callback = null;					// callback to perform pull; returns true to continue processing; false to stop processing
+	this.api_success = false;						// set to true when API call is successful; otherwise false
+	this.push_callback = null;						// callback to perform push; returns true to continue processing; false to stop processing
+	this.pull_callback = null;						// callback to perform pull; returns true to continue processing; false to stop processing
+	this.api_callback = null;						// callback to signal end of API calls
 }
 
 
@@ -32,6 +35,7 @@ function WPSiteSyncContent()
  */
 WPSiteSyncContent.prototype.init = function()
 {
+//console.log('sync.init()');
 	if (0 === jQuery('#spectrom_sync').length)
 		return;
 
@@ -45,61 +49,14 @@ WPSiteSyncContent.prototype.init = function()
 };
 
 /**
- * Initialization for Gutenberg
+ * Check if Gutenberg is running
+ * @returns {Boolean} true when Gutenberg is detected; otherwise false
  */
-WPSiteSyncContent.prototype.init_gutenberg = function()
+WPSiteSyncContent.prototype.is_gutenberg = function()
 {
-console.log('init_gutenberg()');
-	// https://riad.blog/2017/10/16/one-thousand-and-one-way-to-extend-gutenberg-today/
-	// check to see if Gutenberg API code exists and initialize the Gutenberg Component Metabox
-	if ('undefined' !== typeof(wp.blocks) && 'undefined' !== typeof(wp.blocks.registerBlockType)) {
-//alert('init gutenberg');
-		var header = jQuery('#spectrom_sync h2').html();
-		// copies the HTML content of the metabox from "Extended Settings" within the Component menu
-		var sync_contents = jQuery('#spectrom_sync div.inside').html();
-		if ('undefined' === typeof(sync_contents))
-			return;						// nothing there, let's not muck with it
-console.log(sync_contents);
-console.log('read ' + sync_contents.length + ' bytes of popup content.')
-		// remove the old metabox
-		jQuery('#spectrom_sync').parent().parent().remove();
-
-//console.log('sync_contents: ' + sync_contents);
-		var content = '<div id="spectrom_sync" class="components-panel__body">' +
-			'<h2 class="components-panel__body-title">' +
-				'<button type="button" aria-expanded="false" class="components-button components-panel__body-toggle" onclick="wpsitesynccontent.show_component(); return false;">' +
-					header +
-					'<svg aria-hidden="true" role="img" focusable="false" class="dashicon dashicons-arrow-down" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">' +
-//						'<path d="M8 6l6 4.03L8 14V6z"></path>' +
-						'<path d="M15 8l-4.03 6L7 8h8z"></path>' +
-					'</svg>' +
-				'</button>' +
-			'</h2>' +
-			'<div class="editor-post-spectrom-sync inside invisible">' +
-				sync_contents +
-			'</div>' +
-			'</div>';
-		// TODO: move into sync-admin.css
-		var style = '<style>' +
-			'#spectrom-sync { background-color: transparent; } ' +
-			'.edit-post-sidebar #spectrom_sync .inside { padding: 0 .5rem .5rem .5rem; background-color: white !important; } ' +
-			'.edit-post-sidebar #spectrom_sync .inside.visible { display: block; }' +
-			'.edit-post-sidebar #spectrom_sync .inside.invisible { display: none; }' +
-			'.components-panel__body-toggle.components-button { background-color: white !important; } ' +
-			'</style>';
-
-		// inject the metabox at the top of the Component menu
-//		jQuery('.edit-post-sidebar .components-panel .components-panel__body:nth-child(1)').before(style + content);
-//		jQuery('.edit-post-sidebar .components-panel__header').before(style + content);
-//		jQuery('.edit-post-sidebar').before(style + content);
-console.log('looking up dom');
-		var eps = jQuery('.edit-post-sidebar');
-//console.log(eps);
-//console.log(jQuery('.edit-post-sidebar .edit-post-sidebar-header'));
-//		jQuery('.edit-post-sidebar .edit-post-sidebar-header:nth-child(1)').before(style + content);
-		jQuery('.edit-post-sidebar .edit-post-sidebar-header').before(style + content);
-		jQuery('#sync-logo').parent().css('margin-right', '70px');
-	}
+	if ('undefined' !== typeof(wp.blocks) && 'undefined' !== typeof(wp.blocks.registerBlockType))
+		return true;
+	return false;
 };
 
 /**
@@ -167,6 +124,26 @@ WPSiteSyncContent.prototype.show_details = function()
 };
 
 /**
+ * Button handler to show the Remove Association dialog
+ */
+WPSiteSyncContent.prototype.show_assoc = function()
+{
+	jQuery('#sync-remove-assoc-dialog').dialog({
+		resizable: true,
+		height: 'auto',
+		width: 700,
+		modal: true,
+		zindex: 1001,
+		dialogClass: 'wp-dialog',
+		closeOnEscape: true,
+		close: function(event, ui) {
+//			jQuery('#sync-temp').replaceWith(message_container);
+		}
+	});
+	jQuery('#spectrom_sync_remove_assoc a').blur();
+};
+
+/**
  * Sets the message area within the metabox
  * @param {string} msg The HTML contents of the message to be shown.
  * @param {boolean|null} anim If set to true, display the animation image; otherwise animation will not be shown.
@@ -198,6 +175,15 @@ WPSiteSyncContent.prototype.set_message = function(msg, anim, dismiss, css_class
 };
 
 /**
+ * Sets the jQuery selector to be used for WPSiteSync messages
+ * @param {string} sel The jQuery selector to be targeted for displaying messages
+ */
+WPSiteSyncContent.prototype.set_message_selector = function(sel)
+{
+	this.set_message_selector = sel;
+};
+
+/**
  * Adds some message content to the current success/failure message in the Sync metabox
  * @param {string} msg The message to append
  */
@@ -209,7 +195,6 @@ WPSiteSyncContent.prototype.add_message = function(msg)
 
 /**
  * Hides the message area within the metabox
- * @returns {undefined}
  */
 WPSiteSyncContent.prototype.clear_message = function()
 {
@@ -296,6 +281,7 @@ WPSiteSyncContent.prototype.api = function(op, post_id, msg, msg_success, values
 	if ('undefined' !== typeof(values)) {
         _.extend(data, values);
 	}
+	this.api_success = false;
 
 //console.log('api() performing ajax request');
 	this.push_xhr = {
@@ -304,11 +290,12 @@ WPSiteSyncContent.prototype.api = function(op, post_id, msg, msg_success, values
 		data: data,
 		url: ajaxurl,
 		success: function(response) {
-//console.log('api() success response:');
-//console.log(response);
+console.log('api() success response:');
+console.log(response);
 			wpsitesynccontent.clear_message();
 			if (response.success) {
 //				jQuery('#sync-message').text(jQuery('#sync-success-msg').text());
+				wpsitesynccontent.api_success = true;				// set callback success to true
 				wpsitesynccontent.set_message(msg_success, false, true);
 				if ('undefined' !== typeof(response.notice_codes) && response.notice_codes.length > 0) {
 					for (var idx = 0; idx < response.notice_codes.length; idx++) {
@@ -327,10 +314,14 @@ WPSiteSyncContent.prototype.api = function(op, post_id, msg, msg_success, values
 					wpsitesynccontent.set_message(jQuery('#sync-error-msg').text() + more, false, true);
 				}
 			}
+			if (null !== wpsitesynccontent.api_callback) {
+console.log('sync.api() calling api_callback()');
+				wpsitesynccontent.api_callback(post_id, true, response);
+			}
 		},
 		error: function(response) {
-//console.log('api() failure response:');
-//console.log(response);
+console.log('api() failure response:');
+console.log(response);
 			var msg = '';
 			if ('undefined' !== typeof(response.error_message)) {
 				var more = ' <a href="https://wpsitesync.com/knowledgebase/wpsitesync-error-messages/#error' + response.error_code + '" target="_blank" style="text-decoration:none"><span class="dashicons dashicons-info"></span></a>';
@@ -338,6 +329,10 @@ WPSiteSyncContent.prototype.api = function(op, post_id, msg, msg_success, values
 			} else
 				wpsitesynccontent.set_message('<span class="error">' + jQuery('#sync-runtime-err-msg').html() + '</span>', false, true)
 //			jQuery('#sync-content-anim').hide();
+			if (null !== wpsitesynccontent.api_callback) {
+console.log('sync.api() calling api_callback()');
+				wpsitesynccontent.api_callback(post_id, false, response);
+			}
 		}
 	};
 
@@ -355,10 +350,32 @@ WPSiteSyncContent.prototype.api = function(op, post_id, msg, msg_success, values
 WPSiteSyncContent.prototype.push = function(post_id)
 {
 	// TODO: refactor to use api() method
-//console.log('push()');
+console.log('push()');
 	// Do nothing when in a disabled state
 	if (this.disable || !this.inited)
 		return;
+
+	// check for Gutenberg and non-published/dirty- don't allow push
+	if (this.is_gutenberg()) {
+		// isCurrentPostPublished()
+		var status = wp.data.select('core/editor').getEditedPostAttribute('status');
+		var dirty = wp.data.select('core/editor').isEditedPostDirty();
+//console.log('sync: status=' + status + ' dirty=' + dirty);
+		if (('publish' !== status && 'private' !== status) || dirty) { // allow private status #240
+			this.set_message(jQuery('#sync-msg-update-changes').html(), false, true);
+			return;
+		}
+		// TODO: set up subscriber to get dirty state. when it changes, clear message
+
+//		var mod = wp.data.select('core/editor').getEditedPostAttribute('modified');
+//alert('modified=' + mod);
+		// getCurrentPostId()
+		var id = wp.data.select('core/editor').getEditedPostAttribute('id');
+//alert('id=' + id + ' post_id=' + post_id);
+		this.clear_message();
+//	} else {
+//console.log('not a gutenberg page');
+	}
 
 	// check for a callback function - used to alter the behavior of the Push operation
 	if (null !== this.push_callback) {
@@ -373,15 +390,15 @@ WPSiteSyncContent.prototype.push = function(post_id)
 	this.post_id = post_id;
 	var data = { action: 'spectrom_sync', operation: 'push', post_id: post_id, _sync_nonce: jQuery('#_sync_nonce').val() };
 
-//console.log('push() calling AJAX');
+console.log('push() calling AJAX');
 	var push_xhr = {
 		type: 'post',
 		async: true, // false,
 		data: data,
 		url: ajaxurl,
 		success: function(response) {
-//console.log('push() success response:');
-//console.log(response);
+console.log('push() success response:');
+console.log(response);
 			wpsitesynccontent.clear_message();
 			if (response.success) {
 //console.log('push() response.success');
@@ -402,16 +419,24 @@ WPSiteSyncContent.prototype.push = function(post_id)
 					wpsitesynccontent.set_message(jQuery('#sync-error-msg').text() + more, false, true);
 				}
 			}
+			if (null !== wpsitesynccontent.api_callback) {
+console.log('sync.push() calling api_callback()');
+				wpsitesynccontent.api_callback(post_id, true, response);
+			}
 		},
 		error: function(response) {
-//console.log('push() failure response:');
-//console.log(response);
+console.log('push() failure response:');
+console.log(response);
 			var msg = '';
 			if ('undefined' !== typeof(response.error_message))
 				wpsitesynccontent.set_message('<span class="error">' + response.error_message + '</span>', false, true);
 			else
 				wpsitesynccontent.set_message('<span class="error">' + jQuery('#sync-runtime-err-msg').html() + '</span>', false, true)
 //			jQuery('#sync-content-anim').hide();
+			if (null !== wpsitesynccontent.api_callback) {
+console.log('sync.push() calling api_callback()');
+				wpsitesynccontent.api_callback(post_id, false, response);
+			}
 		}
 	};
 
@@ -440,6 +465,12 @@ WPSiteSyncContent.prototype.set_pull_callback = function(fn)
 	this.pull_callback = fn;
 };
 
+WPSiteSyncContent.prototype.set_api_callback = function(fn)
+{
+console.log('.set_apicallback()');
+	this.api_callback = fn;
+};
+
 /**
  * Display message about WPSiteSync Pull feature
  */
@@ -455,7 +486,7 @@ var wpsitesynccontent = new WPSiteSyncContent();
 jQuery(document).ready(function() {
 	wpsitesynccontent.init();
 	// setting timer avoids issues with Gutenberg UI taking a while to get set up
-	setTimeout(function() { wpsitesynccontent.init_gutenberg(); }, 200);
+//	setTimeout(function() { wpsitesynccontent.init_gutenberg(); }, 200);
 	jQuery(document).trigger('sync_init');
 });
 

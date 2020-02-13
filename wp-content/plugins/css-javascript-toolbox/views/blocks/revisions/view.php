@@ -12,24 +12,24 @@ defined('ABSPATH') or die("Access denied");
 * Blocks view.
 */
 class CJTBlocksRevisionsView extends CJTView {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	public $blockId = null;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	public $revisions = array();
-	
+
 	/**
-	* Output Javascript files requirred to Add-New-Block view to run.
-	* 
+	* Output JavaScript files requirred to Add-New-Block view to run.
+	*
 	* @return void
 	*/
 	public function enququeScripts() {
@@ -39,10 +39,10 @@ class CJTBlocksRevisionsView extends CJTView {
 			'views:blocks:revisions:public:js:{CJT-}revisions'
 		);
 	}
-	
+
 	/**
 	* Output CSS files required to Add-New-Block view.
-	* 
+	*
 	* @return void
 	*/
 	public function enququeStyles() {
@@ -51,16 +51,16 @@ class CJTBlocksRevisionsView extends CJTView {
 			'framework:css:forms'
 		);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function display() {
 		// Display view.
 		echo $this->getTemplate('default');
 	}
-	
+
 } // End class.
 
 // Hookable!!

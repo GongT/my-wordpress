@@ -1,29 +1,29 @@
 <?php
 /**
-* 
+*
 */
 
 // Disallow direct access.
 defined('ABSPATH') or die("Access denied");
 
 /**
-* 
+*
 */
 class CJTExtensionsAccessPoint extends CJTAccessPoint {
-	
+
 	/**
-	* 
+	*
 	*/
 	const MENU_POSITION_INDEX = 2;
-	
+
 	/**
-	* 
+	*
 	*/
 	const PLUGINS_PAGE_SEARCH_TERM = 'css-javascript-toolbox';
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function __construct() {
 		// Initialize Access Point base!
@@ -34,7 +34,7 @@ class CJTExtensionsAccessPoint extends CJTAccessPoint {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	protected function doListen() {
 		// Only if permitted!
@@ -43,23 +43,49 @@ class CJTExtensionsAccessPoint extends CJTAccessPoint {
 			add_action('admin_menu', array(&$this, 'menu'), 13);
 		}
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function menu() {
 		// Extensions page.
-		add_submenu_page(CJTPlugin::PLUGIN_REQUEST_ID, null, cssJSToolbox::getText('Extensions'), 'administrator', null);
+		// add_submenu_page(CJTPlugin::PLUGIN_REQUEST_ID, null, cssJSToolbox::getText('Extensions'), 'administrator', null);
 		// Hack Extensions menu item to point to Plugins page!
-		$GLOBALS['submenu'][CJTPlugin::PLUGIN_REQUEST_ID][self::MENU_POSITION_INDEX][2] = admin_url('plugins.php?s=' . self::PLUGINS_PAGE_SEARCH_TERM);
+		// $GLOBALS['submenu'][CJTPlugin::PLUGIN_REQUEST_ID][self::MENU_POSITION_INDEX][2] = admin_url('plugins.php?s=' . self::PLUGINS_PAGE_SEARCH_TERM);
 		// When plugins page loaded!
+
+		/**
+		 * Need this to fix the menu issue with CJT PLUS 8.4 or lower.
+		 *
+		 */
+		if ( class_exists( 'CJTPlus' ) ) :
+			$reflector = new \ReflectionClass( 'CJTPlus' );
+			$CJTPlusVersion = get_plugin_data( str_replace( 'plus.class', 'plus', $reflector->getFileName() ) )['Version'];
+
+			if ( version_compare( $CJTPlusVersion, '8.4', '<=' ) ) {
+				global $menu, $submenu;
+
+				# Find CJT Menu and Sub Menu, ADD PLUS to the title
+				foreach( $menu as & $menuItem )
+				{
+
+					if ( $menuItem[ 2 ] == 'cjtoolbox' )
+					{
+						$submenu[ 'cjtoolbox' ][ 0 ] [ 0 ] = $menuItem[ 0 ];
+						$submenu[ 'cjtoolbox' ][ 0 ] [ 1 ] = 'administrator';
+						$submenu[ 'cjtoolbox' ][ 0 ] [ 2 ] = 'cjtoolbox';
+					}
+				}
+			}
+		endif;
+
 		add_action('load-plugins.php', array($this, 'route'), 10, 0);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function route($loadView = null, $request = array('view' => 'extensions/plugins-list')) {
 		// Set as connected object!
@@ -71,7 +97,7 @@ class CJTExtensionsAccessPoint extends CJTAccessPoint {
 		// Dispatch the call!
 		->_doAction();
 	}
-	
+
 } // End class.
 
 // Hookable!

@@ -1,40 +1,40 @@
 <?php
 /**
-* 
+*
 */
 
 // Disallow direct access.
 defined('ABSPATH') or die("Access denied");
 
 /**
-* 
+*
 */
 class CJTExtensionsPluginsListView extends CJTView {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $extensions;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $listTypeName;
 
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $securityToken;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $info
 	* @return CJTInstallerNoticeView
 	*/
@@ -45,14 +45,14 @@ class CJTExtensionsPluginsListView extends CJTView {
 		add_action('admin_print_styles', array(__CLASS__, 'enqueueStyles'));
 		add_action('admin_print_scripts', array(__CLASS__, 'enqueueScripts'));
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $parent
 	*/
 	public function activateExtensionsMenuItem($parent) {
-		// Hack Wordpress menu to select CSS & Javascript root menu item
+		// Hack Wordpress menu to select CSS & JavaScript root menu item
 		// and the Extensions child menu item!
 		// We just hack get_admin_page_parent() function!
 		$GLOBALS['typenow'] = CJTPlugin::PLUGIN_REQUEST_ID;
@@ -61,10 +61,10 @@ class CJTExtensionsPluginsListView extends CJTView {
 		// We use this filter as (ACTION) not change in the return value!
 		return $parent;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $links
 	*/
 	public function addExtensionActions($links, $file) {
@@ -89,12 +89,12 @@ class CJTExtensionsPluginsListView extends CJTView {
 				$links['license-key'] = $this->getTemplate('default_setup_action', array('component' => $component));
 			}
 		}
-		return $links;	
+		return $links;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $tpl
 	*/
 	public function display($tpl = null) {
@@ -114,10 +114,10 @@ class CJTExtensionsPluginsListView extends CJTView {
 		add_filter('plugin_action_links', array(&$this, 'addExtensionActions'), 10 , 2);
 
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public static function enqueueScripts() {
 		$listTypeName = CJTModel::getInstance('extensions')->getListTypeName();
@@ -131,10 +131,10 @@ class CJTExtensionsPluginsListView extends CJTView {
 			"views:extensions:plugins-list:public:js:{CJTExtensionsPluginsListView-}{$listTypeName}"
 		);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public static function enqueueStyles() {
 		$listTypeName = CJTModel::getInstance('extensions')->getListTypeName();
@@ -144,10 +144,10 @@ class CJTExtensionsPluginsListView extends CJTView {
 			"views:extensions:plugins-list:public:css:{CJTExtensionsPluginsListView-}{$listTypeName}"
 		);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function outputCommonMarkups() {
 		echo $this->getTemplate('default');

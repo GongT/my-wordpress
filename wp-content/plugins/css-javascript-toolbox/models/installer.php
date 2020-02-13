@@ -1,56 +1,56 @@
 <?php
 /**
-* 
+*
 */
 
 // Disallow direct access.
 defined('ABSPATH') or die("Access denied");
 
 /**
-* 
+*
 */
 class CJTInstallerModel {
-	
+
 	/**
-	* 
+	*
 	*/
 	const OPERATION_STATE_INSTALLED = 'installed';
-	
+
 	/**
-	* 
+	*
 	*/
 	const INSTALLATION_STATE = 'state.CJTInstallerModel.operations';
-	
+
 	/**
-	* 
+	*
 	*/
 	const NOTICED_DISMISSED_OPTION_NAME = 'settings.CJTInstallerModel.noticeDismissed';
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $input;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $installedDbVersion;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function __construct() {
 		$this->installedDbVersion = get_option(CJTPlugin::DB_VERSION_OPTION_NAME);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $dismiss
 	*/
 	public function dismissNotice($dismiss = null) {
@@ -62,18 +62,18 @@ class CJTInstallerModel {
 		}
 		return $currentValue;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getInstalledDbVersion() {
 		return $this->installedDbVersion;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getInternalVersionName() {
 		return str_replace(array('.', '-'), '', $this->installedDbVersion);
@@ -81,7 +81,7 @@ class CJTInstallerModel {
 
 	/**
 	* Get installer operations for current CJT version!
-	* 
+	*
 	* @return array Operations list metadata.
 	*/
 	public function getOperations() {
@@ -104,16 +104,16 @@ class CJTInstallerModel {
 				}
 				// Import upgrader + reflect its operations!
 				cssJSToolbox::import($upgrader['file']);
-				$operations[CJTPlugin::DB_VERSION]['operations']['upgrade'] = CJTInstallerReflection::getInstance($upgrader['class'], 'CJTUpgradeNonTabledVersions')->getOperations();				
+				$operations[CJTPlugin::DB_VERSION]['operations']['upgrade'] = CJTInstallerReflection::getInstance($upgrader['class'], 'CJTUpgradeNonTabledVersions')->getOperations();
 			}
-			update_option(self::INSTALLATION_STATE, $operations);				
+			update_option(self::INSTALLATION_STATE, $operations);
 		}
 		return $operations[CJTPlugin::DB_VERSION];
 	}
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getUpgrader() {
 		// Upgrader file.
@@ -122,12 +122,12 @@ class CJTInstallerModel {
 		$upgrader['class'] = "CJTV{$this->getInternalVersionName()}Upgrade";
 		return $upgrader;
 	}
-	
+
 	/**
 	* Allow executing of a single installation operation!
-	* Both Install and Upgrade operations can be executed throught here
-	* 
-	* 
+	* Both Install and Upgrade operations can be executed through here
+	*
+	*
 	* @return void
 	*/
 	public function install() {
@@ -171,10 +171,10 @@ class CJTInstallerModel {
 		}
 		return $result;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function isCommonRelease() {
 		// Check weather the current installed version is in the same
@@ -195,22 +195,22 @@ class CJTInstallerModel {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function isUpgrade() {
 		// If the version is not the same and not equal to current version then its upgrading!
 		$isUpgrade = (($this->installedDbVersion != CJTPlugin::DB_VERSION) && ($this->installedDbVersion != ''));
 		return $isUpgrade;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $input
 	*/
 	public function setInput(& $input) {
 		$this->input = $input;
 		return $this; // Chaining!
 	}
-	
+
 } // End class.

@@ -6,7 +6,6 @@ class SyncModel
 
 	private $_sync_table = NULL;
 	private static $_taxonomies = array();
-	private $_edit_user_id = FALSE;
 
 	public function __construct()
 	{
@@ -109,12 +108,17 @@ SyncDebug::log(__METHOD__.'() sql=' . $sql);
 	 * Gets sync data based on site_key and the post ID from the Source site
 	 * @param int $source_id The post ID coming from the Source site
 	 * @param string $site_key The site_key associated with the sync operation
-	 * @param string $type The content type being searched, defaults to 'post'
+	 * @param string $type The content type being searched, defaults to 'post'. This is not a 'post_type' but
+	 *  which database the Content identified by $source_id is found in. One of 'post', 'term' or 'user'.
 	 * @param boolean $assoc TRUE to associate Target ID to the wp_post table; otherwise FALSE
 	 * @return mixed Returns NULL if no result is found, else an object
 	 */
 	public function get_sync_data($source_id, $site_key = NULL, $type = 'post', $assoc = FALSE)
 	{
+		if (defined('WP_DEBUG') && WP_DEBUG) {
+			if (!in_array($type, array('comment', 'post', 'term', 'user')))
+				throw new Exception('The $type passed to get_sync_data() is invalid');
+		}
 		global $wpdb;
 
 		if (NULL === $site_key)
@@ -143,14 +147,21 @@ SyncDebug::log(__METHOD__.'() sql: ' . $sql);
 	/**
 	 * Gets sync data based on site_key and the post ID from the Target site
 	 * @param int $target_id The post ID coming from the Target
-	 * @param int $target_site_key The site_key associated with the sync operation
+	 * @param string $target_site_key The site_key associated with the sync operation
 	 * @param string $type The content type being searched, defaults to 'post'
 	 * @return mixed Returns NULL if no result is found, else an object matching the Target post ID and Site Key
 	 */
 	public function get_sync_target_data($target_id, $target_site_key = NULL, $type = 'post')
 	{
-		if (NULL === $site_key)
-			$site_key = SyncOptions::get('site_key');
+		if (defined('WP_DEBUG') && WP_DEBUG) {
+			if (!in_array($type, array('comment', 'post', 'term', 'user')))
+				throw new Exception('The $type passed to get_sync_data() is invalid');
+		}
+
+		if (NULL === $target_site_key) {
+SyncDebug::log(__METHOD__.'():' . __LINE__ . ' replacing site key');
+			$target_site_key = SyncOptions::get('site_key');
+		}
 
 		$where = '';
 		if (NULL !== $type) {
@@ -163,9 +174,10 @@ SyncDebug::log(__METHOD__.'() sql: ' . $sql);
 					FROM `{$this->_sync_table}`
 					WHERE `target_content_id`=%d AND `target_site_key`=%s {$where}
 					LIMIT 1";
-$sql = $wpdb->prepare($query, $target_id, $target_site_key);
-SyncDebug::log(__METHOD__.'() sql: ' . $sql);
-		return $wpdb->get_row($sql);
+		$sql = $wpdb->prepare($query, $target_id, $target_site_key);
+		$res = $wpdb->get_row($sql);
+SyncDebug::log(__METHOD__.'() sql: ' . $sql . ' res=' . var_export($res, TRUE));
+		return $res;
 	}
 
 	/**
@@ -177,6 +189,11 @@ SyncDebug::log(__METHOD__.'() sql: ' . $sql);
 	 */
 	public function get_sync_target_post($source_post_id, $target_site_key, $type = 'post')
 	{
+		if (defined('WP_DEBUG') && WP_DEBUG) {
+			if (!in_array($type, array('comment', 'post', 'term', 'user')))
+				throw new Exception('The $type passed to get_sync_data() is invalid');
+		}
+
 		$where = '';
 		if (NULL !== $type) {
 			$type = sanitize_key($type);
@@ -190,6 +207,31 @@ SyncDebug::log(__METHOD__.'() sql: ' . $sql);
 		$sql = $wpdb->prepare($query, $source_post_id, $target_site_key);
 		$ret = $wpdb->get_row($sql);
 SyncDebug::log(__METHOD__.'() sql=' . $sql . ' returned ' . var_export($ret, TRUE));
+		return $ret;
+	}
+
+	/**
+	 * Find a Source site entry given the Target's Post ID and the Source's Site Key
+	 * @param int $target_post_id The post ID of the Target's entry
+	 * @param string $source_site_key The Site Key for the Source site
+	 * @param string $type The entry type to look up; defaults to 'post' for wp_post entries
+	 * @return object representing the found Sync data record or NULL if not found
+	 */
+	public function get_source_from_target($target_post_id, $source_site_key, $type = 'post')
+	{
+		$where = '';
+		if (NULL !== $type) {
+			$type = sanitize_key($type);
+			$where = " AND `content_type`='{$type}' ";
+		}
+		global $wpdb;
+		$query = "SELECT *
+					FROM `{$this->_sync_table}`
+					WHERE `target_content_id`=%d AND `site_key`=%s {$where}
+					LIMIT 1 ";
+		$sql = $wpdb->prepare($query, $target_post_id, $source_site_key);
+		$ret = $wpdb->get_row($sql);
+SyncDebug::log(__METHOD__.'():' . __LINE__ . ' sql=' . $sql . ' returned ' . var_export($ret, TRUE));
 		return $ret;
 	}
 
@@ -310,15 +352,14 @@ SyncDebug::log(__METHOD__.'() post id=' . $post_id);
 	 */
 	public function _build_tax_data($post_id, $post_type)
 	{
-SyncDebug::log(__METHOD__.'() post id #' . $post_id . ' post_type=' . $post_type);
+SyncDebug::log(__METHOD__.'():' . __LINE__ . ' post id #' . $post_id . ' post_type=' . $post_type);
 		// https://codex.wordpress.org/Function_Reference/get_taxonomies
-		$args = array();
 		$taxonomies = $this->get_all_taxonomies(); // get_taxonomies($args, 'objects');
-//SyncDebug::log(__METHOD__.'() post tax: ' . var_export($taxonomies, TRUE));
+//SyncDebug::log(__METHOD__.'():' . __LINE__ . ' post tax: ' . var_export($taxonomies, TRUE));
 
 		// get a list of all taxonomy terms associated with the post type
 		$tax_names = $this->get_all_tax_names($post_type);
-SyncDebug::log(__METHOD__.'() names: ' . var_export($tax_names, TRUE));
+//SyncDebug::log(__METHOD__.'():' . __LINE__ . ' names: ' . var_export($tax_names, TRUE));
 
 		// set up the scaffolding for the returned data object
 		$tax_data = array(
@@ -331,7 +372,7 @@ SyncDebug::log(__METHOD__.'() names: ' . var_export($tax_names, TRUE));
 		$post_terms = wp_get_post_terms($post_id, $tax_names);
 		if (is_wp_error($post_terms))
 			$post_terms = array();
-SyncDebug::log(__METHOD__.'() post terms: ' . var_export($post_terms, TRUE));
+//SyncDebug::log(__METHOD__.'():' . __LINE__ . ' post terms: ' . var_export($post_terms, TRUE));
 		// add the term information to the data object being returned
 		foreach ($post_terms as $term_data) {
 			$tax_name = $term_data->taxonomy;
@@ -352,7 +393,6 @@ SyncDebug::log(__METHOD__.'() post terms: ' . var_export($post_terms, TRUE));
 		}
 
 //SyncDebug::log(__METHOD__.'() returning taxonomy information: ' . var_export($tax_data, TRUE));
-
 		return $tax_data;
 	}
 
@@ -405,6 +445,7 @@ SyncDebug::log(__METHOD__.'() post terms: ' . var_export($post_terms, TRUE));
 	 * @param int $post_id The post ID to be checked
 	 * @return boolean TRUE if currently being edited; otherwise FALSE
 	 */
+	// TODO: deprecated: use SyncPostModel->is_post_locked()
 	public function is_post_locked($post_id)
 	{
 		if (!function_exists('wp_check_post_lock'))

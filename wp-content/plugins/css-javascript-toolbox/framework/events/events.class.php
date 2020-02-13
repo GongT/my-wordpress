@@ -1,86 +1,86 @@
 <?php
 /**
-* 
+*
 */
 
 /**
-* 
+*
 */
 abstract class CJTEvents {
- 
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected static $classes = array();
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	public static $defaultOptions = array('prefix' => 'on');
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	public static $definition;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $freeStatic;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected static $live;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	private $options = array();
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	public static $paths = array();
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $subjects;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	private $target;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	private $targetClass;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $target
 	* @param mixed $options
 	* @return CJTEvents
@@ -94,13 +94,13 @@ abstract class CJTEvents {
 		// Define class events if not defined yet!
 		$this->define();
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $options
 	*/
-	public static function __init($options = array()) {
+	public static function _init($options = array()) {
 		if (!self::$definition) {
 			self::$defaultOptions += $options;
 			// Definition object!
@@ -113,7 +113,7 @@ abstract class CJTEvents {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $typeName
 	* @param mixed $observer
 	* @param mixed $typePrefixed
@@ -128,7 +128,7 @@ abstract class CJTEvents {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $type
 	*/
 	public function createSubject($event) {
@@ -151,7 +151,7 @@ abstract class CJTEvents {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	protected function define() {
 		$className = $this->targetClass;
@@ -166,7 +166,7 @@ abstract class CJTEvents {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	* @deprecated
 	*/
 	private function findEvents() {
@@ -185,19 +185,19 @@ abstract class CJTEvents {
 			}
 		}
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $class
 	*/
 	public function getDefinition() {
 		return self::$definition->get($this->targetClass);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $type
 	*/
 	public function getSubject($type) {
@@ -220,13 +220,13 @@ abstract class CJTEvents {
 			foreach ($lives as $live) {
 				$subject[] = $live['observer'];
 			}
-		}		
+		}
 		return $this->subjects[$type->name];
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $type
 	* @return CJTWordpressEvents
 	*/
@@ -237,28 +237,28 @@ abstract class CJTEvents {
 	 }
 	 return self::$classes[$type->class];
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function isFreeStatic() {
-		return $this->freeStatic;	
+		return $this->freeStatic;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $typeName
 	* @param mixed $observer
 	*/
 	public function off($typeName, $observer) {
-		
+
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $typeName
 	* @param mixed $observer
 	*/
@@ -269,10 +269,10 @@ abstract class CJTEvents {
 		$on['observer'] = $observer;
 		self::$live[$type->class][$type->name][] = $on;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $type
 	*/
 	public static function parseEventType($type, $typePrefixed = true) {
@@ -300,33 +300,33 @@ abstract class CJTEvents {
 		}
 		return ((object) $type);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $type
 	*/
 	protected function prepareEventTypeOptions($event) {
-		return $event;	
+		return $event;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $type
 	* @param mixed $params
 	* @param mixed $typePrefixed
 	*/
 	public abstract function trigger($type, $params = array(), $typePrefixed = true);
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $type
 	* @param mixed $observer
 	*/
   public function unbind($type, $observer, $typePrefixed = true) {
-		
+
   }
-  
+
 } // End class.

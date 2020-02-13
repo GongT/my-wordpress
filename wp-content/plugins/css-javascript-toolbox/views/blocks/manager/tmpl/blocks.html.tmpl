@@ -1,6 +1,6 @@
 <?php
 /**
-* 
+*
 */
 
 // Diallow direct access.
@@ -13,17 +13,53 @@ defined('ABSPATH') or die("Access denied");
 ?>
 <?php require CJTOOLBOX_VIEWS_PATH . '/blocks/block/tmpl/codefile/codefile.html.tmpl' ?>
     <div id="custom-icon" class="icon32 blocks-icon32"></div>
-    <h2 class="cjt-main-title logo"><?php echo htmlentities( cssJSToolbox::getText('CSS & Javascript Toolbox') ) ?><?php echo apply_filters( 'cjt_after_main_title', '' ) ?></h2>
-    
+
+	<h2 class="cjt-main-title logo"><?php echo htmlentities( cssJSToolbox::getText('CSS & JavaScript Toolbox') ) ?><?php echo apply_filters( 'cjt_after_main_title', '' ) ?>
+	<?php
+		$CJTVersion = get_plugin_data( CJTOOLBOX_PLUGIN_FILE )['Version'];
+		$versionText = 'CJT Version: ' . $CJTVersion;
+
+		if ( class_exists( 'CJTPlusPluginInterface' ) ) :
+			$reflector = new \ReflectionClass( 'CJTPlus' );
+			$CJTPlusVersion = get_plugin_data( str_replace( 'plus.class', 'plus', $reflector->getFileName() ) )['Version'];
+			$versionText .= ' / CJT PLUS Version: ' . $CJTPlusVersion;
+		endif; ?>
+
+		<span class="cjt-ver"><?php echo $versionText; ?></span>
+	</h2>
+
+	<?php if ( class_exists( 'CJTPlusPluginInterface' ) && version_compare( $CJTPlusVersion, $CJTVersion, '<' ) ) : ?>
+		<div id="cjt-banner-bar-center">
+			<p style="font-size:16px;font-weight:600"><strong>WARNING:</strong> CJT PLUS is out of date!</p>
+			<p class="license-key-alt">We have made a number of security and bug fixes, and stability improvements.<br>
+			Please <a href="#">add your license</a> and update CJT PLUS or <a href="https://<?php echo cssJSToolbox::CJT_WEB_SITE_DOMAIN ?>/pricing/" target="_blank">Click for CJT PLUS license renewal</a>.</p>
+		</div>
+		<script>
+			jQuery('.license-key-alt a').click(jQuery.proxy(function() {
+				var _req = {
+					view: 'setup/activation-form',
+					component: {
+						pluginBase: "css-javascript-toolbox-plus/css-javascript-toolbox-plus.php",
+						title: "CJT PLUS"
+					},
+					TB_iframe: true,
+					height: 380
+				}
+				var _url = CJTServer.getRequestURL('setup', 'activationFormView', _req);
+
+				tb_show('CJT Extension License Activation Form', _url)
+			}, this))
+		</script>
+	<?php elseif ( ! class_exists( 'CJTPlusPluginInterface' ) ) : ?>
+		<div id="cjt-banner-bar-center">
+			<p style="font-size:16px;font-weight:600"><strong>CJT PLUS</strong> - 50% off for a limited time!</p>
+			<p>1000's of CJT PLUS customers enjoy the features and benefits of the most powerful<br> scripts, styles and code management plugin for WordPress. <a href="https://<?php echo cssJSToolbox::CJT_WEB_SITE_DOMAIN ?>/pricing/" target="_blank">Click for CJT PLUS</a>.</p>
+		</div>
+	<?php endif; ?>
+
     <div id="cjt-banner-bar-right">
-        <?php if (!class_exists('CJTPlusPluginInterface')): ?>
         <span class="cjt-banner-link">
-            <span><?php echo cssJSToolbox::getText('Upgrade') ?></span>: <a target="_blank" href="http://<?php echo cssJSToolbox::CJT_WEB_SITE_DOMAIN ?>/pricing/"><?php echo cssJSToolbox::getText('CJT PLUS') ?></a>
-        </span>
-        &nbsp;|&nbsp;
-        <?php endif; ?>
-        <span class="cjt-banner-link">
-            <span><?php echo cssJSToolbox::getText('Learn') ?></span>: <a target="_blank" href="http://<?php echo cssJSToolbox::CJT_WEB_SITE_DOMAIN ?>/documentation"><?php echo cssJSToolbox::getText('Online Help') ?></a>
+            <span><?php echo cssJSToolbox::getText('Learn') ?></span>: <a target="_blank" href="https://<?php echo cssJSToolbox::CJT_WEB_SITE_DOMAIN ?>/documentation"><?php echo cssJSToolbox::getText('Online Help') ?></a>
         </span>
     </div>
     <div id="cjtoolbox-blocks-page-form" method="post">

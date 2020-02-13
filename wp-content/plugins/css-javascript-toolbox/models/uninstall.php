@@ -1,38 +1,38 @@
 <?php
 /**
-* 
+*
 */
 
 // Disallow direct access.
 defined('ABSPATH') or die("Access denied");
 
 /**
-* Provide uninstall functnios
+* Provide uninstall functions
 * required for cleaning up the installation
 * process!
-* 
+*
 * @author CJT-Team
 */
 class CJTUninstallModel {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function database() {
 		// Import dependencies.
 		cssJsToolbox::import('framework:installer:dbfile.class.php');
 		// Load Uninstallation SQL Statements!
-		CJTDBFileInstaller::getInstance(cssJsToolbox::resolvePath('models:uninstall:db:mysql:uninstall.sql'))
+		CJTDBFileInstaller::getInstance(cssJsToolbox::resolvePath('models:uninstall:db:mysql:uninstall.sql.php'))
 		// Execute All,
 		->exec();
 		// Chaining!
 		return $this;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function expressUninstall() {
 		// Clean up database
@@ -42,10 +42,10 @@ class CJTUninstallModel {
 		// Chaining!
 		return $this;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function fileSystem() {
 		global $wp_filesystem;
@@ -64,5 +64,5 @@ class CJTUninstallModel {
 		// Chaining!
 		return $this;
 	}
-	
+
 } // End class.

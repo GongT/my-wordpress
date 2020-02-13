@@ -148,6 +148,7 @@ SyncDebug::log(__METHOD__.'() ' . var_export($json_data, TRUE));
 	 */
 	public function error_code($code, $data = NULL)
 	{
+SyncDebug::log(__METHOD__.'():' . __LINE__ . ' setting error code: ' . $code);
 		// only allow one error code
 		if (0 === $this->error_code) {
 			$this->error_code = abs($code);
@@ -177,12 +178,42 @@ SyncDebug::log(__METHOD__.'() ' . var_export($json_data, TRUE));
 	}
 
 	/**
+	 * Converts error code into error message
+	 * @param int $error_code Error code to convert. If not provided, will use the local property value.
+	 * @param multi $data Optional error data used as part of the error message. If not provided, will use local property value.
+	 * @return string Error code converted to language-translated message string.
+	 */
+	public function get_error_message($error_code = NULL, $data = NULL)
+	{
+		if (NULL === $error_code)
+			$error_code = $this->error_code;
+		if (NULL === $data)
+			$data = $this->error_data;
+		$msg = SyncApiRequest::error_code_to_string($error_code, $data);
+		return $msg;
+	}
+
+	/**
 	 * Sets a notice-level code to be returned to the user
 	 * @param int $code One of `SyncApiRequest::NOTICE_*` values
 	 */
 	public function notice_code($code)
 	{
 		$this->notice_codes[] = $code;
+	}
+
+	/**
+	 * Converts notice code into notice message
+	 * @param int $notice_code Notice code to convert. If not provided, will use the local property value.
+	 * @param multi $data Optional notice data used as part of the notice message. If not provided, will assume NULL.
+	 * @return string Notice code converted to language-translated message string.
+	 */
+	public function get_notice_message($notice_code = NULL, $data = NULL)
+	{
+		if (NULL === $notice_code && count($this->notice_code) > 0)
+			$notice_code = $this->notice_codes[0];
+		$msg = SyncApiRequest::notice_code_to_string($notice_code, $data);
+		return $msg;
 	}
 
 	/**
@@ -216,7 +247,7 @@ SyncDebug::log(__METHOD__.'() ' . var_export($json_data, TRUE));
 
 		if ($this->has_errors()) {
 			$this->success = 0;					// force this
-			$this->set('message', SyncApiRequest::error_code_to_string($this->error_code));
+			$this->set('message', SyncApiRequest::error_code_to_string($this->error_code, $this->error_data));
 		}
 
 		$output = $this->__toString();			// construct data to send to browser
@@ -258,7 +289,9 @@ SyncDebug::log(__METHOD__.'() ' . var_export($json_data, TRUE));
 	public function __toString()
 	{
 		$aOutput = array('error_code' => $this->error_code);
-		if (0 !== $this->error_code) {
+		if (isset($this->data['message'])) {
+			$aOutput['error_message'] = $this->data['message'];
+		} else if (0 !== $this->error_code) {
 			$msg = SyncApiRequest::error_code_to_string($this->error_code);
 			if (NULL === $msg)
 				$msg = sprintf(__('Unrecognized error: %d', 'wpsitesynccontent'),

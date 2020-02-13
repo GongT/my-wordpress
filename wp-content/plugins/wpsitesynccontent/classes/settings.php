@@ -53,6 +53,9 @@ class SyncSettings extends SyncInput
 	 */
 	public function add_configuration_page()
 	{
+		if (!SyncOptions::has_cap())
+			return;
+
 //SyncDebug::log(__METHOD__.'() tab=' . $this->_tab);
 		$slug = add_submenu_page(
 			'options-general.php',
@@ -110,6 +113,8 @@ class SyncSettings extends SyncInput
 		$tabs = apply_filters('spectrom_sync_settings_tabs', $tabs);
 
 		echo '<div class="wrap spectrom-sync-settings">';
+		echo '<p class="cta-message">', SyncAdminDashboard::get_random_message(FALSE), '</p>';
+
 		echo '<h1 class="nav-tab-wrapper">';
 		echo '<img src="', esc_url(plugin_dir_url(dirname(__FILE__)) . 'assets/imgs/wpsitesync-logo-blue.png') . '" class="sync-settings-logo" width="97" height="35" />';
 		foreach ($tabs as $tab_name => $tab_info) {
@@ -157,7 +162,8 @@ class SyncSettings extends SyncInput
 		if ('extensions' !== $this->_tab)
 			submit_button();
 		echo '</form>';
-		echo '<p>', __('WPSiteSync for Content Site key: ', 'wpsitesynccontent'), '<b>', SyncOptions::get('site_key'), '</b></p>';
+		echo '<p>', sprintf(__('WPSiteSync for Content Site key: %1$s', 'wpsitesynccontent'),
+			SyncOptions::get('site_key')), '<b>', '</b></p>';
 		echo '</div><!-- #tab_container -->';
 	}
 
@@ -171,6 +177,10 @@ class SyncSettings extends SyncInput
 //SyncDebug::log(__METHOD__.'():' . __LINE__ . ' screen=' . var_export($screen, TRUE));
 //		if (NULL !== $screen && 'settings_page_sync' !== $screen->id)
 //			return;
+
+		// check that current user is capable of performing operation
+		if (!current_user_can('manage_options') || !SyncOptions::has_cap())
+			return;
 
 		$this->_tab = $this->get('tab', 'general');
 //SyncDebug::log(__METHOD__.'() tab=' . $this->_tab);
@@ -205,24 +215,6 @@ class SyncSettings extends SyncInput
 //SyncDebug::log(__METHOD__.'() tab=' . $this->_tab);
 		$data = $option_values = SyncOptions::get_all(); // $this->_options;
 
-/*		$default_values = apply_filters('spectrom_sync_default_settings',
-			// TODO: get this list from the SyncOptions class
-			array(
-				'host' => '',
-				'username' => '',
-				'password' => '',
-				'auth' => 0,
-				'strict' => '1',
-				'salt' => '',
-				'min_role' => '',
-				'remove' => '0',
-				'match_mode' => 'title',
-			)
-		);
-
-		// Parse option values into predefined keys, throw the rest away.
-		$data = shortcode_atts($default_values, $option_values); */
-
 		$section_id = 'sync_section';
 
 		register_setting(
@@ -256,9 +248,9 @@ class SyncSettings extends SyncInput
 			array(											// args
 				'name' => 'host',
 				'value' => $data['host'],
-				'placeholder' => empty($data['host']) ? 'http://' : '',
+				'placeholder' => empty($data['host']) ? 'https://' : '',
 				'size' => '50',
-				'description' => __('http://example.com - This is the URL that your Content will be Pushed to. If WordPress is installed in a subdirectory, include the subdirectory.', 'wpsitesynccontent'),
+				'description' => __('https://example.com - This is the URL that your Content will be Pushed to. If WordPress is installed in a subdirectory, include the subdirectory.', 'wpsitesynccontent'),
 			)
 		);
 
@@ -308,30 +300,51 @@ class SyncSettings extends SyncInput
 			self::SETTINGS_PAGE								// option page
 		);
 
+		$args = array(											// args
+			'name' => 'strict',
+			'value' => $data['strict'],
+			'options' => array(
+				'1' => __('On - WordPress and WPSiteSync for Content versions must match on Source and Target in order to perform operations.', 'wpsitesynccontent'),
+				'0' => __('Off - WordPress and WPSiteSync for Content versions do not need to match.', 'wpsitesynccontent'),
+			),
+		);
+		$args = apply_filters('spectrom_sync_setting-strict', $args);
+
 		add_settings_field(
 			'strict',										// field id
 			__('Strict Mode:', 'wpsitesynccontent'),		// title
 			array($this, 'render_radio_field'),				// callback
 			self::SETTINGS_PAGE,							// page
 			$section_id,									// section id
-			array(											// args
-				'name' => 'strict',
-				'value' => $data['strict'],
-				'options' => array(
-					'1' => __('On - WordPress and WPSiteSync for Content versions must match on Source and Target in order to perform operations.', 'wpsitesynccontent'),
-					'0' => __('Off - WordPress and WPSiteSync for Content versions do not need to match.', 'wpsitesynccontent'),
-				),
-			)
+			$args
+		);
+
+		$args = array(
+			'name' => 'report',
+			'value' => $data['report'],
+			'description' => __('When checked, WPSiteSync will forward usage information to ServerPress.com', 'wpsitesynccontent'),
+		);
+		add_settings_field(
+			'report',										// field id
+			__('Usage Reporting:', 'wpsitesynccontent'),	// title
+			array($this, 'render_checkbox_field'),			// callback
+			self::SETTINGS_PAGE,							// page
+			$section_id,									// section id
+			$args
 		);
 
 		$match_mode = isset($data['match_mode']) ? $data['match_mode'] : 'slug';
 		switch ($match_mode) {
-		case 'slug':		$desc = __('Slug - Search for matching Content on Target by Post Slug.', 'wpsitesynccontent');
+		case 'slug':		$desc = __('Slug - Search for matching Content on Target by Post Slug only.', 'wpsitesynccontent');
+			break;
+		case 'slug-title':	$desc = __('Slug, then Title - Search for matching Content on Target by Slug, then Post Title.', 'wpsitesynccontent');
 			break;
 		case 'id':			$desc = __('ID - Search for matching Content on Target by Post ID.', 'wpsitesynccontent');
 			break;
-		case 'title':		$desc = __('Post Title - Search for matching Content on Target by Post Title.', 'wpsitesynccontent');
+		case 'title':		$desc = __('Post Title - Search for matching Content on Target by Post Title only.', 'wpsitesynccontent');
 		default:
+			break;
+		case 'title-slug':	$desc = __('Title, then Slug - Search for matching Content on Target by Post Title, then by Slug.', 'wpsitesynccontent');
 			break;
 		}
 
@@ -346,7 +359,9 @@ class SyncSettings extends SyncInput
 				'value' => $match_mode,
 				'options' => array(
 					'title' => __('Post Title', 'wpsitesynccontent'),
+					'title-slug' => __('Post Title, then Post Slug', 'wpsitesynccontent'),
 					'slug' => __('Post Slug', 'wpsitesynccontent'),
+					'slug-title' => __('Post Slug, then Post Title', 'wpsitesynccontent'),
 //					'id' => __('Post ID', 'wpsitesynccontent'),
 				),
 				'description' => $desc,
@@ -484,7 +499,9 @@ class SyncSettings extends SyncInput
 		$roles = array_reverse(get_editable_roles());
 		$allowed_roles = $args['value'];
 		foreach ($roles as $role => $caps) {
-			if (isset($caps['capabilities']['edit_posts']) && $caps['capabilities']['edit_posts']) {
+			// check for both 'edit_posts' OR 'edit_pages' #245
+			if ((isset($caps['capabilities']['edit_posts']) && $caps['capabilities']['edit_posts']) ||
+				(isset($caps['capabilities']['edit_pages']) && $caps['capabilities']['edit_pages'])) {
 				$checked = (FALSE === strpos($allowed_roles, SyncOptions::ROLE_DELIMITER . $role . SyncOptions::ROLE_DELIMITER)) ? '' : ' checked="checked" ';
 				$disabled = '';
 				if ('administrator' === $role) {
@@ -514,6 +531,20 @@ class SyncSettings extends SyncInput
 	}
 
 	/**
+	 * Renders a checkbox input field for settings display
+	 * @param array $args An array of option data used to output the checkbox
+	 */
+	public function render_checkbox_field($args)
+	{
+		$name = $args['name'];
+
+		echo '<input type="hidden" name="spectrom_sync_settings[', $name, ']" value="0" />';
+		echo '<input type="checkbox" name="spectrom_sync_settings[', $name, ']" ', checked($args['value'], '1'), ' value="1" />';
+		if (isset($args['description']))
+			echo '&nbsp;<em>', $args['description'], '</em>';
+	}
+
+	/**
 	 * Renders the radio buttons used for the control
 	 * @param array $args Arguments used to render the radio buttons
 	 */
@@ -522,10 +553,12 @@ class SyncSettings extends SyncInput
 		$options = $args['options'];
 		$name = $args['name'];
 
+		$br = '';
 		foreach ($options as $value => $label) {
+			echo $br;
 			printf('<input type="radio" name="spectrom_sync_settings[%s]" value="%s" %s /> %s',
 				$name, $value, checked($value, $args['value'], FALSE), $label);
-			echo '<br>';
+			$br = '<br>';
 		}
 		if (isset($args['description']))
 			echo '<br/><em>', $args['description'], '</em>';
@@ -577,14 +610,13 @@ class SyncSettings extends SyncInput
 	 */
 	public function validate_settings($values)
 	{
-SyncDebug::log(__METHOD__.'() tab=' . $this->_tab);
-SyncDebug::log(__METHOD__.'():' . __LINE__ . ' values=' . var_export($values, TRUE));
-		if (!current_user_can('manage_options'))
-			return array();
-
+//SyncDebug::log(__METHOD__.'() tab=' . $this->_tab);
 //SyncDebug::log(__METHOD__.'() values=' . var_export($values, TRUE));
 		$settings = SyncOptions::get_all(); // $this->_options;
 //SyncDebug::log(__METHOD__.'() settings: ' . var_export($settings, TRUE));
+
+		if (!current_user_can('manage_options') || !SyncOptions::has_cap())
+			return $settings;
 
 		// start with a copy of the current settings so that 'site_key' and other hidden values are preserved on update
 		$out = array_merge($settings, array());
@@ -596,8 +628,21 @@ SyncDebug::log(__METHOD__.'():' . __LINE__ . ' values=' . var_export($values, TR
 		if (!isset($values['roles']))
 			$values['roles'] = array('administrator' => 'on');
 
+		// check for removing host value #132
+		if (empty($values['host']) && !empty($settings['host'])) {
+			$sources_model = new SyncSourcesModel();
+			$sources_model->remove_token($settings['host']);		// remove existing entry from the spectrom_sync_source table
+
+			// clear any values in the array to be processed, as well as settings data
+			$out['host'] = $out['username'] = $out['password'] = '';
+			$out['auth'] = 0;										// signal that we're no longer authenticated
+			$settings['host'] = $settings['username'] = $settings['password'] = '';
+			$values['username'] = $values['password'] = '';
+SyncDebug::log(__METHOD__.'():' . __LINE__ . ' clearing host, username, password values=' . var_export($values, TRUE));
+		}
+
 		foreach ($values as $key => $value) {
-SyncDebug::log(" key={$key}  value=[" . var_export($value, TRUE) . ']');
+//SyncDebug::log(" key={$key}  value=[" . var_export($value, TRUE) . ']');
 			if (empty($values[$key]) && 'password' === $key) {
 				// ignore this so that passwords are not required on every settings update
 			} else {
@@ -609,7 +654,9 @@ SyncDebug::log(" key={$key}  value=[" . var_export($value, TRUE) . ']');
 						add_settings_error('sync_host_password', 'missing-password', __('When changing Target site, a password is required.', 'wpsitesynccontent'));
 						$out[$key] = $settings[$key];
 					} else {
-						if (FALSE === $this->_is_valid_url($value)) {
+						if (empty($value)) {
+							// do nothing
+						} else if (FALSE === $this->_is_valid_url($value)) {
 							add_settings_error('sync_options_group', 'invalid-url', __('Invalid URL.', 'wpsitesynccontent'));
 							$out[$key] = $settings[$key];
 						} else {
@@ -621,7 +668,10 @@ SyncDebug::log(" key={$key}  value=[" . var_export($value, TRUE) . ']');
 				} else if ('username' === $key) {
 					// TODO: refactor so that 'host' and 'username' password checking is combined
 					// check to see if 'username' is changing and force use of password
-					if ($value !== $settings['username'] && empty($values['password'])) {
+SyncDebug::log(__METHOD__.'():' . __LINE__ . ' change username: user="' . $value . '" pass="' . $values['password'] . '"');
+					if ('' === $value && '' === $values['password'] /* empty($value) && empty($values['password']) */ ) {
+						// do nothing
+					} else if ($value !== $settings['username'] && empty($values['password'])) {
 						add_settings_error('sync_username_password', 'missing-password', __('When changing Username, a password is required.', 'wpsitesynccontent'));
 						$out[$key] = $settings[$key];
 					} else {
@@ -632,17 +682,19 @@ SyncDebug::log(" key={$key}  value=[" . var_export($value, TRUE) . ']');
 						} else
 							$out[$key] = $settings['username'];
 					}
+				} else if ('report' === $key) {
+					$out[$key] = '1' === $value ? '1' : '0';
 				} else if ('roles' === $key) {
-SyncDebug::log(__METHOD__.'():' . __LINE__ . ' POST=' . var_export($_POST, TRUE));
+//SyncDebug::log(__METHOD__.'():' . __LINE__ . ' POST=' . var_export($_POST, TRUE));
 					$roles = array();
-SyncDebug::log(__METHOD__.'():' . __LINE__ . ' value=' . var_export($value, TRUE));
+//SyncDebug::log(__METHOD__.'():' . __LINE__ . ' value=' . var_export($value, TRUE));
 					foreach ($value as $role => $on) {
 						$roles[] = $role;
 					}
 					if (!in_array('administrator', $roles))
 						$roles[] = 'administrator';				// always force administrator access
 					$out[$key] = SyncOptions::ROLE_DELIMITER . implode(SyncOptions::ROLE_DELIMITER, $roles) . SyncOptions::ROLE_DELIMITER;
-SyncDebug::log(__METHOD__.'():' . __LINE__ . ' roles: ' . $out[$key]);
+//SyncDebug::log(__METHOD__.'():' . __LINE__ . ' roles: ' . $out[$key]);
 				} else if (0 === strlen(trim($value))) {
 					if (!$missing_error) {
 						add_settings_error('sync_options_group', 'missing-field', __('All fields are required.', 'wpsitesynccontent'));
@@ -670,18 +722,18 @@ SyncDebug::log(__METHOD__.'():' . __LINE__ . ' roles: ' . $out[$key]);
 		if (!empty($out['password']) || $re_auth) {
 			$out['auth'] = 0;
 
-SyncDebug::log(__METHOD__.'():' . __LINE__ . ' authenticating with data ' . var_export($out, TRUE));
+//SyncDebug::log(__METHOD__.'():' . __LINE__ . ' authenticating with data ' . var_export($out, TRUE));
 			$api = new SyncApiRequest();
 			$res = $api->api('auth', $out);
 			if (!is_wp_error($res)) {
-SyncDebug::log(__METHOD__.'():' . __LINE__ . '  response from auth request: ' . var_export($res, TRUE));
+//SyncDebug::log(__METHOD__.'():' . __LINE__ . '  response from auth request: ' . var_export($res, TRUE));
 				if (isset($res->response->success) && $res->response->success) {
 					$out['auth'] = 1;
 					$out['target_site_key'] = $res->response->data->site_key;
 //SyncDebug::log(__METHOD__.'() got token: ' . $res->response->data->token);
 				} else {
 					// authentication failure response from Target- report this to user
-SyncDebug::log(__METHOD__.'():' . __LINE__ . ' authentication response from Target');
+//SyncDebug::log(__METHOD__.'():' . __LINE__ . ' authentication response from Target');
 					$msg = SyncApiRequest::error_code_to_string($res->error_code);
 					$msg .= ' <a href="https://wpsitesync.com/knowledgebase/wpsitesync-error-messages/#error' . $res->error_code . '" target="_blank" style="text-decoration:none"><span class="dashicons dashicons-info"></span></a>';
 					add_settings_error('sync_options_group', 'auth-error',
@@ -752,7 +804,7 @@ SyncDebug::log(__METHOD__.'():' . __LINE__ . ' authentication response from Targ
 		$screen->set_help_sidebar(
 			'<p><strong>' . __('For more information:', 'wpsitesynccontent') . '</strong></p>' .
 			'<p>' . sprintf(__('Visit the <a href="%s" target="_blank">documentation</a> on the WPSiteSync for Content website.', 'wpsitesynccontent'),
-						esc_url('http://wpsitesync.com/knowledgebase/use-wpsitesync-content/')) . '</p>' .
+						esc_url('https://wpsitesync.com/knowledgebase/use-wpsitesync-content/')) . '</p>' .
 			'<p>' . sprintf(
 						__('<a href="%1$s" target="_blank">Post an issue</a> on <a href="%2$s" target="_blank">GitHub</a>.', 'wpsitesynccontent'),
 						esc_url('https://github.com/ServerPress/wpsitesync/issues'),
@@ -765,14 +817,13 @@ SyncDebug::log(__METHOD__.'():' . __LINE__ . ' authentication response from Targ
 			'title'	    => __('General', 'wpsitesynccontent'),
 			'content'	=>
 				'<p>' . __('This page allows you to configure how WPSiteSync for Content behaves.', 'wpsitesynccontent') . '</p>' .
-				'<p>' . __('<strong>Host Name of Target</strong>: Enter the URL of the Target website you wish to Sync with.', 'wpsitesynccontent') . '</p>' .
-				'<p>' . __('<strong>Username on Target</strong>: Enter the Administrator username for the Target website.', 'wpsitesynccontent') . '</p>' .
-				'<p>' . __('<strong>Password on Target</strong>: Enter the Administrator password for the Target website.', 'wpsitesynccontent') . '</p>' .
+				'<p>' . __('<strong>Host Name of Target</strong>: Enter the URL of the Target website you wish to Sync with. This is the URL of your Home Page. Examples would be https://www.mydomain.com or http://domain.com.', 'wpsitesynccontent') . '</p>' .
+				'<p>' . __('<strong>Username on Target</strong>: Enter the username of an account on the Target website. This username must be able to create content. A role of "Administrator" or "Editor" is required.', 'wpsitesynccontent') . '</p>' .
+				'<p>' . __('<strong>Password on Target</strong>: Enter the password associated with the username of the Target website.', 'wpsitesynccontent') . '</p>' .
 				'<p>' . __('<strong>Strict Mode</strong>: Select if WordPress and WPSiteSync for Content should be the same versions on the Source and the Target.', 'wpsitesynccontent') . '</p>' .
-				'<p>' . __('<strong>Match Mode</strong>: How WPSiteSync should match posts on the Target. You can select "Post Title" (default), or "Post Slug" to match Content by Title or Slug.', 'wpsitesynccontent') . '</p>' .
-				'<p>' . __('<strong>Roles</strong>: The Roles that will be allowed to perform Syncing operations. Only Roles with the "edit_posts" capability will be shown. The "Administrator" Role is always allowed to perform operations.', 'wpsitesynccontent') . '</p>'
+				'<p>' . __('<strong>Match Mode</strong>: How WPSiteSync should match posts on the Target. Searches for matching Content on Target site based on "Post Title" (default), "Post Slug", "Post Title, then Post Slug", or "Post Slug, then Post Title".', 'wpsitesynccontent') . '</p>' .
+				'<p>' . __('<strong>Roles</strong>: The Roles that will be allowed to perform Syncing operations from the Source site. Only Roles with the "edit_posts" capability will be shown. The "Administrator" Role is always allowed to perform operations.', 'wpsitesynccontent') . '</p>'
 //				'<p>' . __('<strong>Authentication Salt:</strong>: Enter a salt to use when Content is sent to current site or leave blank.', 'wpsitesynccontent') . '</p>' .
-//				'<p>' . __('<strong>Minimum Role allowed to SYNC Content</strong>: Select minimum role of user who can Sync Content to current site.', 'wpsitesynccontent') . '</p>'
 		));
 		$screen->add_help_tab(array(
 			'id'		=> 'sync-settings-terms',
@@ -782,7 +833,7 @@ SyncDebug::log(__METHOD__.'():' . __LINE__ . ' authentication response from Targ
 				'<p>' . __('<b>Target</b> - The website that you will be Pushing/Syncing Content to. This is the authoritative or live site.', 'wpsitesynccontent') . '</p>' .
 				'<p>' . __('<b>Push</b> - Moving Content from the Source to the Target website.', 'wpsitesynccontent') . '</p>' .
 				'<p>' . __('<b>Pull</b> - Moving Content from the Target to the Source website.', 'wpsitesynccontent') . '</p>' .
-				'<p>' . __('<b>Content</b> - The data that is being Syncd between websites. This can be Posts, Pages or Custom Post Types, User Information, Comments, and more, depending on the Sync Add-ons that you have installed.', 'wpsitesynccontent') . '</p>'
+				'<p>' . __('<b>Content</b> - The data that is being Syncd between websites. This can be Posts, Pages or Custom Post Types, Products, User Information, Comments, and more, depending on the Sync Add-ons that you have installed.', 'wpsitesynccontent') . '</p>'
 		));
 
 		do_action('spectrom_sync_contextual_help', $screen);

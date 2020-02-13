@@ -1,19 +1,19 @@
 <?php
 /**
-* 
+*
 */
 
 // Disallow direct access.
 defined('ABSPATH') or die("Access denied");
 
 /**
-* 
+*
 */
 class CJTInstallerNoticeView extends CJTView {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $info
 	* @return CJTInstallerNoticeView
 	*/
@@ -22,27 +22,35 @@ class CJTInstallerNoticeView extends CJTView {
 		parent::__construct($info);
 		// Enqueue scripts.
 		self::enqueueScripts();
+		self::enqueueStyles();
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $tpl
 	*/
 	public function display($tpl = null) {
 		echo $this->getTemplate($tpl);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public static function enqueueScripts() {
 		// Use related scripts.
-		self::useScripts(__CLASS__, 
+		self::useScripts(__CLASS__,
 			'framework:js:ajax:{CJT-}cjt-server',
 			'views:installer:notice:public:js:{CJTInstallerNotice-}default;1'
 		);
 	}
-	
+
+	public static function enqueueStyles() {
+		// Use related scripts.
+		self::useStyles(__CLASS__,
+			'framework:css:{CJT-}install-notice'
+		);
+	}
+
 } // End class.

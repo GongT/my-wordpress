@@ -1,19 +1,19 @@
 <?php
 /**
-* 
+*
 */
 
 /**
-* 
+*
 */
 class CJT_Models_Parameters {
 
 	/**
 	* Delete parameter or group or parameters
 	* or all parameters associasted to specific block.
-	* 
+	*
 	* Each Key might has only the parameterId or blockId or both of them.
-	* 
+	*
 	* @param array array('blockId' => ID, 'parameterId' => 'ID).
 	* @return
 	*/

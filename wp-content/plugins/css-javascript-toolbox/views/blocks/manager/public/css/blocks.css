@@ -1,10 +1,27 @@
-/** CSS &amp; Javascript Toolkit - blocks page CSS **/
+/** CSS &amp; JavaScript Toolkit - blocks page CSS **/
 /* Wordpress Page */
 body{min-width: 700px;}
 .wrap { position: relative; }
-.cjt-banner-bar .cjt-banner-link a, .cjt-banner-bar a:hover, .cjt-banner-bar a:visited{color: #A5581B;}
-#cjt-banner-bar-right {left: 300px; position: absolute;top: 2px;}
+.cjt-banner-bar .cjt-banner-link a, .cjt-banner-bar a:hover, .cjt-banner-bar a:visited{color: #005da4;}
+#cjt-banner-bar-right {right: 0; position: absolute;top: 2px;}
 #cjt-banner-bar-right .cjt-banner-link {margin-bottom: 6px; font-size: 14px}
+#cjt-banner-bar-center {
+	position: absolute;
+    top: 0px;
+	left: 35%;
+	border: 3px solid #005EA5;
+	padding: 10px 15px 0 15px;
+	background-color: #FFF;
+}
+#cjt-banner-bar-center p strong {
+	color: #005EA5;
+}
+#cjt-banner-bar-center p {
+	font-weight: 500;
+	margin: 0 0 15px;
+	line-height: 1.5;
+	font-size: 12px;
+}
 span#support-us {position: absolute;top: 15px;left: 370px;font-size: 13px;color: #aaa;font-weight: bold;}
 
 #get-packages-icon {display: inline-block; width: 13px; height: 15px; background-image: url('../images/get-packages.png'); margin-left: 3px;margin-bottom: -4px; margin-right: 5px;}
@@ -38,8 +55,8 @@ span#support-us {position: absolute;top: 15px;left: 370px;font-size: 13px;color:
 	padding: 4px 4px 4px 0px !important;
 	clear: both;
 	visibility: hidden;
-	border: solid #ccc; 
-	border-width: 1px; 
+	border: solid #ccc;
+	border-width: 1px;
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
@@ -68,11 +85,11 @@ span#support-us {position: absolute;top: 15px;left: 370px;font-size: 13px;color:
 .cjt-toolbox-blocks a.cjttbl-save-changes.cjttbs-disabled {background: url(../images/toolbox/save-changes-inactive.png) no-repeat;}
 .cjt-toolbox-blocks a.cjttbl-add-block { background: url(../images/toolbox/add-new.png)  no-repeat; }
 .cjt-toolbox-blocks a.cjttbl-cancel-restore {
-	background: url(../images/toolbox/cancel-restore.png)  no-repeat; 
+	background: url(../images/toolbox/cancel-restore.png)  no-repeat;
 	padding-left: 29px !important;
 }
-.cjt-toolbox-blocks a.cjttbl-restore { 
-	background: url(../images/toolbox/restore.png) no-repeat; 
+.cjt-toolbox-blocks a.cjttbl-restore {
+	background: url(../images/toolbox/restore.png) no-repeat;
 	padding-left: 43px !important;
 }
 .cjt-toolbox-blocks a.cjttbl-restore.cjttbs-disabled {
@@ -96,7 +113,18 @@ cjt-noblocks-intro h2 {font-weight: bold; margin: 4px 0px;}
 cjt-noblocks-intro h4 {font-weight: bold; font-size: 15px;}
 
 .cjt-main-title.logo {
+	position: relative;
     background: transparent url('../images/css-js-toolbox-logo.png') no-repeat;
     height: 75px;
     text-indent: -9999px;
+}
+
+.cjt-main-title.logo span.cjt-ver {
+	text-indent: 1px;
+    font-size: 14px;
+    display: block;
+	margin-top: 45px;
+}
+#cjtoolbox-blocks-page-form {
+	margin-top: 20px;
 }

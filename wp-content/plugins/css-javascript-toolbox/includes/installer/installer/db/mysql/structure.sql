@@ -3,12 +3,12 @@
 *
 * Owner: css-javascript-toolbox.com
 * Author: Ahmed Said
-* Date: 
-* Description: 
+* Date:
+* Description:
 */
 
 /*
-* Template Authors Table Structure 
+* Template Authors Table Structure
 * Since: 2.0
 */
 CREATE TABLE IF NOT EXISTS `#__cjtoolbox_authors` (
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `#__cjtoolbox_authors` (
   KEY `name` (`name`)
 ) CHARACTER SET = utf8, COLLATE=utf8_general_ci;
 
-/* 
+/*
 * CJT Backups Header Table Structure.
 * Since: 2.0
 */
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `#__cjtoolbox_block_pins` (
 ) CHARACTER SET = utf8, COLLATE=utf8_general_ci;
 
 /*
-* Block Associated/Linked templates table structure! 
+* Block Associated/Linked templates table structure!
 * Since: 2.0
 */
 CREATE TABLE IF NOT EXISTS `#__cjtoolbox_block_templates` (
@@ -224,7 +224,7 @@ CREATE TABLE IF NOT EXISTS `#__cjtoolbox_parameter_typedef` (
   KEY `parameterId` (`parameterId`)
 ) CHARACTER SET = utf8, COLLATE=utf8_general_ci;
 
-CREATE TABLE `#__cjtoolbox_parameter_typeparams` (
+CREATE TABLE IF NOT EXISTS `#__cjtoolbox_parameter_typeparams` (
 	`id` INT(11) NOT NULL AUTO_INCREMENT,
 	`parameterId` INT(11) NOT NULL,
 	`name` TEXT NOT NULL,
@@ -234,7 +234,7 @@ CREATE TABLE `#__cjtoolbox_parameter_typeparams` (
 ) CHARACTER SET = utf8, COLLATE=utf8_general_ci;
 
 /* 1.4 */
-CREATE TABLE `#__cjtoolbox_form_group_xfields` (
+CREATE TABLE IF NOT EXISTS `#__cjtoolbox_form_group_xfields` (
 	`groupId` INT(11) NOT NULL,
 	`text` TEXT NULL,
 	UNIQUE INDEX `groupId` (`groupId`)

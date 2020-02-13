@@ -378,7 +378,7 @@ class TablePress_Frontend_Controller extends TablePress_Controller {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param array $commands The JS commands for the DataTables JS library.
+		 * @param string $commands The JS commands for the DataTables JS library.
 		 */
 		$commands = apply_filters( 'tablepress_all_datatables_commands', $commands );
 		if ( empty( $commands ) ) {
@@ -608,7 +608,7 @@ JS;
 		// Check if table output shall and can be loaded from the transient cache, otherwise generate the output.
 		if ( $render_options['cache_table_output'] && ! is_user_logged_in() ) {
 			// Hash the Render Options array to get a unique cache identifier.
-			$table_hash = md5( wp_json_encode( $render_options ) );
+			$table_hash = md5( wp_json_encode( $render_options, TABLEPRESS_JSON_OPTIONS ) );
 			$transient_name = 'tablepress_' . $table_hash; // Attention: This string must not be longer than 45 characters!
 			$output = get_transient( $transient_name );
 			if ( false === $output || '' === $output ) {
@@ -628,7 +628,7 @@ JS;
 				if ( ! in_array( $transient_name, $caches_list, true ) ) {
 					$caches_list[] = $transient_name;
 				}
-				set_transient( $caches_list_transient_name, wp_json_encode( $caches_list ), 2 * DAY_IN_SECONDS );
+				set_transient( $caches_list_transient_name, wp_json_encode( $caches_list, TABLEPRESS_JSON_OPTIONS ), 2 * DAY_IN_SECONDS );
 			} else {
 				/**
 				 * Filter the cache hit comment message.
@@ -740,7 +740,7 @@ JS;
 						$time_diff = $current_timestamp - $modified_timestamp;
 						// Time difference is only shown up to one day.
 						if ( $time_diff >= 0 && $time_diff < DAY_IN_SECONDS ) {
-							$output = sprintf( __( '%s ago', 'default' ), human_time_diff( $modified_timestamp, $current_timestamp ) ); // No `tablepress` text domain as translations are not loaded.
+							$output = sprintf( __( '%s ago', 'default' ), human_time_diff( $modified_timestamp, $current_timestamp ) );
 						} else {
 							$output = TablePress::format_datetime( $table['last_modified'], 'mysql', '<br />' );
 						}

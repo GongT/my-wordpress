@@ -8,9 +8,9 @@ a:visited {text-decoration: none;}
 a,
 a:visited {color: #a0a0a0 !important;}
 
-a:hover {color:  #c8671b !important;}
+a:hover {color:  #628ead !important;}
 
-a.active {color: #a5581b !important;}
+a.active {color: #005DA4 !important;}
 
 ul {width: 100%;}
 ul li {margin-bottom: 0;}
@@ -49,4 +49,4 @@ form#templates-lookup {height: 100%;}
 	border-top: 1px solid #bbb;
 	padding: 9px;
 }
-.ui-accordion-header.ui-accordion-header-active a {color: #a5581b !important;}
+.ui-accordion-header.ui-accordion-header-active a {color: #005DA4 !important;}

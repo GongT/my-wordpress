@@ -75,22 +75,9 @@ body {
 	margin: 0 0 15px 15px;
 }
 
-/* Fix search field positioning */
-#tablepress-page .search-box {
-	position: relative;
-	height: auto;
-	width: auto;
-	float: right;
-	clear: none;
-	margin: 0;
-}
 #tablepress-page .subtitle {
 	float: left;
 	padding: 10px 0 0;
-}
-#tablepress-page .search-box input[name="s"] {
-	float: left;
-	width: auto;
 }
 
 /* Fix pagination layout */
@@ -119,7 +106,7 @@ body {
 	font-weight: bold;
 }
 .tablepress-editor-button-list thead .column-table_action {
-	width: 150px;
+	min-width: 150px;
 }
 /* Responsiveness on the All Tables screen */
 @media screen and (max-width: 782px) {
@@ -134,37 +121,24 @@ body {
 	background: transparent;
 	border: none;
 	color: #333333;
-	width: 110px;
+	width: 120px;
 	margin: 0;
 	padding: 0;
 	font-weight: bold;
-	font-size: 14px;
-	-webkit-box-shadow: none;
 	box-shadow: none;
 	text-align: center;
-	vertical-align: top;
-}
-#tablepress-page .table-shortcode {
-	cursor: text;
 }
 <?php if ( is_rtl() ) : ?>
 /* RTL CSS */
 body.rtl {
 	margin: 0 15px 15px 0;
 }
-.rtl #tablepress-page .search-box {
-	float: left;
-}
 .rtl #tablepress-page .subtitle {
-	float: right;
-}
-.rtl #tablepress-page .search-box input[name="s"] {
 	float: right;
 }
 .rtl #tablepress-page .table-shortcode-inline {
 	width: 125px;
 	font-size: 13px;
-	vertical-align: baseline;
 }
 <?php endif; ?>
 </style>
@@ -428,7 +402,7 @@ class TablePress_Editor_Button_Thickbox_List_Table extends WP_List_Table {
 		static $term, $json_encoded_term;
 		if ( is_null( $term ) || is_null( $json_encoded_term ) ) {
 			$term = wp_unslash( $_GET['s'] );
-			$json_encoded_term = substr( wp_json_encode( $term ), 1, -1 );
+			$json_encoded_term = substr( wp_json_encode( $term, TABLEPRESS_JSON_OPTIONS ), 1, -1 );
 		}
 
 		// Load table again, with table data, but without options and visibility settings.
@@ -444,7 +418,7 @@ class TablePress_Editor_Button_Thickbox_List_Table extends WP_List_Table {
 		|| false !== stripos( $item['description'], $term )
 		|| false !== stripos( TablePress::get_user_display_name( $item['author'] ), $term )
 		|| false !== stripos( TablePress::format_datetime( $item['last_modified'], 'mysql', ' ' ), $term )
-		|| false !== stripos( wp_json_encode( $item['data'] ), $json_encoded_term ) ) {
+		|| false !== stripos( wp_json_encode( $item['data'], TABLEPRESS_JSON_OPTIONS ), $json_encoded_term ) ) {
 			return true;
 		}
 

@@ -9,16 +9,20 @@ class SyncOptions
 	private static $_options = NULL;
 	private static $_dirty = FALSE;
 
+	// the following are allowed values for specific settings
 	private static $_constraints = array(
-		'match_mode' => array('title', 'slug', 'id'),
+		'match_mode' => array('title', 'title-slug', 'slug', 'slug-title', 'id'),
 		'min_role' => array('author', 'editor', 'administrator'),
 		'roles' => '|author|editor|administrator|',
+		'report' => array('0', '1'),
 	);
 	const ROLE_DELIMITER = '|';
-	
+
 	/*
 	 * Options are:
 	 // TODO: rename to 'target'
+	 * 'version' = current version, used for db updates
+	 * 'installed' = install date
 	 * 'host' = Target site URL
 	 * 'username' = Target site login username
 	 * 'password' = Target site login password
@@ -31,6 +35,7 @@ class SyncOptions
 	 * 'match_mode' = method for matching content on Target: 'title', 'slug', 'id'
 	 * 'min_role' = minimum role required to be able to perform Sync operations #122
 	 * 'roles' = Roles allowed to perform Sync operations
+	 * 'report' = Enable reporting to serverpress.com
 	 */
 
 	/**
@@ -41,12 +46,14 @@ class SyncOptions
 		if (NULL !== self::$_options)
 			return;
 		self::$_options = get_option(self::OPTION_NAME, array());
-SyncDebug::log(__METHOD__.'():' . __LINE__ . ' options=' . var_export(self::$_options, TRUE));
+//SyncDebug::log(__METHOD__.'():' . __LINE__ . ' options=' . var_export(self::$_options, TRUE));
 		if (FALSE === self::$_options)
 			self::$_options = array();
 
 		// perform fixup / cleanup on option values...migrating from previous configuration settings
 		$defaults = array(
+			'installed' => '',
+			'version' => '',
 			'host' => '',
 			'username' => '',
 			'password' => '',
@@ -59,10 +66,20 @@ SyncDebug::log(__METHOD__.'():' . __LINE__ . ' options=' . var_export(self::$_op
 			'match_mode' => 'title',
 			'min_role' => 'author',
 			'roles' => '|author|editor|administrator|',
+			'report' => '0',
 		);
 
 		self::$_options = array_merge($defaults, self::$_options);
-SyncDebug::log(__METHOD__.'():' . __LINE__ . ' options=' . var_export(self::$_options, TRUE));
+//SyncDebug::log(__METHOD__.'():' . __LINE__ . ' options=' . var_export(self::$_options, TRUE));
+
+		// update the install date if it's empty
+		if (empty(self::$_options['installed'])) {
+			// use method in activation code to set install date
+			include_once(dirname(dirname(__FILE__)) . '/install/activate.php');
+			$activate = new SyncActivate();
+			self::$_options['installed'] = $activate->get_install_date();
+			self::$_dirty = TRUE;
+		}
 
 		// adjust settings for roles if missing (newly added setting not configured; use defaults) #166
 		if (empty(self::$_options['roles']) || empty(self::$_options['min_role'])) {
@@ -78,8 +95,11 @@ SyncDebug::log(__METHOD__.'():' . __LINE__ . ' options=' . var_export(self::$_op
 				self::$_options['roles'] = '|administrator|';
 				break;
 			}
-SyncDebug::log(__METHOD__.'():' . __LINE__ . ' roles are empty; setting to: ' . self::$_options['roles']);
+//SyncDebug::log(__METHOD__.'():' . __LINE__ . ' roles are empty; setting to: ' . self::$_options['roles']);
+			self::$_dirty = TRUE;
 		}
+
+		self::save_options();
 	}
 
 	/**
@@ -157,48 +177,35 @@ SyncDebug::log(__METHOD__.'():' . __LINE__ . ' roles are empty; setting to: ' . 
 	 */
 	public static function has_cap()
 	{
+		if (is_multisite() && is_super_admin())					// always allow admins #244
+			return TRUE;
+
 		$min_role = self::get('min_role', 'author');
 		$roles = self::get('roles', '');
 		if (empty($roles)) {
 			// if the roles are empty, adjust setting based on default roles from v1.4
-SyncDebug::log(__METHOD__.'():' . __LINE__ . ' roles are empty; min_role=' . var_export($min_role, TRUE));
+//SyncDebug::log(__METHOD__.'():' . __LINE__ . ' roles are empty; min_role=' . var_export($min_role, TRUE));
 			switch ($min_role) {
-				case 'administrator':
-				default:
-					$roles = '|administrator|';
-					break;
-				case 'editor':
-					$roles = '|editor|administrator|';
-					break;
-				case 'author':
-					$roles = '|author|editor|administrator|';
-					break;
+			case 'administrator':
+			default:
+				$roles = '|administrator|';
+				break;
+			case 'editor':
+				$roles = '|editor|administrator|';
+				break;
+			case 'author':
+				$roles = '|author|editor|administrator|';
+				break;
 			}
 		}
 		$current_user = wp_get_current_user();
 		// check to see if current user's Role is in list of allowed roles #166
-SyncDebug::log(__METHOD__.'():' . __LINE__ . ' roles=' . var_export($roles, TRUE));
+//SyncDebug::log(__METHOD__.'():' . __LINE__ . ' roles=' . var_export($roles, TRUE));
 		foreach ($current_user->roles as $role)
 			if (FALSE !== strpos($roles, self::ROLE_DELIMITER . $role . self::ROLE_DELIMITER)) {
-SyncDebug::log(__METHOD__.'():' . __LINE__ . ' found matching role "' . $role . '"');
+//SyncDebug::log(__METHOD__.'():' . __LINE__ . ' found matching role "' . $role . '"');
 				return TRUE;
 			}
-		return FALSE;
-#####
-		switch ($min_role) {
-		case 'administrator':
-			if (in_array($min_role, $current_user->roles))
-				return TRUE;
-			break;
-		case 'editor':
-			if (in_array($min_role, $current_user->roles) || in_array('administrator', $current_user->roles))
-				return TRUE;
-			break;
-		case 'author':
-			if (in_array($min_role, $current_user->roles) || in_array('editor', $current_user->roles) || in_array('administrator', $current_user->roles))
-				return TRUE;
-			break;
-		}
 		return FALSE;
 	}
 
@@ -230,6 +237,7 @@ SyncDebug::log(__METHOD__.'():' . __LINE__ . ' found matching role "' . $role . 
 		if (self::$_dirty) {
 			// assume options already exist - they are created at install time
 			update_option(self::OPTION_NAME, self::$_options);
+			self::$_dirty = FALSE;
 		}
 	}
 }

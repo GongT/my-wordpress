@@ -1,31 +1,31 @@
 <?php
 /**
-* 
+*
 */
 
 // Disallow direct access.
 defined('ABSPATH') or die("Access denied");
 
 /**
-* 
+*
 */
 class CJTSetupModel {
-	
+
 	/**
-	* 
+	*
 	*/
 	const LICENSES_CACHE = 'cache.CJTSetupModel.licenses';
 
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $licenses;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function __construct() {
 		// Read all cached licenses!
@@ -35,10 +35,10 @@ class CJTSetupModel {
 			$this->licenses = array();
 		}
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $component
 	* @param mixed $action
 	* @param mixed $state
@@ -57,12 +57,12 @@ class CJTSetupModel {
 		// update local Cache!
 		$this->licenses = $cache;
 		// return action name
-		return $action;		
+		return $action;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $action
 	* @param mixed $component
 	* @param mixed $license
@@ -88,42 +88,42 @@ class CJTSetupModel {
 			}
 		}
 		catch ( CJTServicesAPICallException $exception ) {
-			// If request error compaitble the response object to be used!	
+			// If request error compaitble the response object to be used!
 			$response = array('license' => 'error', 'component' => $component['name']);
 		}
 		return $response;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getCJTComponentData() {
 		$component = array();
 		// Set info!
 		$component['pluginBase'] = CJTOOLBOX_PLUGIN_BASE;
-		$component['title'] = 'CSS & Javascript Toolbox';
+		$component['title'] = 'CSS & JavaScript Toolbox';
 		return $component;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $component
 	*/
 	public function getExtensionProductTypes($component) {
-		# Initialize 
+		# Initialize
 		$types = array();
 		# Extension plugin file
 		$pluginDirName = dirname($component['pluginBase']);
-		$pluginXMLFile = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 
-									$pluginDirName . DIRECTORY_SEPARATOR . 
+		$pluginXMLFile = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR .
+									$pluginDirName . DIRECTORY_SEPARATOR .
 									$pluginDirName . '.xml';
 		# Use XML
 		$exDef = new SimpleXMLElement(file_get_contents($pluginXMLFile));
 		# Register XPath namespace
 		$license = $exDef->license;
-		$license->registerXPathNamespace('ext', 'http://css-javascript-toolbox.com/extensions/xmldeffile');
+		$license->registerXPathNamespace('ext', 'https://css-javascript-toolbox.com/extensions/xmldeffile');
 		# Get types
 		$typesSrc = $exDef->license->xpath('name');
 		foreach ($typesSrc as $type) {
@@ -142,16 +142,16 @@ class CJTSetupModel {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function & getLicenses() {
 		return $this->licenses;
 	}
-	
+
 	/**
-	* Get list of all cached licenses that has 
+	* Get list of all cached licenses that has
 	* a license key in $state state!
-	* 
+	*
 	* @param mixed $state
 	*/
 	public function getStatedLicenses($state = 'activate') {
@@ -167,20 +167,20 @@ class CJTSetupModel {
 		}
 		return $statedList;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $licenseTypes
 	* @param mixed $compoment
 	* @param mixed $struct
 	*/
 	public function getStateStruct($licenseTypes, $struct = null) {
-		// INit 
+		// INit
 		$state = null;
 		// Read all licenses from db!
 		$licensesCache =& $this->getLicenses();
-		// Find license 
+		// Find license
 		foreach ($licenseTypes as $type) {
 			# Get product name to search
 			$productName = $type['name'];
@@ -199,10 +199,10 @@ class CJTSetupModel {
 		}
 		return $state;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $state
 	*/
 	public function removeCachedLicense($state) {
@@ -212,7 +212,7 @@ class CJTSetupModel {
 		$cachedStates =& $this->getLicenses();
 		// Set return value!
 		$result = isset($cachedStates[$componentName]) ? 'valid' : 'invalid';
-		// Remove component license even if its not exists, nothing will happen!  
+		// Remove component license even if its not exists, nothing will happen!
 		unset($cachedStates[$componentName]);
 		// Update cache list!
 		update_option(self::LICENSES_CACHE, $cachedStates);
@@ -220,5 +220,5 @@ class CJTSetupModel {
 		$this->licenses = $cachedStates;
 		return $result;
 	}
-	
+
 } // End class.

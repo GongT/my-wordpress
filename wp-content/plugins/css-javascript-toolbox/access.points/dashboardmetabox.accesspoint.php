@@ -1,19 +1,19 @@
 <?php
 /**
-* 
+*
 */
 
 // Disallow direct access.
 defined('ABSPATH') or die("Access denied");
 
 /**
-* 
+*
 */
 class CJTDashboardMetaboxAccessPoint extends CJTAccessPoint {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function __construct() {
 		// Initialize Access Point base!
@@ -24,25 +24,25 @@ class CJTDashboardMetaboxAccessPoint extends CJTAccessPoint {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function createMetabox() {
 		if (CJTPlugin::getInstance()->isInstalled()) {
-			wp_add_dashboard_widget('cjt-statistics', cssJSToolbox::getText('CSS & Javascript Toolbox News'), array($this, 'route'));	
+			wp_add_dashboard_widget('cjt-statistics', cssJSToolbox::getText('CSS & JavaScript Toolbox News'), array($this, 'route'));
 		}
 	}
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	protected function doListen() {
 		add_action('wp_dashboard_setup', array(&$this, 'createMetabox'), 10, 0);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function route($loadView = false, $request = null) {
 		// Load Auto Upgrade controller!
@@ -53,5 +53,5 @@ class CJTDashboardMetaboxAccessPoint extends CJTAccessPoint {
 		// fire action to enable automatic upgrade!
 		->_doAction();
 	}
-	
+
 } // End class.

@@ -1,6 +1,6 @@
 /**
 * @version $ Id; cjtserver.js 21-03-2012 03:22:10 Ahmed Said $
-* 
+*
 * Block model class.
 */
 
@@ -13,17 +13,17 @@ var CJTBlockBase;
 * JQuery wrapper for the CJTBlock class.
 */
 (function($) {
-	
+
 	/**
 	* Flags values.
 	*
-	* @var object 
+	* @var object
 	*/
 	var flags = {
 		location : ['header', 'footer'],
 		state : ['active', 'inactive']
 	};
-	
+
 	/**
 	* Provide simple access to single block properties.
 	*
@@ -32,33 +32,33 @@ var CJTBlockBase;
 	* @param DOMElement Block element.
 	*/
 	CJTBlockBase = function() {
-		
+
 		/**
-		* 
+		*
 		*
 		*
 		*/
 		this.aceEditor = null;
-		
+
 		/**
-		* 
+		*
 		*/
 		this.blockPlugin = null;
-		
+
 		/**
 		* Block JQuery object.
 		*
 		* @var JQuery object.
 		*/
 		this.box = null;
-		
+
 		/**
 		* Block id.
 		*
 		* @var integer
 		*/
 		this.id = 0;
-		
+
 		/**
 		* Blocks property that allowed to be read or write.
 		*
@@ -73,7 +73,7 @@ var CJTBlockBase;
 		this.properties = {};
 
 		/**
-		* 
+		*
 		*/
 		this.addProperties = function(properties) {
 			// Prepare properties, add them to model list.
@@ -102,7 +102,7 @@ var CJTBlockBase;
 
 		/**
 		* put your comment there...
-		* 
+		*
 		* @param element
 		*/
 		this.CJTBlockBase = function(blockPlugin, element, properties) {
@@ -118,7 +118,7 @@ var CJTBlockBase;
 			// Initialize ALL (BASE, DERIVDED) properties.
 			this.addProperties(properties);
 		}
-		
+
 		/**
 		* Get block property cvalue.
 		*
@@ -127,7 +127,7 @@ var CJTBlockBase;
 		*/
 		this.get = function(name, _default) {
 			// Initialize.
-			var value = null;		
+			var value = null;
 			var property = this.property(name);
 			// Check member variables first.
 			if (this[name] != undefined) {
@@ -139,10 +139,10 @@ var CJTBlockBase;
 				var cookieName = name + '-' + this.id;
 				value = $.cookies.get(cookieName);
 			}
-			else { // Not cookies, it may be saved throught JS object or inside HTML elements.
+			else { // Not cookies, it may be saved through JS object or inside HTML elements.
 				// Custom implemetation.
 				switch (name) {
-					case 'code': // Code is throught ACE-Editor Object.
+					case 'code': // Code is through ACE-Editor Object.
 						value = this.aceEditor.getSession().getValue();
 					break;
 					default: // Get property value from html elements.
@@ -157,9 +157,9 @@ var CJTBlockBase;
 			// Returns
 			return value;
 		}
-		
+
 		/**
-		* 
+		*
 		*/
 		this.getDIFields = function() {
 			// Initialize.
@@ -169,9 +169,9 @@ var CJTBlockBase;
 			// Returns diFields
 			return diFields;
 		}
-		
+
 		/**
-		* 
+		*
 		*/
 		this.getDIProperties = function() {
 			// Initialize.
@@ -198,18 +198,18 @@ var CJTBlockBase;
 		* The method call CJTServer.getQueue method with the name parameter
 		* generated from the operation name and the block id. The result is each block has
 		* an object for each operation it may process.
-		* 
+		*
 		* @param string Operation name.
 		* @return CJTBlocksServerQueue Operation queue object.
-		*/		
+		*/
 		this.getOperationQueue = function(operation) {
 			var name = (operation + '-operation-' + this.get('id').toString());
 			var queue = CJTBlocksPage.server.getQueue('Blocks', name, 'blocksPage', 'save_blocks');
 			return queue;
 		}
-		
+
 		/**
-		* 
+		*
 		*/
 		this.loadBase = function(properties) {
 			// Enable ACE Editor.
@@ -241,12 +241,12 @@ var CJTBlockBase;
 
 		/**
 		* @internal
-		* 
+		*
 		* Prepare property selector object.
 		*
 		* @param string Property name.
 		* @return object Property selector object.
-		*/		
+		*/
 		this.property = function(name) {
       // Get property object from the cache.
       var property = this.properties[name];
@@ -254,7 +254,7 @@ var CJTBlockBase;
       // get and set property values.
 			return property;
 		}
-		
+
 		/**
 		* Set block property value.
 		*
@@ -300,29 +300,29 @@ var CJTBlockBase;
 			}
 			return promise;
 		}
-		
+
 		/**
 		* Send block Ajax queues to the server.
 		*
 		* This method calls CJTServerQueue.send method.
 		* The result is sending all updated properties queue to the server.
-		* 
+		*
 		* Please note: CJTServerQueue.send method will do nothing if the queue is locked.
-		* 
+		*
 		* @return jqxhr
 		*/
 		this.sync = function(name, data) {
 			var ajaxPromise = this.getOperationQueue(name).send('post', data);
 			return ajaxPromise;
 		}
-		
+
 		/**
 		* Switch block flag property.
 		*
 		* Because flag can represent only two states. This method
-		* is to simplify changing flag value. It automatically detect 
-		* current flag value and the new value OR simply the value can be 
-		* forced to a specific state throught the newValue parameter. 
+		* is to simplify changing flag value. It automatically detect
+		* current flag value and the new value OR simply the value can be
+		* forced to a specific state through the newValue parameter.
 		*
 		* @param string Flag name.
 		* @param [mixed] Force flag value to newValue.
@@ -339,12 +339,12 @@ var CJTBlockBase;
 				// currentIndex(0) XOR 1 = 1
 				// currentIndex(1) XOR 1 = 0
 				var newIndex = currentIndex ^ 1;
-				var newValue = possibleValues[newIndex];			
+				var newValue = possibleValues[newIndex];
 			}
 			promise = this.set(flag, newValue);
 			return promise;
 		}
-		
+
 		/**
 		* Save Direct Interact Fields.
 		*
@@ -368,7 +368,7 @@ var CJTBlockBase;
 				}, this)
 			);
 		}
-		
+
 	} // End class.
-	
+
 })(jQuery);

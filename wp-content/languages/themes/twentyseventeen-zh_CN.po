@@ -164,8 +164,8 @@ msgctxt "Libre Franklin font: on or off"
 msgid "on"
 msgstr "off"
 
-#: functions.php:64 functions.php:203
-#: template-parts/navigation/navigation-top.php:12
+#: template-parts/navigation/navigation-top.php:12 functions.php:64
+#: functions.php:203
 msgid "Top Menu"
 msgstr "顶部菜单"
 
@@ -185,7 +185,7 @@ msgstr "抱歉，没有符合您搜索条件的结果。请换其它关键词再
 msgid "Ready to publish your first post? <a href=\"%1$s\">Get started here</a>."
 msgstr "准备好发布第一篇文章了？<a href=\"%1$s\">从这里开始</a>。"
 
-#: search.php:21 template-parts/post/content-none.php:17
+#: template-parts/post/content-none.php:17 search.php:21
 msgid "Nothing Found"
 msgstr "未找到"
 
@@ -221,12 +221,12 @@ msgid "Search Results for: %s"
 msgstr "%s的搜索结果"
 
 #. translators: %s: Name of current post
-#: functions.php:390 template-parts/post/content-gallery.php:71
-#: template-parts/post/content.php:57 template-parts/post/content-image.php:61
-#: template-parts/post/content-audio.php:84
-#: template-parts/post/content-video.php:83
-#: template-parts/page/content-front-page.php:42
 #: template-parts/page/content-front-page-panels.php:45
+#: template-parts/page/content-front-page.php:42
+#: template-parts/post/content-audio.php:84 template-parts/post/content.php:57
+#: template-parts/post/content-gallery.php:71
+#: template-parts/post/content-video.php:83
+#: template-parts/post/content-image.php:61 functions.php:390
 msgid "Continue reading<span class=\"screen-reader-text\"> \"%s\"</span>"
 msgstr "继续阅读<span class=\"screen-reader-text\">“%s”</span>"
 
@@ -243,11 +243,11 @@ msgstr "Twenty Seventeen主题需要WordPress 4.7或更高版本。您运行的%
 msgid "Edit<span class=\"screen-reader-text\"> \"%s\"</span>"
 msgstr "编辑<span class=\"screen-reader-text\">“%s”</span>"
 
-#: template-parts/post/content-gallery.php:78
-#: template-parts/post/content.php:64 template-parts/post/content-image.php:68
-#: template-parts/post/content-audio.php:91
-#: template-parts/post/content-video.php:90
 #: template-parts/page/content-page.php:26
+#: template-parts/post/content-audio.php:91 template-parts/post/content.php:64
+#: template-parts/post/content-gallery.php:78
+#: template-parts/post/content-video.php:90
+#: template-parts/post/content-image.php:68
 msgid "Pages:"
 msgstr "页码："
 
@@ -255,7 +255,7 @@ msgstr "页码："
 msgid "Menu"
 msgstr "菜单"
 
-#: header.php:27
+#: header.php:28
 msgid "Skip to content"
 msgstr "跳至内容"
 
@@ -296,7 +296,7 @@ msgctxt "comments title"
 msgid "One Reply to &ldquo;%s&rdquo;"
 msgstr "&ldquo;%s&rdquo;的一个回复"
 
-#: index.php:54 archive.php:50 search.php:47
+#: archive.php:50 search.php:47 index.php:54
 msgid "Page"
 msgstr "页"
 
@@ -308,11 +308,11 @@ msgstr "有点尴尬诶！该页无法显示。"
 msgid "It looks like nothing was found at this location. Maybe try a search?"
 msgstr "这儿似乎什么都没有，试试搜索？"
 
-#: index.php:52 archive.php:48 search.php:45
+#: archive.php:48 search.php:45 index.php:52
 msgid "Previous page"
 msgstr "上一页"
 
-#: index.php:53 archive.php:49 search.php:46
+#: archive.php:49 search.php:46 index.php:53
 msgid "Next page"
 msgstr "下一页"
 

@@ -1,46 +1,46 @@
 <?php
 /**
-* 
+*
 */
 
 /**
-* 
+*
 */
 class CJTWordpressEvents extends CJTEvents {
-	
+
 	/**
-	* 
+	*
 	*/
 	const HOOK_ACTION = 'action';
 
 	/**
-	* 
+	*
 	*/
 	const HOOK_CUSTOM = 'custom';
-	
+
 	/**
-	* 
+	*
 	*/
 	const HOOK_FILTER = 'filter';
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $options
 	*/
-	public static function __init($options = array()) {
+	public static function _init($options = array()) {
 		// Initialize CJTEvents!
-		parent::__init($options);
+		parent::_init($options);
 		// Extend all Hookable objects with CJTEvents events!
 		$events = new CJTWordpressEvents(__CLASS__, $options, true);
 		// Inherits all CJTEvents and CJTWordpressEvents Events to all hookable objects!
 		self::$definition->addBaseClass(__CLASS__, array('hookType' => self::HOOK_FILTER));
 		return $events;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $type
 	*/
 	protected function prepareEventTypeOptions($event) {
@@ -61,10 +61,10 @@ class CJTWordpressEvents extends CJTEvents {
 		}
 		return $event;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $type
 	* @param mixed $params
 	*/
@@ -80,5 +80,5 @@ class CJTWordpressEvents extends CJTEvents {
 		}
 		return $result;
 	}
-	
+
 } // End class.

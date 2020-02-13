@@ -1,152 +1,152 @@
 <?php
 /**
-* 
+*
 */
 
 // Disallow direct access.
 defined('ABSPATH') or die("Access denied");
 
 /**
-* 
+*
 */
 class CJTExtensions extends CJTHookableClass {
-	
+
 	/**
-	* 
+	*
 	*/
 	const CACHE_OPTION_NAME = 'cjt_extensions';
-	
+
 	/**
-	* 
+	*
 	*/
 	const LOAD_METHOD = 'getInvolved';
-	
+
 	/**
-	* 
+	*
 	*/
 	const PREFIXS = 'cjte-,css-javascript-toolbox-';
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $defDocs;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $extensions;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $file2Classmap;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $incompatibilies;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $loadMethod;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $onautoload = array('parameters' => array('file', 'class'));
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $onbindevent = array('parameters' => array('event', 'callback'));
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $ondetectextension  = array('parameters' => array('extension'));
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $ongetactiveplugins = array('parameters' => array('plugins'));
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $onload = array('parameters' => array('params'));
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $onloadcallback = array('parameters' => array('callback'));
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $onloaddefinition = array('parameters' => array('definition'));
-	
+
 	/***
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $ontregisterautoload = array('parameters' => array('callback'));
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $onreloadcacheparameters = array('parameters' => array('params'));
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $onloaded = array(
 		'hookType' => CJTWordpressEvents::HOOK_ACTION,
 		'parameters' => array('class', 'extension', 'definition', 'result')
 	);
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $prefix;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $className
 	*/
-	 public function __autoload($className) {
+	 public function _autoload($className) {
 		// Load only classed defined on the list!
 		if (isset($this->extensions[$className])) {
 			$classFile = $this->onautoload($this->extensions[$className]['runtime']['classFile'], $className);
@@ -154,10 +154,10 @@ class CJTExtensions extends CJTHookableClass {
 			require_once $classFile;
 		}
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $prefix
 	* @param mixed $loadMethod
 	* @return CJTExtensions
@@ -169,18 +169,18 @@ class CJTExtensions extends CJTHookableClass {
 		$this->prefix = explode( ',', $prefix );
 		$this->loadMethod = $loadMethod;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function __destruct() {
-		spl_autoload_unregister(array($this, '__autoload'));
+		spl_autoload_unregister(array($this, '_autoload'));
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $reload
 	* @return CJTExtensions
 	*/
@@ -203,7 +203,7 @@ class CJTExtensions extends CJTHookableClass {
 				$pluginDir = dirname($file);
 				$pluginName = basename($pluginDir);
 				// Any plugin with our prefix is a CJT extension!
-				if ( ( strpos( $pluginName, $this->prefix[0] ) === 0 ) || 
+				if ( ( strpos( $pluginName, $this->prefix[0] ) === 0 ) ||
 					 	 ( strpos( $pluginName, $this->prefix[1] ) === 0 ) ) {
 					// CJT Extsnsion must has the definition XML file!
 					// First try for Edition-Specific file
@@ -241,16 +241,16 @@ class CJTExtensions extends CJTHookableClass {
 		// Chaining
 		return $this->extensions;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function load() {
 		// Initialize.
 		$frameworkVersion = new CJT_Framework_Version_Version(CJTPlugin::FW_Version);
 		// Auto load CJT extensions files when requested.
-		spl_autoload_register($this->ontregisterautoload(array($this, '__autoload')));
+		spl_autoload_register($this->ontregisterautoload(array($this, '_autoload')));
 		// Load all CJT extensions!
 		foreach ($this->getExtensions() as $class => $extension) {
 			// Filters!
@@ -309,7 +309,7 @@ class CJTExtensions extends CJTHookableClass {
 					}
 				}
 			}
-			else { // If manual load specified just 
+			else { // If manual load specified just
 				if (class_exists($class)) { // Make sure the class is loaded!
 					$this->onloaded($class, $extension, $definitionXML, call_user_func($callback));
 				}
@@ -320,10 +320,10 @@ class CJTExtensions extends CJTHookableClass {
 			add_action('admin_notices', array(& $this, 'processIncompatibles'));
 		}
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $pluginName
 	*/
 	public function & getDefDoc($pluginName) {
@@ -334,7 +334,7 @@ class CJTExtensions extends CJTHookableClass {
 			// Extension might removed while its license key still in the database
 			// Make sure the extension still exists
 			if (file_exists($pluginXMLFile)) {
-				$this->defDocs[$pluginName] = new SimpleXMLElement(file_get_contents($pluginXMLFile));	
+				$this->defDocs[$pluginName] = new SimpleXMLElement(file_get_contents($pluginXMLFile));
 			}
 			else {
 				# Return null when extension is absent!
@@ -346,15 +346,15 @@ class CJTExtensions extends CJTHookableClass {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function & getFiles2ClassesMap() {
-		return $this->file2Classmap;	
+		return $this->file2Classmap;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @TODO: REMOVE HTML-MARKUP. CJT PLUGIN NEVER WRITE MARKUP IMIXED WITH HTML. ITS VERY BAD PROGRAMMING PRACTICE. THIS WILL BE REMOVED NEXT TIME AS WE IN RUSH!!!
 	*/
 	public function processIncompatibles() {
@@ -366,7 +366,7 @@ class CJTExtensions extends CJTHookableClass {
 		$message = cssJSToolbox::getText('CJT detects incompatible installed extensions, listed below with status message for every extension:');
 		$list = '';
 		// For every compatible extension add
-		// an list item with details 
+		// an list item with details
 		// if there is an update available or provide
 		// a direct link to CJT website if no upgrade is available.
 		// Upgrade wont be available in case no license key is activated!

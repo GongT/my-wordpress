@@ -1,32 +1,32 @@
 <?php
 /**
-* 
+*
 */
 
 // Import dependencies.
 cssJSToolbox::import('framework:html:list.php', 'framework:db:mysql:xtable.inc.php');
 
 /**
-* 
+*
 */
 class CJTTemplateTypesField extends CJTListField {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	protected function prepareItems() {
 		if ((isset($this->options['result'])) && ($this->options['result'] == 'fullList')) {
-			$this->items['css']['text'] = cssJSToolbox::getText('css');
-			$this->items['javascript']['text'] = cssJSToolbox::getText('javascript');
-			$this->items['html']['text'] = cssJSToolbox::getText('html');
-			$this->items['php']['text'] = cssJSToolbox::getText('php');
+			$this->items['css']['text'] = cssJSToolbox::getText('CSS');
+			$this->items['javascript']['text'] = cssJSToolbox::getText('JavaScript');
+			$this->items['html']['text'] = cssJSToolbox::getText('HTML');
+			$this->items['php']['text'] = cssJSToolbox::getText('PHP');
 		}
 		else {
 			CJTxTable::import('author');
 			$internalAuthorsFlag = CJTAuthorTable::FLAG_SYS_AUTHOR;
 			// Query all types  ezcluding internal authors!
-			$query = "SELECT DISTINCT(type) `text` 
+			$query = "SELECT DISTINCT(type) `text`
 													FROM #__cjtoolbox_templates  t
 													LEFT JOIN #__cjtoolbox_authors a
 													ON  t.authorId = a.id
@@ -35,5 +35,5 @@ class CJTTemplateTypesField extends CJTListField {
 			$this->items = cssJSToolbox::getInstance()->getDBDriver()->select($query);
 		}
 	}
-	
+
 } // End class.

@@ -1,6 +1,6 @@
 <?php
 /**
-* 
+*
 */
 
 // Disallow direct access.
@@ -11,13 +11,13 @@ require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 cssJSToolbox::import('tables:template.php');
 
 /**
-* 
+*
 */
 class CJTTemplatesManagerListTable extends WP_List_Table {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function __construct() {
 		// Set hook suffix (E_ALL complain)!
@@ -26,9 +26,9 @@ class CJTTemplatesManagerListTable extends WP_List_Table {
 		$args = array();
 		parent::__construct($args);
 	}
-	
+
 	/**
-	* 
+	*
 	*/
 	protected function column_default($item, $name) {
 		$value = null;
@@ -36,6 +36,28 @@ class CJTTemplatesManagerListTable extends WP_List_Table {
 			case 'state':
 			case 'type':
 				$value = cssJSToolbox::getText($item->{$name});
+				switch  ( $value ) :
+					case 'Javascript': case 'javascript':
+					$value = 'JavaScript';
+					break;
+					case 'css':
+					$value = 'CSS';
+					break;
+					case 'html':
+					$value = 'HTML';
+					break;
+					case 'php':
+					$value = 'PHP';
+					case 'published':
+					$value = 'Published';
+					break;
+					case 'draft':
+					$value = 'Draft';
+					break;
+					case 'trash':
+					$value = 'Trash';
+					break;
+				endswitch;
 			break;
 			case 'name':
 				// Display cell value as regular.
@@ -56,13 +78,13 @@ class CJTTemplatesManagerListTable extends WP_List_Table {
 				$actions['edit'] = "<a href='#edit({$item->id})'>" . cssJSToolbox::getText('Edit') . '</a>';
 				// Allow Deletion Only if state = trash!
 				if ($item->state == 'trash') {
-					$actions['delete'] = "<a href='#delete({$item->id})'>" . cssJSToolbox::getText('Delete') . '</a>';	
+					$actions['delete'] = "<a href='#delete({$item->id})'>" . cssJSToolbox::getText('Delete') . '</a>';
 				}
 				// Show only states that the Template s not in!
 				$states = CJTTemplateTable::$states;
 				unset($states[$item->state]);
 				foreach ($states as $name => $text) {
-					$actions[$name] = "<a href='#changeState({$item->id})'>{$text}</a>";
+					$actions[$name] = "<a href='#changeState({$item->id})'>". ucfirst( $text ) ."</a>";
 				}
 				// Show actions row underneath template name!!
 				$value .= $this->row_actions($actions, false);
@@ -76,16 +98,16 @@ class CJTTemplatesManagerListTable extends WP_List_Table {
 		}
 		return $value;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $which
 	*/
 	function extra_tablenav($which) {
 		// Import dependencies.
 		cssJSToolbox::import('framework:html:list.php');
-		// Define filters.		
+		// Define filters.
 		$filters = array();
 		$filters['states'] = 'State';
 		$filters['types'] = 'Type';
@@ -96,15 +118,15 @@ class CJTTemplatesManagerListTable extends WP_List_Table {
 		$filters['last-modified-dates'] = 'Last Modified';
 		// Get the HTML field for each filter antput the result.
 		$filtersName = array();
-		foreach ($filters as $name => $text) { 
+		foreach ($filters as $name => $text) {
 			// Output field markup.
 			$fieldName = "filter_{$name}";
 			$classes = "filter filter_{$name}";
-			echo CJTListField::getInstance("template-{$name}", 
-					'templates-manager', 
-					$fieldName, 
-					isset($_REQUEST[$fieldName]) ? $_REQUEST[$fieldName] : null, 
-					null, 
+			echo CJTListField::getInstance("template-{$name}",
+					'templates-manager',
+					$fieldName,
+					isset($_REQUEST[$fieldName]) ? $_REQUEST[$fieldName] : null,
+					null,
 					$classes,
 					null,
 					null,
@@ -117,26 +139,26 @@ class CJTTemplatesManagerListTable extends WP_List_Table {
 		if ($which == 'top') {
 			// Output all filter names list!
 			$filtersName = implode(',', $filtersName);
-			echo "<input type='hidden' name='allFiltersName' value='{$filtersName}' />";			
+			echo "<input type='hidden' name='allFiltersName' value='{$filtersName}' />";
 		}
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function get_bulk_actions() {
 		// Bulk ations.
 		$actions = array(
 			'delete' => cssJSToolbox::getText('Delete'),
-			'changeState::published' => cssJSToolbox::getText('published'),
-			'changeState::trash' => cssJSToolbox::getText('trash'),
-			'changeState::draft' => cssJSToolbox::getText('draft'),
+			'changeState::published' => cssJSToolbox::getText('Published'),
+			'changeState::trash' => cssJSToolbox::getText('Trash'),
+			'changeState::draft' => cssJSToolbox::getText('Draft'),
 		);
 		// Return actions!
 		return $actions;
 	}
-	
+
 	/**
 	 * Get a list of columns. The format is:
 	 * 'internal-name' => 'Title'
@@ -160,10 +182,10 @@ class CJTTemplatesManagerListTable extends WP_List_Table {
 			'state' => cssJSToolbox::getText('State'),
 		);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function get_sortable_columns() {
 		$sortables = array();
@@ -177,5 +199,5 @@ class CJTTemplatesManagerListTable extends WP_List_Table {
 		$sortables['author'] = 'author';
 		return $sortables;
 	}
-	
+
 } // End class.

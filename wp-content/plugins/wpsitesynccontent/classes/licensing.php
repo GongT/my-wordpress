@@ -58,12 +58,13 @@ class SyncLicensing
 		$lic = file_exists(dirname(dirname(__FILE__)) . '/license.tmp');
 
 		foreach (self::$_api_urls as $api) {
+			if (self::LICENSE_API_URL_PRIMARY === $api && $lic)
+				$api = str_replace('//', '//staging.', $api);
+
 SyncDebug::log(__METHOD__.'():' . __LINE__ . ' api=' . $api . ' endpoint=' . var_export($endpoint, TRUE));
 			$this->_license_data = NULL;
 			if (NULL !== $endpoint)
 				$api = add_query_arg($endpoint, $api);
-			if (FALSE && $lic)
-				$api = str_replace('//', '//staging.', $api);
 
 SyncDebug::log(__METHOD__.'():' . __LINE__ . ' calling wp_remote_' . (self::MODE_GET == $mode ? 'get' : 'post') . '() on ' . $api . ' with ' . var_export($params, TRUE));
 
@@ -78,7 +79,7 @@ SyncDebug::log(__METHOD__.'():' . __LINE__ . ' error: ' . var_export($res, TRUE)
 			}
 
 			$this->_license_data = json_decode(wp_remote_retrieve_body($res));
-SyncDebug::log(__METHOD__.'():' . __LINE__ . ' decoded: ' . var_export($this->_license_data, TRUE));
+SyncDebug::log(__METHOD__.'():' . __LINE__ . ' decoded: ' . SyncDebug::arr_sanitize(get_object_vars($this->_license_data)));
 			// check results for get_version
 			if (isset($params['body']['edd_action']) && 'get_version' === $params['body']['edd_action']) {
 SyncDebug::log(__METHOD__.'():' . __LINE__ . ' edd get_version request');
@@ -144,6 +145,18 @@ SyncDebug::log(__METHOD__.'():' . __LINE__ . ' processed all licensing servers; 
 		if (empty(self::$_licenses[$name]))
 			return FALSE;
 		return self::$_licenses[$name];
+	}
+
+	/**
+	 * Sets a key
+	 * @param string $name Add-on name
+	 * @param string $key Key
+	 */
+	public function set_key($name, $key)
+	{
+		$this->_load_licenses();
+		self::$_licenses[$name] = $key;
+		self::$_dirty = TRUE;
 	}
 
 	/**
@@ -310,7 +323,7 @@ SyncDebug::log(__METHOD__.'():' . __LINE__ . ' sending ' . var_export($api_param
 			'sslverify' => FALSE,
 			'body'      => $api_params
 		), self::MODE_POST);
-SyncDebug::log(__METHOD__.'():' . __LINE__ . ' results=' . var_export($response, TRUE));
+SyncDebug::log(__METHOD__.'():' . __LINE__ . ' results=' . var_export($res, TRUE));
 
 		// check for errors
 		if (FALSE === $res) {		// if (is_wp_error($response)) {

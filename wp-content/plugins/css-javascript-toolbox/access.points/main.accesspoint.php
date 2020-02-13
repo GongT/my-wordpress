@@ -1,26 +1,26 @@
 <?php
 /**
-* 
+*
 */
 
 // Disallow direct access.
 defined('ABSPATH') or die("Access denied");
 
 /**
-* 
+*
 */
 class CJTMainAccessPoint extends CJTAccessPoint {
 
     /**
     * put your comment there...
-    *  
+    *
     * @var mixed
     */
     protected static $instance;
 
     /**
     * put your comment there...
-    * 
+    *
     */
     public function __construct() {
         // Initialize Access Point base!
@@ -30,21 +30,21 @@ class CJTMainAccessPoint extends CJTAccessPoint {
         // Needed for calling from nuinstall static method!
         self::$instance = $this;
     }
-    
+
     /**
     * put your comment there...
-    * 
+    *
     */
-    protected function doListen() 
+    protected function doListen()
     {
-        
+
         // Register uninstall hook!
         if (CJTPlugin::getInstance()->isInstalled())
         {
             // Wordpress need STATIC method!
-            register_uninstall_hook(CJTOOLBOX_PLUGIN_FILE, array(__CLASS__, 'uninstall'));	
+            register_uninstall_hook(CJTOOLBOX_PLUGIN_FILE, array(__CLASS__, 'uninstall'));
         }
-        
+
         // If not in uninstall state then plugins_loaded hook
         // used to run the plugin!
         add_action('plugins_loaded', array(&$this, 'main'));
@@ -52,29 +52,35 @@ class CJTMainAccessPoint extends CJTAccessPoint {
 
     /**
     * put your comment there...
-    * 
+    *
     */
-    public function main() 
+    public function main()
     {
-        
+
         // Run the coupling only if installed!
         if (CJTPlugin::getInstance()->isInstalled())
         {
             $this->controllerName = 'blocks-coupling';
             $this->route(false);
         }
-        
+
         // Run all the aother access points!
         CJTPlugin::getInstance()->listen();
     }
 
     /**
     * put your comment there...
-    * 
+    *
     */
     public static function uninstall() {
         // For the uninstaller to be run eraseData setting must be enabled.
         cssJSToolbox::import('models:settings:uninstall.php');
+		cssJSToolbox::import('models:installer.php');
+
+		delete_option( CJTPlugin::DB_VERSION_OPTION_NAME );
+		delete_option( CJTInstallerModel::INSTALLATION_STATE );
+		delete_option( 'cjtplusinstaller' );
+
         $settings = new CJTSettingsUninstallPage();
         if ($settings->eraseData) {
             // Get the only instance we've for the main access point!
@@ -84,7 +90,9 @@ class CJTMainAccessPoint extends CJTAccessPoint {
             $controller = $mainAccessPointObject->route(false)
             // Fire uninstall action!
             ->setAction('uninstall')
-            ->_doAction();
+			->_doAction();
+
+
         }
     }
 

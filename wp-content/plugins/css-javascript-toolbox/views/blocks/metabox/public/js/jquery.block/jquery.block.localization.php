@@ -5,8 +5,8 @@
 */
 
 /**
-* Localization for Javascript CJT_METABOX_BLOCKJqueryBlockI18N variable.
-* 
+* Localization for JavaScript CJT_METABOX_BLOCKJqueryBlockI18N variable.
+*
 */
 return array(
 	'previewLinkTitle' => cssJSToolbox::getText('Preview Post/Page in a new window'),

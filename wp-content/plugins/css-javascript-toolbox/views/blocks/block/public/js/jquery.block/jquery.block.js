@@ -1,22 +1,22 @@
 /**
 * @version $ Id; block.jquery.js 21-03-2012 03:22:10 Ahmed Said $
-* 
+*
 * CJT Block jQuery Plugin
 */
 
 /**
-* JQuery wrapper for the CJTBlockPlugin object. 
+* JQuery wrapper for the CJTBlockPlugin object.
 */
 (function($) {
 
 	/**
-	* 
+	*
 	*/
 	var notifySaveChangesProto = function(block) {
-		
+
 		/**
 		* put your comment there...
-		* 
+		*
 		* @param block
 		*/
 		this.initDIFields = function() {
@@ -39,7 +39,7 @@
 			* Method to get hash copy from stored content.
 			*/
 			aceEditor.cjtSyncInputField = function() {
-				this.cjtBlockSyncValue = hex_md5(this.getSession().getValue());	
+				this.cjtBlockSyncValue = hex_md5(this.getSession().getValue());
 			}
 			// Hack jQuery Object by pushing
 			// ace Editor into fields list, increase length by 1.
@@ -53,10 +53,10 @@
 			// Chaining.
 			return this;
 		},
-		
+
 		/**
 		* put your comment there...
-		* 
+		*
 		* @param element
 		*/
 		this.initElement = function(field) {
@@ -72,7 +72,7 @@
 				else {
 			  	field.cjtSyncInputField = function() {
 			  		this.cjtBlockSyncValue = this.value;
-			  	}			  	
+			  	}
 				}
 				// Create interface to "bind" too.
 				field.bind = function(e, h) {
@@ -102,9 +102,9 @@
 	*
 	* This element is commonly used in various places inside the Plugin.
 	* there is no need to find them everytime we need it. Load it only one time.
-	* 
+	*
 	* @var object
-	*/	
+	*/
 	var autoLoadElements = {
 		editBlockName : 'div.edit-block-name',
 		blockName : 'span.block-name',
@@ -120,68 +120,68 @@
 	* @Author Ahmed Said
 	*/
 	CJTBlockPluginBase = function() {
-		
+
 		/**
 		* Block model for accessing block properties.
 		*
 		* @var CJTBlock
 		*/
 		this.block;
-		
+
 		/**
 		*
 		*
 		*/
 		this.changes;
-		
+
 		/**
-		* 
+		*
 		*/
 		this.defaultDocks;
-		
+
 		/**
-		* 
+		*
 		*/
 		this.editorToolbox;
-		
+
 		/**
 		* Commonly accessed elements stored here.
 		*
 		* @var object
 		*/
 		this.elements;
-		
+
 		/**
-		* 
+		*
 		*/
 		this.extraDocks = [];
-		
+
 		/**
 		* Block features and options.
 		*
 		* @var object
-		*/			
+		*/
 		this.features;
-		
+
 		/**
-		* 
+		*
 		*/
 		this.internalChanging = false;
-		
+
 		/**
-		* 
 		*
-		* 
-		*/	
+		*
+		*
+		*/
 		this.toolbox = null;
-		
+
 		// Block Plugins
 		CJTBlockObjectPluginDockModule.plug(this);
-		
+
 		/**
 		* Event handler for cancel edit block name.
 		*
-		* Cancel edit name can be done throught two ways.
+		* Cancel edit name can be done through two ways.
 		*		- Press Escape inside edit block name input.
 		*		- Click cancel edit name icon.
 		*/
@@ -194,7 +194,7 @@
 			// Hide CodeFile Name.
 			this.block.box.find('.file').css({visibility : 'visible'});
 		}
-		
+
 		/**
 		*
 		*
@@ -221,7 +221,7 @@
 			}
 			else { // All HTML native types.
 				element = event.target;
-				// Use field "value" property for getting new 
+				// Use field "value" property for getting new
 				// context except checkboxes uses checked property.
 				newValue = (element.type == 'checkbox') ? newValue = $(element).prop('checked') : element.value;
 			}
@@ -235,7 +235,7 @@
 			// Notify blocks page.
 			CJTBlocksPage.blockContentChanged(this.block.id, isChanged);
 		}
-		
+
 		/**
 		* Event handler for delete the block.
 		*
@@ -253,7 +253,7 @@
 			  	CJTBlocksPage.deleteBlocks(this.block.box);
 			}
 		}
-		
+
 		/**
 		*
 		*
@@ -277,7 +277,7 @@
 			tb_show(CJTJqueryBlockI18N.blockRevisionsDialogTitle, url);
 			return false;
 		}
-		
+
 		/**
 		* Event handler for start editing block name.
 		*
@@ -319,7 +319,7 @@
 					'font-size' : this.elements.blockName.css('font-size'),
 					'font-family' : this.elements.blockName.css('font-family')
 				};
-				// Make the textbox wider in case the displayed name is 
+				// Make the textbox wider in case the displayed name is
 				// wider than the text field.
 				var labelWidth = parseInt(this.elements.blockName.css('width'));
 				var textWidh = parseInt(inputText.css('width'));
@@ -336,7 +336,7 @@
 				inputText.focus();
 			}
 		}
-		
+
 		/**
 		*
 		*
@@ -349,15 +349,15 @@
 				// Server paramerers.
 				id : this.block.get('id'),
 				// Thick box parameters.
-				width : 300,
-				height: 190
+				width : 500,
+				height: 500
 			};
 			var url = CJTBlocksPage.server.getRequestURL('block', 'get_info_view', requestData);
 			tb_show(CJTJqueryBlockI18N.blockInfoTitle, url);
 		};
-	
+
 		/**
-		* 
+		*
 		*/
 		this._onlookuptemplates = function(targetElement, tbButton) {
 			// Initialize.
@@ -367,7 +367,7 @@
 				CJTToolBox.forms.templatesLookupForm[blockId] = {};
 			}
 			var lookupForm = CJTToolBox.forms.templatesLookupForm[blockId];
-			// This method will fired only once when the 
+			// This method will fired only once when the
 			// Templates popup button is hovered for the first time.
 			if (!targetElement.get(0).__cjt_loaded) {
 				var request = {blockId : blockId};
@@ -387,7 +387,7 @@
 			/** @TODO Tell Block toolbox to deatach/unbind popup callback */
 			return true; // Tell CJTToolBox to Show Popup menu as normal.
 		}
-		
+
 		/**
 		* Don't show popup menus if Block is minimized!
 		*/
@@ -404,12 +404,12 @@
 			}
 			return show;
 		}
-		
+
 		/**
-		* 
+		*
 		*/
 		this._onpostboxopened = function() {
-			// If aceEditor is undefined then the 
+			// If aceEditor is undefined then the
 			// block is no loaded yet,
 			// loads it.
 			if (this.block.aceEditor == undefined) {
@@ -420,7 +420,7 @@
 				this.block.aceEditor.resize();
 			}
 		}
-		
+
 		/**
 		* Event handler for saving block data.
 		*
@@ -480,7 +480,7 @@
 				}, this)
 			);
 		}
-		
+
 		/**
 		* Event handler for saveing block name.
 		*
@@ -509,7 +509,7 @@
 				this._oncanceleditname();
 			}
 		}
-		
+
 		/**
 		*
 		*
@@ -542,7 +542,7 @@
 			// Store current selected language for later use.
 			languageSwitcher.cjtbCurrentLangClass = cssMap[params.lang];
 		}
-		
+
 		/**
 		* Event handler for switch block flag.
 		*
@@ -573,7 +573,7 @@
 				}, this)
 			);
 		}
-		
+
 		/**
 		*
 		*
@@ -594,16 +594,16 @@
 			// Enable = true then setReadnly = false and vise versa.
 			this.block.aceEditor.setReadOnly(!state);
 		}
-		
+
 		/**
 		* Make block code is the active element.
 		*
 		* @return false.
-		*/		
+		*/
 		this.focus = function() {
 			this.block.aceEditor.focus();
 		}
-		
+
 		/**
 		* Initialize Block Plugin object.
 		*
@@ -680,14 +680,14 @@
 			if (model.box.find('.code-editor').length) {
 				this.load();
 			}
-			// Display block. 
+			// Display block.
 			// !important: Blocks come from server response doesn't need this but the newly added blocks does.
 			// need sometime to be ready for display.
 			model.box.css({display : 'block'}).addClass('cjt-block');
 		}
-		
+
 		/**
-		* 
+		*
 		*/
 		this._onload = function() {
 			// Initialize.
@@ -697,7 +697,7 @@
 			// Retrieve Block HTML content.
 			CJTBlocksPage.server.send('blocksPage', 'loadBlock', {blockId : model.get('id'), isLoading : true})
 			.success($.proxy(
-				function(blockContent) {					
+				function(blockContent) {
 					// Remove loading bloc progress.
 					loadingPro.remove();
 					// Add assignment panel at the most begning of the block.
@@ -709,21 +709,21 @@
 				}, this)
 			);
 		};
-		
+
 		/**
-		* 
+		*
 		*/
-		this.load = function() 
+		this.load = function()
 		{
-			
+
 			var model = this.block;
-			
+
 			// Broadcast block event
 			this.block.box.trigger( 'cjtBlockLoaded', [ this ] );
-			
+
 			// LOAD MODEL.
 			model.load();
-			
+
 			// Editor default options.
 			this.block.aceEditor.setOptions({showPrintMargin : false});
 			// Initialize editor toolbox.
@@ -749,18 +749,18 @@
 			this.theme = {};
 			this.theme.backgroundColor = 'white';
 			this.theme.color = 'black';
-			
+
 			// LOAD EVENT.
 			if (this.onLoad !== undefined) {
-				this.onLoad();	
+				this.onLoad();
 			}
-			
+
 			// Block Code File.
 			this.codeFile = new CJTBlockFile(this);
 		}
 
 		/**
-		* 
+		*
 		*/
 		this.registerCommands = function() {
 			var editorCommands = this.block.aceEditor.commands;
@@ -777,9 +777,9 @@
 			/** Add Our Ace Save, Full screen and Code-Auto-Completion commands */
 			editorCommands.addCommands(commands);
 		}
-		
+
 		/**
-		* 
+		*
 		*/
 		this.restoreRevision = function(revisionId, data) {
 			// Create new revision control action.
@@ -787,15 +787,15 @@
 			// Display the revision + enter revision mode.
 			this.revisionControl.display();
 		}
-		
+
 		/**
-		* 
+		*
 		*/
 		this.setFeatures = function( features )
 		{
 			this.features = features;
 		};
-		
+
 		/*
 		*
 		*
@@ -815,18 +815,18 @@
 				break;
 			}
 		}
-		
+
 	} // End class.
-	
+
 	/**
 	*	jQuery Plugin interface.
 	*/
 	$.fn.CJTBlock = function(args) {
 		/**
 		* Process every block object.
-		*/		
+		*/
 		return this.each(function() {
-			
+
 			// If this is the first time to be called for this element
 			// create new CJTBlockPlugin object for the this element.
 			if (this.CJTBlock == undefined) {
@@ -838,7 +838,7 @@
 			}
 			return this;
 		});
-		
+
 	} // End Plugin class.
 
 })(jQuery);

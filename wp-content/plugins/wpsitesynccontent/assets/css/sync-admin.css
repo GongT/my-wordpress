@@ -74,6 +74,9 @@ margin-right: -0.5rem;
 	padding-top: 4px;
 }
 
+#spectrom_sync #sync-details {
+	margin-bottom: 10px;
+}
 #spectrom_sync #sync-details-container {
 
 }
@@ -105,8 +108,18 @@ padding-right: 5px;
 	-webkit-transform: rotate(180deg);     /* Chrome and other webkit browsers */
 	transform: rotate(180deg);
 padding-bottom: 3px;
+padding-bottom: 0px;
 padding-left: 3px;
 	vertical-align: text-top;
+}
+#spectrom_sync button#remove-association {
+	text-align: center;
+}
+#spectrom_sync button#remove-association .sync-button-icon {
+	text-align: center;
+	padding-right: 0;
+	padding-top: 4px;
+	margin-left: 0;
 }
 #spectrom_sync #sync-message-dismiss .dashicons {
 	font-size: 85%;
@@ -137,6 +150,11 @@ padding-left: 3px;
 .spectrom-sync-settings .sync-settings-logo {
 	float: left;
 }
+.spectrom-sync-settings .cta-message {
+	border-left: 3px solid #e542f4;
+	margin-left: 3px;
+	padding-left: 8px;
+}
 .spectrom-sync-settings table.form-table {
 	width: 450px;
 width: 100%;
@@ -148,7 +166,7 @@ width: 100%;
 	background-color: #e5e5e5;;
 }
 
-.spectrom-sync-settings #connect-success-indicator { margin-left: 0.7rem; margin-top: 0.5rem; font-size: 120%; font-weight:bolder; }
+.spectrom-sync-settings #connect-success-indicator { margin-left: 0.7rem; margin-top: 0.4rem; font-size: 120%; font-weight:bold; }
 /* .spectrom-sync-settings #connect-success-indicator.fa-check { color: green; } */
 /* .spectrom-sync-settings #connect-success-indicator.fa-close { color: red; } */
 .spectrom-sync-settings #connect-success-indicator.dashicons-yes { color: green; }
@@ -224,3 +242,10 @@ margin-bottom: .5rem;
 	padding-left: .5rem;
 	padding-right: .5rem;
 }
+
+/* rules needed for Gutenberg UI */
+#spectrom-sync { background-color: transparent; }
+.edit-post-sidebar #spectrom_sync .inside { padding: 0 .5rem .5rem .5rem; background-color: white !important; }
+.edit-post-sidebar #spectrom_sync .inside.visible { display: block; }
+.edit-post-sidebar #spectrom_sync .inside.invisible { display: none; }
+.components-panel__body-toggle.components-button { background-color: white !important; }

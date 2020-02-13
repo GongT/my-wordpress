@@ -8,25 +8,25 @@ defined('ABSPATH') or die("Access denied");
 
 /**
 * Get Add-New-Block view markups.
-* 
+*
 * The method is resposible for selecting the correct template
 * and initialize template vars.
-* 
+*
 * @author Ahmed Said
 * @version 6
 */
 class CJTBlocksNewView extends CJTView {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	public $position;
-	
+
 	/**
 	* Output Add New Block markups.
-	* 
+	*
 	* @return void
 	*/
 	public function display() {
@@ -39,10 +39,10 @@ class CJTBlocksNewView extends CJTView {
 		}
 		echo $this->getTemplate('default');
 	}
-	
+
 	/**
-	* Output Javascript files requirred to Add-New-Block view to run.
-	* 
+	* Output JavaScript files requirred to Add-New-Block view to run.
+	*
 	* @return void
 	*/
 	public static function enququeScripts() {
@@ -55,10 +55,10 @@ class CJTBlocksNewView extends CJTView {
 			'views:blocks:new:public:js:{CJT-}add-new-block'
 		);
 	}
-	
+
 	/**
 	* Output CSS files required to Add-New-Block view.
-	* 
+	*
 	* @return void
 	*/
 	public static function enququeStyles() {
@@ -69,7 +69,7 @@ class CJTBlocksNewView extends CJTView {
 			'framework:css:{CJT-}forms'
 		);
 	}
-	
+
 } // End class.
 
 // Hookable!!
