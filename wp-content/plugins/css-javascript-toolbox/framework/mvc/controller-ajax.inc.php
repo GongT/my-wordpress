@@ -109,7 +109,7 @@ abstract class CJTAjaxController extends CJTController {
 			$method = ucfirst(str_replace('_', ' ', $method));
 			$method = str_replace(' ', '', $method);
 			// Lower case the first character.
-			$method = strtolower($method{0}) . substr($method, 1);
+			$method = strtolower($method[0]) . substr($method, 1);
 			// Cahe method name for child classes to use!
 			$this->methodName = $method;
 			// Relying on the trailer "Action" for security.

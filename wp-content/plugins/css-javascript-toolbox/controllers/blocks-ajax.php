@@ -198,7 +198,7 @@ class CJTBlocksAjaxController extends CJTAjaxController {
 		// make sure we're save.
 		if ( is_array( $blocksToSave ) && ! empty( $blocksToSave ) )
 		{
-
+            
 			foreach ( $blocksToSave as $id => $postedblockPartialData )
 			{
 				// Push block id into block data.
@@ -219,7 +219,9 @@ class CJTBlocksAjaxController extends CJTAjaxController {
 				$this->model->save();
 
 				// Send the changes properties back to client.
-				foreach ( $postedblockPartialData as $property => $value )
+                $updatedBlockData = $this->model->getBlock($id, null, array('*'), ARRAY_A);
+                
+				foreach ( $updatedBlockData as $property => $value )
 				{
 					$response[ $id ][ $property ][ 'value' ] = $value;
 				}
@@ -234,6 +236,7 @@ class CJTBlocksAjaxController extends CJTAjaxController {
 		// Save changes.
 		$this->model->save();
 
+        // Return 
 		// Set response.
 		$this->response = $response;
 

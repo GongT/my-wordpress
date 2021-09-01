@@ -49,22 +49,18 @@
 				<td><?php echo cssJSToolbox::getText('Code Templates') ?></td>
 				<td><strong><?php echo $this->templates ?></strong></td>
 			</tr>
-			<tr>
-				<td><?php echo cssJSToolbox::getText('Script Packages') ?></td>
-				<td><strong><?php echo $this->scriptsPackage ?></strong></td>
-			</tr>
 		</tbody>
 	</table>
 </div>
 <hr />
 <div id="cjt-statcs-metabox-info">
-	<span class="cjt-support-us-link">
-<?php echo cssJSToolbox::getText('Upgrade to') ?>: <a target="_blank" href="https://css-javascript-toolbox.com/pricing/"><?php echo cssJSToolbox::getText('CJT Core and CJT PLUS') ?></a>
-    </span>
-    <span class="cjt-support-us-link">
-<?php echo cssJSToolbox::getText('Learn with') ?>: <a target="_blank" href="https://css-javascript-toolbox.com/documentation/"><?php echo cssJSToolbox::getText('CJT Online Help') ?></a>
-    </span>
     <div class="cjt-stat-metabox-version">
-        <span><?php echo cssJSToolbox::getText('Version') ?>:&nbsp;&nbsp;<?php echo CJTPlugin::VERSION; ?></span>
+		<span><?php echo cssJSToolbox::getText('CJT Version') ?>:&nbsp;&nbsp;<?php echo CJTPlugin::VERSION; ?>
+		<?php if ( class_exists( 'CJTPlusPluginInterface' ) ) {
+			$reflector = new \ReflectionClass( 'CJTPlus' );
+			$CJTPlusVersion = get_plugin_data( str_replace( 'plus.class', 'plus', $reflector->getFileName() ) )['Version'];
+			echo ' / ' . cssJSToolbox::getText('CJT PLUS Version') ?>:&nbsp;&nbsp;<?php echo $CJTPlusVersion;
+		} ?>
+		</span>
     </div>
 </div>

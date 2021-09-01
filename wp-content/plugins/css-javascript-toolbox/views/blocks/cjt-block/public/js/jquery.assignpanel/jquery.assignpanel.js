@@ -1,23 +1,23 @@
 /**
-* 
+*
 */
 
 /**
-* 
+*
 */
 (function($) {
-	
+
 	/**
 	* Hold the items per page to load
 	* at a time.
-	* 
+	*
 	* The variable is set the first time
 	* getIPerPage method is called.
-	* 
+	*
 	* @
 	*/
 	var iPerPage = null;
-					
+
 	/**
 	* jQuery namespace.
 	*/
@@ -30,110 +30,110 @@
 			if (assigmentPanelElement.CJTBlockAssignmentPanel === undefined) {
 				// Define assigment panel plugin.
 				assigmentPanelElement.CJTBlockAssignmentPanel = new function() {
-					
+
 					/**
 					* Assigment panel jQuery pLugin reference
-					* 
+					*
 					*/
 					var apjp = this;
-					
+
 					/**
 					* put your comment there...
-					* 
+					*
 					* @type Array
 					*/
 					this.objectsList = [ 'pages', 'posts', 'categories', 'pinPoint' ];
-					
+
 					// Allow Pluggable buttons
 					$( assigmentPanelElement ).trigger( 'cjtblockassigninitobjectslist', [ this ] );
-					
+
 					/**
 					* put your comment there...
-					* 
+					*
 					* @type CJTBLockPlugin
 					*/
 					this.block = options.block;
 
 					/**
-					* 
+					*
 					*/
 					this.buttons = ( function() {
-						
+
 						var buttons = {};
 
 						$.each( apjp.objectsList,
-						
-								function( index, name ) 
+
+								function( index, name )
 								{
 									buttons[ name ] = [];
 								}
 							);
-						
+
 						return buttons;
-						
+
 					} )();
-					
+
 					/**
-					* 
+					*
 					*/
 					this.checkboxDisabled = (this.block.state == 'restore')
-					
+
 					/**
-					* 
+					*
 					*/
 					this.loadAssignedOnlyMode = this.checkboxDisabled;
-					
+
 					/**
-					* 
+					*
 					*/
 					this.jElement = $(assigmentPanelElement);
-					
+
 					/**
 					* Hold reference for 'this' object to
 					* be accessed by 'private' methods when called
 					* from DOM element event handler.
-					* 					
+					*
 					*/
 					var assignPanel = this;
-					
+
 					/**
 					* put your comment there...
-					* 
+					*
 					* @type Object
 					*/
 					var map = ( function() {
-						
+
 						var map = {};
 
 						$.each( apjp.objectsList,
-						
-								function( index, name ) 
+
+								function( index, name )
 								{
 									map[ name ] = { };
 								}
 							);
 
 						return map;
-						
+
 					} )();;
-					
+
 					/**
 					* put your comment there...
-					* 
+					*
 					*/
 					var mdlBlock = this.block.block;
-					
+
 					/**
-					* 
+					*
 					*/
-					var _onadvancedaccordionchanged = function(event, ui) {
+					var _onadvancedaccordionchanged = function (event, ui) {
 						// Activate textarea under the current selected item content!
 						ui.newContent.find('textarea').focus();
 					};
 
 					/**
 					* put your comment there...
-					* 
+					*
 					* @param event
 					*/
 					var _ondetectlistscroll = function(event) {
@@ -159,11 +159,11 @@
 
 					/**
 					*
-					* 
+					*
 					* @param event
 					* @param ui
 					*/
-					var _onobjectlistactivate = function(event, ui) {
+					var _onobjectlistactivate = function (event, ui) {
 						// Initialize.
 						var item = ui.item;
 						// Process only elements that list assignment panel objects.
@@ -176,7 +176,7 @@
 								var params = list.data('params');
 								// Load first page.
 								list.get(0).getCJTBlockAPOP(true).success($.proxy(
-									function(response) {
+									function (response) {
 										// Mark item as activated after the page
 										// is successfully loaded.
 										item.data('objectListActivated', true);
@@ -196,10 +196,10 @@
 
 					/**
 					* put your comment there...
-					* 
+					*
 					* @param event
 					*/
-					var _onobjectstatechanged = function() {
+					var _onobjectstatechanged = function () {
 						// Initialize.
 						var checkbox = this;
 						var groupName = checkbox.name.match(/cjtoolbox\[\d+\]\[(\w+)\]/)[1];
@@ -217,16 +217,22 @@
 								delete map[groupName][objectId];
 							}
 							else {
-								map[groupName][objectId] = item;	
+								map[groupName][objectId] = item;
 							}
 						}
+
+                        // Set Assignment Counter
+                        var assignmentCounterElement = options.block.infoBar.find('.block-assignment-count a');
+                        var assignmentCount = parseInt(assignmentCounterElement.text());
+
+                        assignmentCounterElement.text(assignmentCount + (item.value ? 1 : -1));
 					};
-					
+
 					/**
 					* put your comment there...
-					* 
+					*
 					* @param event
-					* 
+					*
 					* @returns {Boolean}
 					*/
 					var _onselectchilds = function(event) {
@@ -234,14 +240,35 @@
 						var overlay = $(event.target);
 						var checkbox = overlay.parent().find('.select-childs');
 						var state = checkbox.prop('checked') ? '' : 'checked';
+                        var boolState = state == 'checked' ? true : false;
+
 						// Work only if select-child checkbox is interactive!
 						if (checkbox.attr('disabled') != 'disabled') {
+
 							// Revert checkbox state.
 							checkbox.prop('checked', state);
-							// Clone state to parent checkbox.
-							checkbox.parent().find('label>input:checkbox').prop('checked', state).trigger('change');
-							//Clone state to all child checkboxes
-							checkbox.parent().find('.children input:checkbox').prop('checked', state).trigger('change');
+
+                            /**
+                            *  Clone state to parent checkbox.
+                            *  Clone state to all child checkboxes
+                            */
+                            var checkboxes = $.merge(   checkbox.parent().find('>label>input:checkbox').get(),
+                                                        checkbox.parent().find('.children input:checkbox').get());
+
+							$(checkboxes).each(
+
+                                function() {
+
+                                    let panelCheckbox = $(this);
+
+                                    if (panelCheckbox.prop('checked') != boolState) {
+
+                                        panelCheckbox.prop('checked', state).trigger('change');
+                                    }
+
+                                }
+                            );
+
 						}
 						// For link to behave inactive.
 						return false;
@@ -249,7 +276,7 @@
 
 					/**
 					* put your comment there...
-					* 
+					*
 					* @param index
 					* @param typeParams
 					* @param initialize
@@ -258,7 +285,7 @@
 					var getAPOP = function(index, typeParams, initialize, page) {
 						// Initialize.
 						var server = CJTBlocksPage.server;
-						// Use modeBlockId instead of original block id to be used in case of 
+						// Use modeBlockId instead of original block id to be used in case of
 						// DISPLAY-REVISION mode or any other modes added in the future.
 						var blockId = assignPanel.modeBlockId ? assignPanel.modeBlockId : assignPanel.block.block.get('id');
 						var requestData = {
@@ -282,7 +309,7 @@
 										// Cache only 'assigned' items.
 										if (item.assigned === true) {
 											map[typeParams.group][item.id] = {value : 1, sync : 1};
-										}										
+										}
 									}, this)
 								);
 							}, this)
@@ -292,27 +319,27 @@
 					};
 
 					/**
-					* 
+					*
 					*/
 					this.activateTab = function(type) {
 						// Activate the AUX tab by default.
 						assignPanel.jElement.find('li.type-' + type + '>a').trigger('click');
 						assignPanel.jElement.tabs({collapsible : false});
 					};
-					
+
 					/**
 					* Get items count to load per
 					* page.
-					* 
+					*
 					* The items to load per page is calculated by
 					* determing the maximum height that the objects-list element
 					* can reach divided by the single item height.
-					* 
+					*
 					* The maximum objects-list height is determined by
 					* the available screen-height - the other elements
 					* (TAB Nav, margins, padding, etc...).
 					* above and bottom the objects-list.
-					* 
+					*
 					*/
 					this.getIPerPage = function() {
 						// Calculate iPerPage only if not calculated.
@@ -335,7 +362,7 @@
 					};
 
 					/**
-					* 
+					*
 					*/
 					this.list_displayItems = function(list, data) {
 						// Initialize.
@@ -347,15 +374,17 @@
 						// Get the cached loaded pins count.
 						var loadedPinsCount = list.data('loadedCount');
 						// Update loaded count.
-						list.data('loadedCount', (loadedPinsCount + data.count));
+						list.data( 'loadedCount', ( loadedPinsCount + data.count ) );
 						// Add items to list using
 						$.each(items, $.proxy(
 							function(index, item) {
 								// Get parent list DOM Node.
-								var listId = '#objects-list-' + typeParams.type + '-' + mdlBlock.get('id') + '-' + item.parent;
+								var listId = '#objects-list-' + typeParams.type + '-' + mdlBlock.get( 'id' ) + '-' + item.parent;
+
 								var targetList = assignPanel.jElement.find(listId);
 								// Item list LI element.
-								var itemLi = $('<li></li>').appendTo(targetList);
+								var itemLi = $( '<li></li>' ).appendTo( targetList );
+
 								// Item assignment panel checkbox.
 								var checkbox = $('<input type="checkbox" />')
 																 // Set name
@@ -368,7 +397,7 @@
 																.prop('checked', item.assigned)
 																.appendTo($('<label></label>').appendTo(itemLi))
 																// If load-assigned-only-mode is activated then disable checkboxes.
-																.prop('disabled', assignPanel.checkboxDisabled);
+																.prop('disabled', 'undefined' !== typeof existingCJTUser && 'false' === existingCJTUser && 'undefined' === typeof CJTPlusBlock && listId.indexOf( '#objects-list-auxiliary-' ) >= 0 ? true : ( assignPanel.checkboxDisabled ) );
 								// Add the Checkbox to notification save chnages elements.
 								assignPanel.block.notifySaveChanges.initElement(checkbox.get(0));
 								// Checkbox title container.
@@ -377,7 +406,7 @@
 														.appendTo(itemLi);
 								// Checkbox title and link
 								if (item.link) {
-									$('<a href="' + item.link + '" target="_blank">' + item.title + '</a>').appendTo(title);	
+									$('<a href="' + item.link + '" target="_blank">' + item.title + '</a>').appendTo(title);
 								}
 								else {
 									title.text(item.title)
@@ -399,10 +428,10 @@
 							}, this)
 						);
 					}
-					
+
 					/**
 					* APOP -- Assigment Pabel Objects page
-					* 
+					*
 					*/
 					this.list_GetAPOP = function(initialize, page) {
 						// Initialize.
@@ -458,17 +487,17 @@
 						);
 						return promise;
 					};
-					
+
 					/**
-					* 
+					*
 					*/
 					this.getMap = function() {
-						return map;						
+						return map;
 					}
-		
+
 					/**
 					* put your comment there...
-					* 
+					*
 					*/
 					this.getTypeObject = function() {
 						// Default type object.
@@ -492,10 +521,10 @@
 						// Returs.
 						return type;
 					}
-		
+
 					/**
 					* put your comment there...
-					* 
+					*
 					*/
 					var onBlockSaved = function() {
 						// Syncronize the map.
@@ -519,7 +548,7 @@
 					};
 
 					/**
-					* 
+					*
 					*/
 					this.setMapGroup = function(name, mapList) {
 						map[name] = mapList;
@@ -528,7 +557,7 @@
 					/// CONSTRUCTTOR  ///
 					var blockId = mdlBlock.get('id');
 					var typeObjectDefaults = this.getTypeObject();
-					
+
 					// Initialize all 'objects-list'
 					this.jElement.find('.objects-list-button').each(
 						$.proxy(function(index, objectListEle) {
@@ -585,10 +614,10 @@
 							this.buttons[listParams['group']].push(objectListEle);
 						}, this)
 					);
-					
+
 					// Initialize assign panel attachec components
 					$( assigmentPanelElement ).trigger( 'cjtassignpanelattachedcomponents', [ assignPanel ] );
-					
+
 					// Initialize Assigment Panel tab.
 					this.jElement.tabs(
 					{
@@ -599,16 +628,16 @@
 							// Trigger real event handler.
 							_onobjectlistactivate(event, ui);
 						}
-						
+
 					} );
-					
-					this.jElement.tabs( 'option', 'active', this.jElement.find( '>.ui-tabs-panel' ).length - 1 );
-					
+
+					this.jElement.tabs( 'option', 'active', this.jElement.find( '>.ui-tabs-panel:not(.cjt-promo-disabled)' ).length - 1 );
+
 					// Create custom posts toggle widget.
 					var cpContainer = this.jElement.find('#custom-posts-container-' + blockId);
 					// Toggle custom post list when the header link is clicked.
 					cpContainer.find('.objects-list-button>a.custom-post-item-header').click($.proxy(
-						function(event) {
+						function (event) {
 							// Initialize.
 							var button = $(event.target).parent();
 							var list = button.next();
@@ -626,14 +655,16 @@
 							return false;
 						}, this)
 					);
-					
+
 					// Initialize Advanced tab accordion.
 					mdlBlock.box.find('#advanced-accordion-' + blockId).accordion({
-							change : _onadvancedaccordionchanged,
+							change: _onadvancedaccordionchanged,
+							collapsible: true,
+							active: false,
 							header: '.acc-header'
 						}
 					);
-					
+
 					// Syncronize assign panel map when block saved.
 					options.block.onBlockSaved = onBlockSaved;
 				}

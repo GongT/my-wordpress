@@ -1,6 +1,6 @@
 <?php
 /**
-* 
+*
 */
 
 // Disallow direct access.
@@ -10,42 +10,52 @@ defined('ABSPATH') or die("Access denied");
 cssJSToolbox::import('framework:mvc:controller-ajax.inc.php');
 
 /**
-* 
+*
 */
 class CJTsetupController extends CJTAjaxController {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $controllerInfo = array('model' => 'setup');
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function __construct() {
 		parent::__construct();
 		// Register actions!
 		$this->registryAction('activationFormView');
-		$this->registryAction('getState');		
+		$this->registryAction('promoTextView');
+		$this->registryAction('getState');
 		$this->registryAction('license');
 		$this->registryAction('reset');
 	}
-	
+
 	/**
 	* Display Activation form!
-	* 
+	*
 	*/
 	protected function activationFormViewAction() {
 		// Display activation for for the requested component!
 		parent::displayAction();
 	}
-	
+
+	/**
+	* Display CJT Promo form!
+	*
+	*/
+	protected function promoTextViewAction() {
+		// Display activation for for the requested component!
+		parent::displayAction();
+	}
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	protected function getStateAction() {
 		# Get component product types
@@ -53,10 +63,10 @@ class CJTsetupController extends CJTAjaxController {
 		# Return license state back
 		$this->response = $this->model->getStateStruct($licenseTypes);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	protected function licenseAction() {
 		// Read request parameters!
@@ -74,10 +84,10 @@ class CJTsetupController extends CJTAjaxController {
 		// Return state object includes (component, license, edd response [and action only if valid])
 		$this->response = $state;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	protected function resetAction() {
 		// Initializing!
@@ -94,5 +104,5 @@ class CJTsetupController extends CJTAjaxController {
 		$state['response']['item_name'] = $state['component']['name'];
 		$this->response = $state;
 	}
-	
+
 } // End class.

@@ -4,7 +4,7 @@
 	Author: Linesh Jose
 	Author URI: http://linesh.com/
 	Text Domain: wordstar
-	Version: 4.3
+	Version: 4.3.1
 	License: GNU General Public License v2 or later
 	License URI: http://www.gnu.org/licenses/gpl-2.0.html
 	Tags:  two-columns, right-sidebar, custom-background, custom-colors, custom-header, custom-menu, featured-images, microformats, post-formats, sticky-post, threaded-comments
@@ -148,10 +148,9 @@ blockquote {
 	border: 0 solid #1a1a1a;
 	border-left-width: 4px;
 	color: #686868;
-	font-size: 19px;
-	font-size: 1.1875rem;
+	font-size: 22px;
+	line-height: 35px;
 	font-style: italic;
-	line-height: 1.4736842105;
 	margin: 0 0 1.4736842105em;
 	padding: 0 0 0 1.263157895em;
 }
@@ -927,8 +926,7 @@ body.error404 .page-header, body.search-no-results .page-header {
 embed, iframe, object, video {
 	max-width: 100%;
 	vertical-align: middle;
-	height: auto;
-	min-height: 300px;
+
 }
 p > embed, p > iframe, p > object, p > video { margin-bottom: 0; }
 .entry-content .wp-audio-shortcode a, .entry-content .wp-playlist a { box-shadow: none; }
@@ -1372,7 +1370,7 @@ section.no-results .page-header .page-title { margin:0px !important }
 #main .hentry.post-content .post-thumbnail {
 	width: 100%;
 	overflow: hidden;
-	max-height: 250px;
+	max-height: 500px;
 	background: #EFEFEF;
 	background-image: linear-gradient(135deg, #8e8485, #70929c);
 	border: 0;
@@ -1400,14 +1398,18 @@ section.no-results .page-header .page-title { margin:0px !important }
 }
 #main .hentry.post-content .entry-content, #main .hentry.post-content .entry-summary {
 	padding: 25px;
-	font-size: 15px;
-	line-height: 25px;
+	font-size: 17px;
+	line-height: 30px;
 	color: #444;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
 	hyphens: auto;
 	word-wrap: break-word;
+}
+#main .hentry.post-content .entry-summary{
+	font-size: 15px;
+	line-height: 25px;
 }
 #main .hentry.post-content .entry-summary p { margin: 0; }
 #main .hentry.post-content .entry-summary p a.read-more {
@@ -1921,3 +1923,5 @@ list-style: none;
 	top: auto;
 	bottom: 0px;
 }
+
+/* 4.3.1 */

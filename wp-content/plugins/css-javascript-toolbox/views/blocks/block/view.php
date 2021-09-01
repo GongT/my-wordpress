@@ -10,48 +10,55 @@ defined('ABSPATH') or die("Access denied");
 * Blocks view
 */
 class CJTBlocksBlockView extends CJTView {
-	
+
 	/** */
 	const META_BOX_PREFIX = 'cjtoolbox';
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	public $block = null;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	public $isClosed;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $localization;
-	
+
+    /**
+    * put your comment there...
+    *
+    * @var mixed
+    */
+    protected $ontoolbox = array('parameters' => array('block'));
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $params = array();
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	public $templateName = 'edit';
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function __construct($viewInfo) {
 		parent::__construct($viewInfo);
@@ -63,27 +70,27 @@ class CJTBlocksBlockView extends CJTView {
 		// Load localization text.
 		$this->localization = require($this->getPath('public/js/jquery.block/jquery.block.localization.php'));
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function display($template = null) {
 		// Import template.
 		echo $this->getTemplate($template ? $template : $this->templateName);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public static function enqueueScripts() {
 		// Use related scripts.
 		self::useScripts(__CLASS__,
 			'jquery',
-			'common', 
-			'wp-lists', 
-			'postbox', 
+			'common',
+			'wp-lists',
+			'postbox',
 			'thickbox',
 			'framework:js:hash:{CJT-}md5',
 			'framework:js:cookies:{CJT-}jquery.cookies.2.2.0',
@@ -99,13 +106,13 @@ class CJTBlocksBlockView extends CJTView {
 			'views:blocks:block:public:js:{CJT-}codefile',
 			'views:blocks:block:public:js:{CJT-}block',
 			'views:blocks:block:public:js:plugins:{CJT-}_dockmodule',
-			'views:blocks:block:public:js:{CJT-}jquery.block'		
+			'views:blocks:block:public:js:{CJT-}jquery.block'
 		);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public static function enqueueStyles() {
 		// Initialize style.
@@ -122,45 +129,78 @@ class CJTBlocksBlockView extends CJTView {
 	  // Include styles.
 		self::useStyles(__CLASS__, $styles);
 	}
-	
+
+    /**
+    * put your comment there...
+    *
+    * @param mixed $block
+    */
+    public function getAllAssignments() {
+
+        return CJTBlocksModel::getAllAssignments($this->block);
+    }
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getBlock() {
-		return $this->block;	
+		return $this->block;
 	}
-	
+
+    /**
+    * put your comment there...
+    *
+    */
+    public function getHookStatus() {
+
+        $hooksAttacher =& CJTBlocksCouplingController::theInstance()->getHooksAttacher();
+
+        $locationText = $hooksAttacher->getHookText($this->block->location);
+        $locationTitle = $hooksAttacher->getHookText($this->block->location, 'title');
+        $badLocationClass = '';
+
+        if(!$locationText) {
+
+            $badLocationClass = 'bad-location-specified';
+            $locationText = cssJSToolbox::getText('Hook is not supported, it might be assigned by some kind of CJT hooks extensions. You either need to re-enable/re-install that extension or change the hook value to one of the supported hooks');
+        }
+
+        $text = compact('badLocationClass', 'locationText', 'locationTitle');
+
+        return $text;
+    }
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getMetaboxName() {
 		$tip = cssJSToolbox::getText('Click to update Block name');
-		return "<span class='block-name' title='{$tip}'>{$this->block->name}</span>";
+		return "<input name='cjtoolbox[{$this->block->id}][name]' type='text' class='block-name' value='{$this->block->name}' title='{$tip}' maxlength='50' />";
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $id
 	*/
 	public function getMetaboxId() {
 		return self::META_BOX_PREFIX ."-{$this->block->id}";
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $name
 	*/
 	public function getOption($name) {
 		return $this->params->{$name};
 	}
-	
+
 	/**
-	* 
-	* 
+	*
+	*
 	*/
 	public function setBlock($block) {
 		// Set block.
@@ -170,10 +210,10 @@ class CJTBlocksBlockView extends CJTView {
 		$closedMetaboxes = get_user_meta(get_current_user_id(), 'closedpostboxes_cjtoolbox', true);
 		$this->isClosed = in_array($closedBlockId, ((array) $closedMetaboxes));
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $name
 	* @param mixed $value
 	*/
@@ -182,7 +222,7 @@ class CJTBlocksBlockView extends CJTView {
 		// Chains!
 		return $this;
 	}
-	
+
 } // End class.
 
 // Hookable!

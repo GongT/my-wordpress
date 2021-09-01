@@ -40,6 +40,16 @@ else {
 				'finalize' => array('text' => cssJSToolbox::getText('Finalize Installation.')),
 			))
 		);
+
+		global $wpdb;
+		$table_name = $wpdb->base_prefix.'cjtoolbox_blocks';
+		$query = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table_name ) );
+		$preCheck = get_option( '__existing_cjt_user' );
+
+		// Only create it once.
+		if ( empty( $preCheck ) ) {
+			update_option( '__existing_cjt_user', $wpdb->get_var( $query ) === $table_name ? 'true' : 'false' );
+		}
 ?>
 		</ul>
 <?php

@@ -13,39 +13,39 @@ require_once CJTOOLBOX_TABLES_PATH . '/blocks.php';
 require_once CJTOOLBOX_TABLES_PATH . '/block-pins.php';
 // MYSQL Queue Driver.
 require_once CJTOOLBOX_INCLUDE_PATH . '/db/mysql/queue-driver.inc.php';
-		
+
 /**
 * Provide simple access (read or write) to all Blocks data.
-* 
+*
 * @author Ahmed Said
 * @version 6
 */
 class CJTBlocksModel {
-	
+
 	/**
-	* 
+	*
 	*/
-	const MAX_REVISIONS_PER_BLOCK = 10;
-	
+	const MAX_REVISIONS_PER_BLOCK = 99;
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $dbDriver = null;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function __construct() {
 		// Initialize CTTTable MYSQL Driver.
 		$this->dbDriver = new CJTMYSQLQueueDriver($GLOBALS['wpdb']);
 	}
-		
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $block
 	* @param mixed $forceAddCodeBlock
 	*/
@@ -77,10 +77,10 @@ class CJTBlocksModel {
 		// Return Newly added block id.
 		return $block['id'];
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $blockId
 	* @param mixed $activeFileId
 	*/
@@ -90,7 +90,7 @@ class CJTBlocksModel {
 		$pins = new CJTBlockPinsTable($this->dbDriver);
 		$codeFile = new CJTBlockFilesTable($this->dbDriver);
 		// We allow only up to self::MAX_REVISIONS_PER_BLOCK revisions per
-		// block code files So that a single block may has up to 
+		// block code files So that a single block may has up to
 		// self::MAX_REVISIONS_PER_BLOCK * count(codeFiles)
 		$revisions['fields'] 	= array('id');
 		$revisions['filters'] = array('type' => 'revision', 'parent' => $blockId, 'masterFile' => $activeFileId);
@@ -99,7 +99,7 @@ class CJTBlocksModel {
 		if (count($revisions) == self::MAX_REVISIONS_PER_BLOCK) {
 			$this->delete(array_shift($revisions)->id);
 		}
-		// Get block data.                                                    
+		// Get block data.
 		$block['fields'] = array('id', 'lastModified', 'pinPoint', 'links', 'expressions');
 		// get() developed to return multiple blocks, fetch the first.
 		$result = $blocks->get($blockId, $block['fields']);
@@ -110,7 +110,7 @@ class CJTBlocksModel {
 		$block->type = 'revision';
 		$block->created = current_time('mysql');
 		$block->owner = get_current_user_id();
-		$block->masterFile = $activeFileId; // Only the revisioned code file would be exists and must be 
+		$block->masterFile = $activeFileId; // Only the revisioned code file would be exists and must be
 																				// used as the masterFile!
 		$block->id = $blocks->getNextId(); // Get new id for revision rrecord.
 		// Add block data.
@@ -129,20 +129,20 @@ class CJTBlocksModel {
 						 ->set('blockId', $block->id)
 						 ->save(true, true);
 	}
-	
+
 	/**
 	* Put your comments here...
 	*
 	*
-	* @return 
-	*/	
+	* @return
+	*/
 	public function dbDriver() {
   	return $this->dbDriver;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $ids
 	*/
 	public function delete($ids) {
@@ -186,10 +186,57 @@ class CJTBlocksModel {
 		// Chaining!
 		return $this;
 	}
-	
+
+    /**
+    * put your comment there...
+    *
+    * @param mixed $block
+    */
+    public static function getAllAssignments($block) {
+
+        $inPages = $block->pages ? $block->pages : [];
+        $inPosts = $block->posts ? $block->posts : [];
+        $inCats = $block->categories ? $block->categories : [];
+        $inTags = $block->post_tags ? $block->post_tags : [];
+        $inLinks = ! empty( $block->links ) ? explode( "\n", $block->links ) : [];
+        $inExps = ! empty( $block->expressions ) ? explode( "\n", $block->expressions ) : [];
+        $inAux = array();
+
+        // Found selected Aux
+        $auxFlags = array(
+            CJTBlockModel::PINS_404_ERROR,
+            CJTBlockModel::PINS_ARCHIVE,
+            CJTBlockModel::PINS_ATTACHMENT,
+            CJTBlockModel::PINS_AUTHOR,
+            CJTBlockModel::PINS_BACKEND,
+            CJTBlockModel::PINS_CATEGORIES_ALL_CATEGORIES,
+            CJTBlockModel::PINS_EXPRESSIONS,
+            CJTBlockModel::PINS_FRONTEND,
+            CJTBlockModel::PINS_PAGES_ALL_PAGES,
+            CJTBlockModel::PINS_POSTS_ALL_POSTS,
+            CJTBlockModel::PINS_POSTS_BLOG_INDEX,
+            CJTBlockModel::PINS_POSTS_RECENT,
+            CJTBlockModel::PINS_SEARCH,
+            CJTBlockModel::PINS_TAG
+        );
+
+        foreach ($auxFlags as $auxFlag) {
+
+            if ($auxFlag & $block->pinPoint) {
+
+                $inAux[] = $auxFlag;
+            }
+
+        }
+
+        $allAssignment = array_merge( $inPages, $inPosts, $inCats, $inTags, $inLinks, $inExps, $inAux );
+
+        return $allAssignment;
+    }
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $id
 	* @param mixed $fields
 	*/
@@ -198,10 +245,10 @@ class CJTBlocksModel {
 		$block = !empty($blocks) ? reset($blocks) : null;
 		return $block;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $ids
 	*/
 	public function getBlocks($ids = array(), $filters = array(), $fields = array('*'), $returnType = OBJECT_K, $orderBy = array(), $useDefaultBackupFltr = true) {
@@ -247,10 +294,10 @@ class CJTBlocksModel {
 		}
 		return $blocks;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $blockId
 	* @param mixed $authorId
 	*/
@@ -261,9 +308,29 @@ class CJTBlocksModel {
 		return $activeFileId;
 	}
 
+    /**
+    * put your comment there...
+    *
+    * @param mixed $blockId
+    */
+    public static function getCodeFilesCount($blockId) {
+
+        global $wpdb;
+
+        $query = "  SELECT count(*)
+                    FROM {$wpdb->prefix}cjtoolbox_block_files f
+                    WHERE f.blockId = %d;";
+
+        $query = $wpdb->prepare($query, $blockId);
+
+        $codeFilesCount = $wpdb->get_var($query);
+
+        return $codeFilesCount;
+    }
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $blockId
 	* @param mixed $authorId
 	*/
@@ -273,60 +340,60 @@ class CJTBlocksModel {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public static function getCustomPostTypes()
 	{
-		
+
 		static $postTypes = null;
-		
+
 		if ( $postTypes !== null )
 		{
 			return $postTypes;
 		}
-		
-		
+
+
 		$postTypes = array();
-		
+
 		// Create tabs for every custom post under the custom posts tab.
 		// Get all registered custom posts.
 		$customPosts = get_post_types( array( 'public' => 1, 'show_ui' => true, '_builtin' => false ), 'objects' );
 
 		// Add tab for every custom post
 		// Exclude 'Empty' Custom Post Types.
-		foreach ( $customPosts as $typeName => $customPost ) 
+		foreach ( $customPosts as $typeName => $customPost )
 		{
-			// Check if has posts.	
+			// Check if has posts.
 			$hasPosts = count( get_posts( array( 'post_type' => $typeName, 'offset' => 0, 'numberposts' => 1 ) ) );
-			
+
 			// Add only types with at least one post exists.
-			if ( $hasPosts ) 
+			if ( $hasPosts )
 			{
 				$postTypes[ $typeName ] = array
 				(
 					'title' => $customPost->labels->name,
 					'renderer' => 'objects-list',
 					'type' => array
-					( 
+					(
 						'type' => $typeName,
 						'group' => 'posts',
 						'targetType' => 'post'
 					)
-					
+
 				);
-				
+
 			}
-			
+
 		}
 
 		do_action( CJTPluggableHelper::ACTION_BLOCK_CUSTOM_POST_TYPES, $postTypes );
-		
+
 		return $postTypes;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $id
 	*/
 	public function getInfo($id) {
@@ -342,26 +409,26 @@ class CJTBlocksModel {
 		$info->shortcode = "[cjtoolbox name='{$info->name}']";
 		return $info;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function getOrder() {
 		return get_option('meta-box-order_cjtoolbox');
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function save() {
 		$this->dbDriver->processQueue();
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $order
 	*/
 	public function setOrder($order) {
@@ -371,51 +438,51 @@ class CJTBlocksModel {
 		// Update CENTRALIZED order in the options table!
 		update_option($orderOptionName, $order);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $block
 	*/
-	public function update( $block, $updatePins ) 
+	public function update( $block, $updatePins )
 	{
-		
+
 		$block = ( array ) $block;
-		
+
 		$blocks = new CJTBlocksTable( $this->dbDriver );
 		$pins = new CJTBlockPinsTable( $this->dbDriver );
-		
+
 		// Update block pins if requested.
-		if ( $updatePins ) 
+		if ( $updatePins )
 		{
 			// Isolate block pins freom native block data.
 			$pinsData = array_intersect_key( $block, array_flip( array_keys( CJTBlockModel::getCustomPins() ) ) );
-			
+
 			do_action( CJTPluggableHelper::FILTER_BLOCK_MODEL_PRE_UPDATE_BLOCK_PINS, $block, $pinsData );
-			
+
 			$pins->update( $block[ 'id' ], $pinsData );
 
 		}
-		
+
 		// Update code file
-		if ( isset( $block[ 'activeFileId' ] ) ) 
+		if ( isset( $block[ 'activeFileId' ] ) )
 		{
-			
+
 			$codeFile = new CJTBlockFilesTable( $this->dbDriver );
-			
+
 			$codeFile->set( 'blockId', $block[ 'id' ] )
 							 ->set( 'id', $block[ 'activeFileId'] )
 							 ->set( 'code', $block[ 'code'] )
 							 ->save();
 		}
-		
+
 		// Isolate block fields.
 		$blockData = array_intersect_key($block, $blocks->getFields());
-		
+
 		do_action( CJTPluggableHelper::FILTER_BLOCK_MODEL_PRE_UPDATE_BLOCK, $updatePins, $blockData );
-		                                                                                        
+
 		$blocks->update( $blockData );
-		
+
 	}
-	
+
 } // End class.

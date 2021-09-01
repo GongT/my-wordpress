@@ -24,9 +24,9 @@ class CJTBlocksCouplingController extends CJTController {
 	*
 	* @var mixed
 	*/
-	protected $blocks = array(
-		'code' => array('header' => '', 'footer' => ''),
-		'scripts' => array('header' => array(), 'footer' => array()),
+	public $blocks = array(
+		'code' => array(),
+		'scripts' => array(),
 	);
 
 	/**
@@ -42,6 +42,13 @@ class CJTBlocksCouplingController extends CJTController {
 	* @var mixed
 	*/
 	protected $filters = null;
+
+    /**
+    * put your comment there...
+    *
+    * @var mixed
+    */
+    protected $hookAttacher;
 
 	/**
 	* put your comment there...
@@ -232,23 +239,41 @@ class CJTBlocksCouplingController extends CJTController {
 	* @return void
 	*/
 	public function __construct() {
+
 		// Only one instance is allowed.
 		if (self::$instance) {
 			throw new Exception('Trying to instantiate multiple coupling instances!!');
 		}
+
 		// Hold the single instance we've!
 		self::$instance = $this;
 		$siteHook = cssJSToolbox::$config->core->siteHook;
+
 		// Initialize controller.
 		parent::__construct(false);
+
 		// Import related libraries
 		CJTModel::import('block');
+
 		// Not default action needed.
 		$this->defaultAction = null;
+        $this->hookAttacher = new CJTBlocksCouplingHookAttacher(array(&$this, 'outputBlocks'));
+
+        // Initialize Blocks array
+        foreach ($this->hookAttacher->getFiltersList() as $hooks) {
+
+            foreach ($hooks as $hook) {
+
+                $this->blocks['code'][$hook['locationName']] = '';
+                $this->blocks['script'][$hook['locationName']] = '';
+            }
+        }
+
 		// Initialize controller.
 		$initCouplingCallback = $this->onassigncouplingcallback(array(&$this, 'initCoupling'));
 		add_action('admin_init', $initCouplingCallback);
 		add_action($siteHook->tag, $initCouplingCallback, $siteHook->priority);
+
 		// Add Shortcode callbacks.
 		add_shortcode('cjtoolbox', array(&$this, 'shortcode'));
 	}
@@ -281,7 +306,7 @@ class CJTBlocksCouplingController extends CJTController {
 		$metaBoxesOrder = $this->onblocksorder( $this->model->getOrder() );
 
 		// Get ORDER-INDEX <TO> BLOCK-ID mapping.
-		preg_match_all( '/cjtoolbox-(\d+)/', $metaBoxesOrder[ 'normal' ], $blocksOrder, PREG_SET_ORDER );
+		if ( $metaBoxesOrder ) preg_match_all( '/cjtoolbox-(\d+)/', $metaBoxesOrder[ 'normal' ], $blocksOrder, PREG_SET_ORDER );
 
 		/**
 		* append more to orders produced by CJTBlocksCouplingController::setRequestFilter().
@@ -332,6 +357,7 @@ class CJTBlocksCouplingController extends CJTController {
 
 		foreach ( $blocksOrder as $blockOrder )
 		{
+
 			$blockId = (int) $blockOrder[1];
 
 			// As mentioned above. Orders is for all blocks not just those queried from db.
@@ -418,6 +444,12 @@ class CJTBlocksCouplingController extends CJTController {
                         // CODE UPDATED BY RBJ -- END
 					}
 
+                    // Initialize block LOCATION array for the first time
+                    if (!isset($this->blocks[ 'code' ][ $block->location ])) {
+
+                        $this->blocks[ 'code' ][ $block->location ] = '';
+                    }
+
 					$this->blocks[ 'code' ][ $block->location ] .= $this->onappendcode( $evaluatedCode );
 
 					// Store all used Ids in the CORRECT ORDER.
@@ -462,6 +494,14 @@ class CJTBlocksCouplingController extends CJTController {
 		return $this->ongetfilters($this->filters);
 	}
 
+    /**
+    * put your comment there...
+    *
+    */
+    public function & getHooksAttacher() {
+        return $this->hookAttacher;
+    }
+
 	/**
 	* put your comment there...
 	*
@@ -483,7 +523,9 @@ class CJTBlocksCouplingController extends CJTController {
 		// Request URI.
 		$requestURI = $_SERVER['REQUEST_URI'];
 		// Final URL.
-		$url = "{$protocol}{$host}{$port}{$requestURI}";
+		//$url = "{$protocol}{$host}{$port}{$requestURI}";
+		// Removing port segment from the URL as it is causing bugs.
+		$url = "{$protocol}{$host}{$requestURI}";
 		return $url;
 	}
 
@@ -508,17 +550,20 @@ class CJTBlocksCouplingController extends CJTController {
 		}
 		// Get current application hook prefix.
 		$actionsPrefix = is_admin() ? 'admin'	: 'wp';
+
 		// Get cache or get blocks if not cached.
 		// If there is no cache or no blocks for output
 		// do nothing.
 		if ($this->getCached() || $this->getBlocks()) {
+
 			// Output blocks on various locations!
-			add_action("{$actionsPrefix}_head", array(&$this, 'outputBlocks'), 30);
-		  add_action("{$actionsPrefix}_footer", array(&$this, 'outputBlocks'), 30);
+            $this->hookAttacher->bind();
+
 		  // Links templates & styloes!
 		  add_action("{$actionsPrefix}_enqueue_scripts", array(&$this, 'linkTemplates'), 30);
 		  add_action("{$actionsPrefix}_print_styles", array(&$this, 'linkTemplates'), 30);
 		}
+
 		// Link style sheet in footer required custom implementation.
 		add_action("{$actionsPrefix}_print_footer_scripts", array(&$this, 'linkFooterStyleSheets'), 9);
 		// Make sure this is executed only once.
@@ -597,17 +642,14 @@ class CJTBlocksCouplingController extends CJTController {
 	*
 	*/
 	public function outputBlocks() {
-		// Derived location name from wordpress filter name.
-		$currentFilter = current_filter();
-		// Map "wp hook location" to "block hook location".
-		$locationsMap = array('head' => 'header', 'footer' => 'footer');
-		// This hook is used across both ends, front and back ends.
-		// Remove application prefix (wp_ or admin_).
-		// Remining is head or footer.
-		$location = str_replace(array('wp_', 'admin_'), '', $currentFilter);
-		// Map to block location.
-		$location = $locationsMap[$location];
-		echo $this->onoutput($this->blocks['code'][$location], $location);
+
+        $hooks = $this->hookAttacher->getHooksByFilterName(current_filter());
+
+        foreach ($hooks as $hook) {
+
+            echo $this->onoutput($this->blocks['code'][$hook['locationName']], $hook['locationName']);
+        }
+
 	}
 
 	/**

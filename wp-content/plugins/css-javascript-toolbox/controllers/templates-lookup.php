@@ -39,6 +39,7 @@ class CJTTemplatesLookupController extends CJTAjaxController {
 		$this->registryAction('link');
 		$this->registryAction('unlink');
 		$this->registryAction('unlinkAll');
+        $this->registryAction('getBlockLinkedTemplates');
 	}
 	
 	/**
@@ -65,10 +66,36 @@ class CJTTemplatesLookupController extends CJTAjaxController {
 		$this->response['code'] = $this->model->embedded();
 	}
 
-/**
-* put your comment there...
-* 	
-*/
+    /**
+    * put your comment there...
+    * 
+    */
+    protected function getBlockLinkedTemplatesAction() {
+        
+        
+        $blockId = isset($_GET['blockId']) ? $_GET['blockId'] : null;
+        
+        try {
+            
+            if (!$blockId) {
+                
+                throw new Exception('Invalid Request parameters');
+            }
+            
+            $this->response = CJTBlockTemplatesModel::getLinkedTemplatesCount($blockId);
+        }
+        catch (Exception $exception) {
+
+            
+        }
+        
+        
+    }
+    
+    /**
+    * put your comment there...
+    * 	
+    */
 	protected function linkAction() {
 		// Read inputs.
 		$this->model->inputs['templateId'] = $_REQUEST['templateId'];
@@ -79,7 +106,8 @@ class CJTTemplatesLookupController extends CJTAjaxController {
 		$this->response['newState']  = array(
 			'action' => 'unlink',
 			'text' => cssJSToolbox::getText('Unlink'),
-			'className' => 'template-action unlink-template'
+			'className' => 'template-action unlink-template',
+            'count' => CJTBlockTemplatesModel::getLinkedTemplatesCount($_REQUEST['blockId'])
 		);
 	}
 	
@@ -97,7 +125,8 @@ class CJTTemplatesLookupController extends CJTAjaxController {
 		$this->response['newState']  = array(
 			'action' => 'link',
 			'text' => cssJSToolbox::getText('Link'),
-			'className' => 'template-action link-template'
+			'className' => 'template-action link-template',
+            'count' => CJTBlockTemplatesModel::getLinkedTemplatesCount($_REQUEST['blockId'])
 		);
 	}
 	

@@ -89,6 +89,7 @@ abstract class TablePress_Controller {
 		$current_plugin_options_db_version = TablePress::$model_options->get( 'plugin_options_db_version' );
 		if ( $current_plugin_options_db_version < TablePress::db_version ) {
 			// Allow more PHP execution time for update process.
+			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 			@set_time_limit( 300 );
 
 			// Add TablePress capabilities to the WP_Roles objects, for new installations and all versions below 12.
@@ -99,7 +100,7 @@ abstract class TablePress_Controller {
 			if ( 0 === TablePress::$model_options->get( 'first_activation' ) ) {
 				// Save initial set of plugin options, and time of first activation of the plugin, on first activation.
 				TablePress::$model_options->update( array(
-					'first_activation'          => current_time( 'timestamp' ),
+					'first_activation'          => time(),
 					'plugin_options_db_version' => TablePress::db_version,
 				) );
 			} else {
@@ -136,13 +137,7 @@ abstract class TablePress_Controller {
 				TablePress::$model_options->update( $updated_options );
 
 				// Clear table caches.
-				if ( $current_plugin_options_db_version < 16 ) {
-					// For pre-0.9-RC, where the arrays are serialized and not JSON encoded.
-					TablePress::$model_table->invalidate_table_output_caches_tp09();
-				} else {
-					// For 0.9-RC and onwards.
-					TablePress::$model_table->invalidate_table_output_caches();
-				}
+				TablePress::$model_table->invalidate_table_output_caches();
 
 				// Add mime type field to existing posts with the TablePress Custom Post Type, so that other plugins know that they are not dealing with plain text.
 				if ( $current_plugin_options_db_version < 25 ) {
@@ -158,17 +153,7 @@ abstract class TablePress_Controller {
 
 		// Maybe update the table scheme in each existing table, independently from updating the plugin options.
 		if ( TablePress::$model_options->get( 'table_scheme_db_version' ) < TablePress::table_scheme_version ) {
-			// Convert parameter "datatables_scrollX" to "datatables_scrollx", has to be done before merge_table_options_defaults() is called!
-			if ( TablePress::$model_options->get( 'table_scheme_db_version' ) < 3 ) {
-				TablePress::$model_table->merge_table_options_tp08();
-			}
-
 			TablePress::$model_table->merge_table_options_defaults();
-
-			// Merge print_name/print_description changes made for 0.6-beta.
-			if ( TablePress::$model_options->get( 'table_scheme_db_version' ) < 2 ) {
-				TablePress::$model_table->merge_table_options_tp06();
-			}
 
 			TablePress::$model_options->update( array(
 				'table_scheme_db_version' => TablePress::table_scheme_version,

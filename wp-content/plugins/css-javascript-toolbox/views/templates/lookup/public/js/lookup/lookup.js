@@ -12,7 +12,7 @@
 	* 
 	*/
 	var blockId = parseInt(window.location.href.match(/\&blockId\=(\d+)/)[1]);
-	
+    
 	/**
 	* put your comment there...
 	* 
@@ -121,21 +121,32 @@
 					// Do action!
 					this.server.send('templatesLookup', actionInfo[1], request)
 					.success(
+                    
 						function(response) {
+                            
 							// Special actions
 							switch (actionInfo[1]) {
+                                
 								case 'embedded':
+                                
 									// Insert template at cursor.
 									block.aceEditor.getSession().replace(block.aceEditor.getSelectionRange(), response.code);
+                                    
 								break;
 							}
+                            
 							// If the changes required reflect a state.
 							var newState = response.newState;
+                            
 							if (newState) {
-								$(event.target).text(newState.text)
-																								.prop('href', '#' + newState.action + '(' + request.templateId  + ')')
-																								.get(0).className = newState.className;
+                                
+								$(event.target) .text(newState.text)
+										        .prop('href', '#' + newState.action + '(' + request.templateId  + ')')
+										        .get(0).className = newState.className;
+                                
+                                templatesLookupFormNS.inputs.blockPlugin.infoBar.find('.templates-info a.cjttbl-templates').text(newState.count);
 							}
+                            
 							// Close the Popup after completing!
 							//popupButton.close();
 							// Set focus to ace editor.
@@ -165,7 +176,7 @@
 		*/
 		init : function() {
 			// Initialize accordion Plugin.
-			$('#templates-list').accordion({fillSpace : true, heightStyle : "fill"})
+			$('#templates-list').tabs()
 			// Make author templates list toggle-able.
 			.find('.author-name .name').click($.proxy(this._ontoggletemplates, this));
 			// Actions!!
@@ -184,19 +195,22 @@
 		*/
 		refresh : function() {
 			// Set THEME color.
-			var block = window.parent.CJTBlocksPage.blocks.getBlock(blockId).get(0).CJTBlock;
+            var block = window.parent.CJTBlocksPage.blocks.getBlock(blockId).get(0).CJTBlock;
 			var theme = block.theme;
 			var blockElement = block.block.box;
 			blockElement.find('iframe.templates-lookup').css('background-color', theme.backgroundColor);
 			// Set the size of the Accordion Tab based on the Frame height!
 			// Frame height might be changed by the Parent window. 
-			var accordionHeight = templatesLookupFormNS.inputs.height - ($('.sweep').height() + 5);
-			$('#templates-lookup').css('height', (accordionHeight + 'px'));
+			var listHeight = templatesLookupFormNS.inputs.height - ($('.sweep').height() + 5);
+			$('#templates-lookup').css('height', (listHeight + 'px'));
+            
+            $('#templates-list .ui-tabs-panel').css('height', (listHeight - 60) + 'px');
+            
 			// Use accordion menu for templates types list.
 			// @TODO: Select type corresponding to editor language type
 			// (e.g if editor-lang = 'css' then select 'CSS', etc...).
 			// var activeTypeSelector = '#templates-type-header-' + templatesLookupFormNS.inputs.block.get('editorLang');
-			$('#templates-list').accordion('refresh');
+			$('#templates-list').tabs('refresh');
 		}
 		
 	}	// End class.

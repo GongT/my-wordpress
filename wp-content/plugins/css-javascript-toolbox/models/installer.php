@@ -199,7 +199,7 @@ class CJTInstallerModel {
 	*/
 	public function isUpgrade() {
 		// If the version is not the same and not equal to current version then its upgrading!
-		$isUpgrade = (($this->installedDbVersion != CJTPlugin::DB_VERSION) && ($this->installedDbVersion != ''));
+		$isUpgrade = (($this->installedDbVersion <= CJTPlugin::DB_VERSION) && ($this->installedDbVersion != ''));
 		return $isUpgrade;
 	}
 

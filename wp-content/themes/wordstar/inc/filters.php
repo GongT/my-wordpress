@@ -180,7 +180,7 @@ add_filter('get_the_archive_title', function($title )
 // add the filter for search widget title ....
 add_filter( 'widget_title', function( $instance_title, $instance,$this_id_base ) { 
     if($this_id_base=='search'){
-        $instance_title = ! empty( $instance['title'] ) ? $instance['title'] :__('Search','canary');
+        $instance_title = ! empty( $instance['title'] ) ? $instance['title'] :__('Search','wordstar');
     }  
     return $instance_title; 
 } , 10, 3 )  

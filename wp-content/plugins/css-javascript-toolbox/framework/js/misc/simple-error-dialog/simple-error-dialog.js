@@ -1,46 +1,46 @@
 /**
-* 
+*
 */
 
 var CJTSimpleErrorDialog;
 
 /**
-* 
+*
 */
 (function($) {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param form
 	*/
 	CJTSimpleErrorDialog = function(form) {
-		
+
 		/**
 		* put your comment there...
-		* 
+		*
 		*/
 		var inlineElement;
-		
+
 		/**
 		* put your comment there...
-		* 
+		*
 		* @type String
 		*/
 		var onset = '';
-		
+
 		/**
-		* 
+		*
 		*/
 		this.errors = [];
-		
+
 		/**
-		* 
+		*
 		*/
 		this.fields = {};
-				
+
 		/**
-		* 
+		*
 		*/
 		this.add = function(name, expression, message) {
 			// Set fieldset name.
@@ -52,17 +52,17 @@ var CJTSimpleErrorDialog;
 			}
 			return this;
 		}
-		
+
 		/**
-		* 
+		*
 		*/
 		this.clear = function() {
 			this.errors = [];
 			return this;
 		}
-		
+
 		/**
-		* 
+		*
 		*/
 		this.fetchFieldInfo = function(field) {
 			// Initialize vars!
@@ -78,30 +78,30 @@ var CJTSimpleErrorDialog;
 			// Make sure its jQuery object!
 			field = $(field);
 			//Fetch info.
-			info.text =  form.find('label[for=' + field.prop('id') + ']').text().replace('*', ''); 
+			info.text =  form.find('label[for=' + field.prop('id') + ']').text().replace('*', '');
 			return info;
 		}
-		
+
 		/**
-		* 
+		*
 		*/
 		this.hasError = function() {
 			return this.errors.length ? true : false;
 		}
-		
+
 		/**
-		* 
+		*
 		*/
 		this.onSet = function(name) {
 			onset = name;
 			return this;
 		}
-		
+
 		/**
 		* put your comment there...
-		* 
+		*
 		* @param tab_name
-		* 
+		*
 		* @returns {Boolean}
 		*/
 		this.show = function(tbParams, showName) {
@@ -133,7 +133,7 @@ var CJTSimpleErrorDialog;
 		}
 
 		/**
-		* 		
+		*
 		*/
 		this.validate = function() {
 			// Clear errors!
@@ -163,7 +163,7 @@ var CJTSimpleErrorDialog;
 			);
 			return this;
 		}
-		
+
 		// If there is no form id use current time as unique Id.
 		if (!(inlineElement = $(form).prop('id'))) {
 			inlineElement = (new Date()).getTime();

@@ -21,8 +21,13 @@
 		/**
 		* 
 		*/
-   	this.filesManager;
+   	    this.filesManager;
 		
+        /**
+        * 
+        */
+        this.fileManagerPopup;
+        
 		/**
 		* 
 		*/		
@@ -62,30 +67,38 @@
 		*
 		*/
 		var _onswitchfile = function(event) {
+            
 			// Initialize.
 			var link = $(event.target);			
 			var codeFile = link.data('codeFile');
+            
 			// Disable Form.
 			var overlay = this.filesManager.find('.overlay').show();
+            
 			// Switch.
 			this.block.codeFile.switchFile(codeFile).done($.proxy(
+            
 				function(blockId, codeFileId) {
+                    
 					// Process only if it still the current active block
 					// otehrwise discard.
+                    
 					if (blockId == this.block.block.get('id')) {
+                        
 						// Switch editor language.
-						this.block._onswitcheditorlang(undefined, {
-							lang :	codeFile.type ? 
-									codeFile.type : 
-									this.block.block.get('editorLang', 'css')
-						});
-						// Close.
-						this.deattach();
+						this.block._onswitcheditorlang({}, {lang :	codeFile.type ? codeFile.type : this.block.block.get('editorLang', 'css')});
+                        
 						// Activate new switched code file.
-						//===this.filesManager.find('li.codeFile a').removeClass('active');
-						//===link.addClass('active');
+						this.filesManager.find('li.codeFile a').removeClass('active');
+						link.addClass('active');
+                        
 						// Enable Form
 						overlay.hide();
+                        
+                        this.filesManager.trigger('SwitchCodeFile', [this.block]);
+                        
+                        // Close Code Files Manager Thick box
+                        tb_remove();
 					}
 				}, this)
 			);
@@ -96,19 +109,13 @@
 		*
 		*/
 		var dialogToolButtons = function() {
+            
 			// Initialize Tool Buttons.
 			this.dialogToolButtons = this.filesManager.find('.dialog-tool-buttons');	
-			// Close Dialog
-			this.dialogToolButtons.find('.close').click($.proxy(
-				function() {
-					// Deattach from current block, free resources.
-					this.deattach();
-					// Inactive
-					return false;
-				}, this )
-			);
+
 			// Delete Seletced Files.
 			this.dialogToolButtons.find('.delete').click($.proxy(
+            
 				function() {
 					// Get all selected codeFiles ids.
 					var ids = [];
@@ -129,11 +136,17 @@
 							var overlay = this.filesManager.find('.overlay').show();
 							// Once collected process deletion.
 							this.block.codeFile.deleteCodeFile(ids).done($.proxy(
+                            
 								function(response) {
+                                    
 									// Delete those codeFiles from Files Manager.
 									checkboxes.parent().remove();
+                                    
+                                    this.updateBlockInfoBar();
+                                    
 									// Enable Form.
 									overlay.hide();
+                                    
 								}, this)
 							);		
 						}
@@ -153,6 +166,12 @@
 			// Edit Code File Dial object/
 			this.editCodeFileDialog = new (function(codeFilesView) {
 			
+                /**
+                * put your comment there...
+                * 
+                */
+                this.codeFilesView = codeFilesView;
+                
 				/**
 				*
 				*
@@ -220,9 +239,14 @@
 						}
 						else { // Success
 							codeFilesView.block.codeFile.save(data).done($.proxy(
+                            
 								function(response) {
+                                    
+                                    codeFilesView.block._onswitcheditorlang({}, {lang : data.type ? data.type : codeFilesView.block.block.get('editorLang', 'css')});
+                                    
 									// Response to caller (create/edit)
 									promise.resolve(response);
+                                    
 								}, this)
 							);
 						}
@@ -292,15 +316,24 @@
 			})(this);
 		};
 		
+        /**
+        * 
+        */
+        this.updateBlockInfoBar = function() {
+            
+            // 
+            var codeFilesCount = this.filesManager.find('li.codeFile.code-file-item').length;
+            
+            this.block.infoBar.find('.block-code-files a').text(codeFilesCount);
+        };
+        
 		/**
 		*
 		*
 		*/
 		var filesManagerDialog = function() {
 			// File Manager.
-			this.filesManager = $('#code-files-manager')
-			// Prevent Closing Metabox when interacting with the Code Files Manager.
-			.click(function(event) {event.stopPropagation()});
+			this.filesManager = $('#code-files-manager');
 		};
 
 		/**
@@ -401,10 +434,12 @@
 		*
 		*/
 		this.deattach = function() {
-			// Hide Manager.
-			this.filesManager.css({'display' : 'none'}).detach();
+            
+            this.filesManager.detach();
+            
 			// Clear any previously added list
 			this.filesManager.find('li.codeFile').remove();
+            
 			// Make sure edit/create form to be destructed.
 			this.editCodeFileDialog.close();
 			// Hide Quicktoolbar.
@@ -439,14 +474,24 @@
 			if (block.revisionControl && (block.revisionControl.state == 'revision')) {
 				return;
 			}
+            
 			// Enter Deattached state.
-			var oldBlock = this.deattach();
+			this.deattach();
+            
 			// Display if not displayed.
-			if (oldBlock !== block) {
+			if (this.block !== block) {
+                
 				// Switch to block.
 				this.block = block;
+                
+                this.block.block.box.find('.cjpageblock').append(this.filesManager);
+                
+                // Aply theme
+                this.applyTheme(this.block);
+                            
 				// Fetch List
 				block.codeFile.getList().done($.proxy(
+                
 					function(codeFiles) {
 						// - Don't process is entered deattach state.
 						// - Process only last switched block.
@@ -462,12 +507,7 @@
 									}
 								}, this)
 							);
-							// Set Location.
-							this.block.block.box.find('.file').after(this.filesManager);
-							// Aply theme
-							this.applyTheme(this.block);
-							// Display
-							this.filesManager.css({'display' : 'block'});
+                                                                                                                
 						}
 					}, this)
 				);

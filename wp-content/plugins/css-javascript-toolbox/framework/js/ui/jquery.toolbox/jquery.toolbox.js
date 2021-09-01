@@ -1,14 +1,14 @@
 /**
 * @version $ Id; cjttoolbox.jquery.js 21-03-2012 03:22:10 Ahmed Said $
-* 
+*
 * CJT Toolbox jQuery Plugin.
 */
 
 /*
 * JQuery wrapper for the CJTToolBox Plugin.
-*/ 
+*/
 var CJTToolBoxNS = new (function ($) {
-	
+
 	/**
 	*
 	*
@@ -16,7 +16,7 @@ var CJTToolBoxNS = new (function ($) {
 	*
 	*/
 	this.ButtonBase = function() {
-		
+
 		/**
 		*
 		*
@@ -24,30 +24,30 @@ var CJTToolBoxNS = new (function ($) {
 		*
 		*/
 		this.callback = null;
-		
+
 		/**
 		*
 		*
 		*
 		*
-		*/		
+		*/
 		this.cssClass = null;
-		
+
 		/**
 		*
 		*
 		*
 		*/
 		this.enabled = false;
-		
+
 		/**
 		*
 		*
 		*
 		*
-		*/		
+		*/
 		this.jButton = null;
-		
+
 		/**
 		*
 		*
@@ -55,7 +55,7 @@ var CJTToolBoxNS = new (function ($) {
 		*
 		*/
 		this.name = '';
-    
+
 		/**
 		*
 		*
@@ -71,7 +71,7 @@ var CJTToolBoxNS = new (function ($) {
 		*
 		*/
 		this.toolbox = null;
-				
+
 		/**
 		*
 		*
@@ -101,7 +101,7 @@ var CJTToolBoxNS = new (function ($) {
 				if (!this.enabled) {
 					this.jButton.bind('click.CJTButton', null, $.proxy(this._onclick, this));
 					this.jButton.unbind('click.cjtbe-disabled');
-					this.jButton.removeClass(this.toolbox.params.disabledClass);							
+					this.jButton.removeClass(this.toolbox.params.disabledClass);
 					this.enabled = true;
 				}
 			}
@@ -110,15 +110,15 @@ var CJTToolBoxNS = new (function ($) {
 				this.jButton.unbind('click.CJTButton');
 				// For link to act inactive.
 				this.jButton.bind('click.cjtbe-disabled', (function() {return false;}));
-				this.jButton.addClass(this.toolbox.params.disabledClass);							
+				this.jButton.addClass(this.toolbox.params.disabledClass);
 				this.enabled = false;
 			}
 			// Chaining.
 			return this;
 		}
-		
+
 		/**
-		* 
+		*
 		*/
 		this.fireCallback = function(params) {
 			// Proxy to button callback function.
@@ -130,17 +130,17 @@ var CJTToolBoxNS = new (function ($) {
 			// Fire callback function cna change context to user specified.
 			return proxyCallback(params);
 		}
-		
+
 		/**
 		*
 		*
 		*
 		*
-		*/		
+		*/
 		this.isEnabled = function() {
 			return this.enabled;
 		}
-		
+
 	}; // End class.
 
 	/**
@@ -148,12 +148,12 @@ var CJTToolBoxNS = new (function ($) {
 	*
 	*
 	*
-	*/	
+	*/
 	this.Button = function(toolbox, name, callback, params) {
 
 		/**
 		* Event handler for this.params.linkClass.click() event.
-		* 
+		*
 		* The click event is used to dispatch the call to the link handler.
 		*/
 		this._onclick = function(event) {
@@ -164,20 +164,20 @@ var CJTToolBoxNS = new (function ($) {
 			// For links to behave inactive (don't put # AND auto scroll to the button).
 			return false;
 		}
-		
+
 		/**
 		*
 		*
 		*
 		*
-		*/	
+		*/
 		this.Button = function(toolbox, name, callback, params) {
 			// Parent constructor.
 			this.ButtonBase(toolbox, name, callback, params);
 			// Enable/Disable Button events.
 			this.enable(this.params.enable);
 		}
-		
+
 		/**
 		*
 		*
@@ -201,24 +201,30 @@ var CJTToolBoxNS = new (function ($) {
 			var method = load ? 'addClass' : 'removeClass';
 			this.jButton[method](this.toolbox.params.loadingClass);
 		}
-		
+
 	} // End class.
 	// Extend ButtonBase Class.
 	this.Button.prototype = new this.ButtonBase();
-	
+
 	/**
 	*
 	*
 	*
 	*
-	*/	
+	*/
 	this.ButtonPopup = function(toolbox, name, callback, params) {
 
+
+        /**
+        *
+        */
+        this.enabled = true;
+
 		/**
-		* 
+		*
 		*/
 		this.popupTimer = null;
-		
+
 		/**
 		*
 		*
@@ -226,25 +232,31 @@ var CJTToolBoxNS = new (function ($) {
 		*
 		*/
 		this.targetElement = null;
-		
+
 		/**
 		*
 		*
 		*
 		*
-		*/                               
+		*/
 		this._onmouseenter = function() {
 			var cbMouseOut = null;
+
+            if (!this.enabled) {
+
+                return;
+            }
+
 			// Clear time out in case the mouse is out and entered again.
 			// By mean don't close dialog if the mouse is out and quickly back again!
-			clearTimeout(this.popupTimer);
+
 			// Process only if target element is not visible yet.
 			// This condition prevent Shaking!
 			if (this.targetElement.css('display') == 'none') {
 				// Don't show the popup immediately when the mouse come over the button.
 				// As our move the mouse and didnt decide yest which popup to open.
 				// Stay for a while to make sure that this popup is desirable.
-				this.popupTimer = setTimeout($.proxy(this.showPopup, this), 100);
+				this.showPopup()
 				cbMouseOut = $.proxy(this._onmouseout, this);
 				// Hide Popup if mouse out from button or the popup form!
 				this.jButton.bind('mouseout.CJTButtonTouchMouseOut', cbMouseOut);
@@ -257,26 +269,23 @@ var CJTToolBoxNS = new (function ($) {
 		*
 		*
 		*
-		*/		
+		*/
 		this._onmouseout = function(event) {
 			// In all cases just clear the timeout timer.
 			// It has no effect if the popup is already opened.
 			// But it has effect if the Popup is not opened yet.
-			clearTimeout(this.popupTimer);
+			//clearTimeout(this.popupTimer);
 			// Don't close the dialg once get out but give it a break!
-			this.popupTimer = setTimeout($.proxy(function() {
-					// Is the mouse still over button?
-					var isOverButton = (event.relatedTarget === this.jButton.get(0));
-					// Is mouse still over target element of any of its childs/descendants.
-					var isOverElement = this.targetElement.find('*').andSelf().is(event.relatedTarget);
-					// Is mouse is not over button or target element hide element and unbind events.
-					if (!isOverButton && !isOverElement) {
-						this.close();
-					}
-				}, this)
-			, 400);
+			// Is the mouse still over button?
+			var isOverButton = (event.relatedTarget === this.jButton.get(0));
+			// Is mouse still over target element of any of its childs/descendants.
+			var isOverElement = this.targetElement.find('*').andSelf().is(event.relatedTarget);
+			// Is mouse is not over button or target element hide element and unbind events.
+			if (!isOverButton && !isOverElement) {
+				this.close();
+			}
 		}
-		
+
 		/**
 		*
 		*
@@ -293,8 +302,8 @@ var CJTToolBoxNS = new (function ($) {
 				.mouseenter($.proxy(this._onmouseenter, this))
 				.click(function() {return false;}); // Behave inactive.
 			// Prepare popup elements.
-			this.targetElement = params._type.targetElementObject ? 
-													 params._type.targetElement : 
+			this.targetElement = params._type.targetElementObject ?
+													 params._type.targetElement :
 													 this.toolbox.jToolbox.find(params._type.targetElement)
 			// Be intelegant and don't close for just if the mouse got out
 			// Please give User a break!!
@@ -303,15 +312,15 @@ var CJTToolBoxNS = new (function ($) {
 
 		/**
 		* put your comment there...
-		* 		
+		*
 		*/
 		this.close = function() {
 			this.jButton.unbind('mouseout.CJTButtonTouchMouseOut');
 			this.targetElement.unbind('mouseout.CJTButtonTouchMouseOut').hide();
 		}
-		
+
 		/**
-		* 
+		*
 		*/
 		this.showPopup = function() {
 			var cbParams = [this.targetElement, this];
@@ -324,7 +333,7 @@ var CJTToolBoxNS = new (function ($) {
 			}
 			// Callback before displaying menu.
 			if ($.isFunction(this.callback)) {
-				this.fireCallback(cbParams);	
+				this.fireCallback(cbParams);
 			}
 			// Display target element below button link if desired.
 			if (this.params._type.setTargetPosition) {
@@ -333,11 +342,147 @@ var CJTToolBoxNS = new (function ($) {
 			// Show popup form.
 			this.targetElement.show();
 		}
-		
+
 	} // End class.
 	// Extend ButtonBase Class.
 	this.ButtonPopup.prototype = new this.ButtonBase();
-		
+
+    /**
+    *
+    *
+    *
+    *
+    */
+    this.ButtonClickedPopup = function(toolbox, name, callback, params)
+    {
+
+        /**
+        *
+        */
+        this.popupTimer = null;
+
+        /**
+        *
+        *
+        *
+        *
+        */
+        this.targetElement = null;
+
+        /**
+        * put your comment there...
+        *
+        */
+        var _onclickbutton = function()
+        {
+
+            if (this.targetElement.css('display') == 'none')
+            {
+                this.showPopup();
+            }
+            else
+            {
+                this.close();
+            }
+
+            return false;
+        };
+
+        /**
+        * put your comment there...
+        *
+        */
+        var _onclickpopupbutton = function()
+        {
+
+            this.close();
+
+            return false;
+        };
+
+        /**
+        *
+        *
+        *
+        *
+        */
+        this.ButtonClickedPopup = function(toolbox, name, callback, params)
+        {
+            // Set type parameters.
+            params._type = $.extend(
+                {
+                    setTargetPosition : true,
+                    scope : toolbox.jToolbox
+                },
+            params._type);
+
+            // Initialize parent/prototype class.
+            this.ButtonBase(toolbox, name, callback, params);
+
+            // Show popup element when mouse entered button element.
+            this.jButton.click($.proxy(_onclickbutton, this)
+
+            ); // Behave inactive.
+
+            // Prepare popup elements.
+            this.targetElement =    params._type.targetElementObject ?
+                                    params._type.targetElement :
+                                    params._type.scope.find(params._type.targetElement);
+
+                                    // Close when popup clicked
+            this.targetElement.find('.' + this.toolbox.params.linkClass).click($.proxy(_onclickpopupbutton, this));
+        }
+
+        /**
+        * put your comment there...
+        *
+        */
+        this.close = function()
+        {
+            this.targetElement.hide();
+        }
+
+        /**
+        *
+        */
+        this.showPopup = function()
+        {
+
+            var cbParams = [this.targetElement, this];
+
+            // Call onPopup event. If false is returned don't display the list.
+            if (this.params._type.onPopup !== undefined)
+            {
+
+                var openPopup = this.params._type.onPopup.apply(this.toolbox.params.context, cbParams);
+
+                if (!openPopup)
+                {
+                    return false;
+                }
+            }
+
+            // Callback before displaying menu.
+            if ($.isFunction(this.callback))
+            {
+                this.fireCallback(cbParams);
+            }
+
+            // Display target element below button link if desired.
+            if (this.params._type.setTargetPosition)
+            {
+                this.targetElement.css ({left : (this.jButton.position().left + 'px')})
+            }
+
+            // Show popup form.
+            this.targetElement.show();
+        }
+
+    } // End class.
+
+    // Extend ButtonBase Class.
+    this.ButtonClickedPopup.prototype = new this.ButtonBase();
+
 	/**
 	*
 	*
@@ -351,9 +496,9 @@ var CJTToolBoxNS = new (function ($) {
 		*
 		*
 		*
-		*/	
+		*/
 		this.currentValue = '';
-		
+
 		/**
 		*
 		*
@@ -361,7 +506,7 @@ var CJTToolBoxNS = new (function ($) {
 		*
 		*/
 		this.list = null;
-		
+
 		/**
 		*
 		*
@@ -375,7 +520,7 @@ var CJTToolBoxNS = new (function ($) {
 			var currentClass = this.params._type.cssMap[this.currentValue];
 			if (currentClass != undefined) {
 				// Remove previous value class.
-				this.jButton.removeClass(currentClass);			
+				this.jButton.removeClass(currentClass);
 			}
 			// Add new value class.
 			this.jButton.addClass(newValueClass);
@@ -384,7 +529,7 @@ var CJTToolBoxNS = new (function ($) {
 			this.fireCallback([event, this.params, newValue]);
 			this.targetElement.hide('fast');
 		}
-		
+
 		/**
 		*
 		*
@@ -412,25 +557,25 @@ var CJTToolBoxNS = new (function ($) {
 				}
 			)
 		}
-		
+
 	}; // End class.
 	// Extend ButtonBase Class.
 	this.ButtonPopupList.prototype = new this.ButtonPopup();
-	
+
 	/**
 	* jQuery Plugin interface.
 	* version 6
 	* @author Ahmed Said
 	*/
 	$.fn.CJTToolBox = function(args) {
-	
+
 		/**
 		* Process objects list.
 		*/
 		return this.each(
-		
+
 			function() {
-				
+
 				// If first time to be called for this element
 				// create new CJToolBox object for the this element.
 				if (this.CJTToolBox == undefined) {
@@ -440,9 +585,9 @@ var CJTToolBoxNS = new (function ($) {
 					* the jquery object below.
 					*
 					* @var DOMElement
-					*/				
+					*/
 					var tbDOMElement = this;
-					
+
 					/**
 					* CJToolbox class.
 					*
@@ -469,16 +614,16 @@ var CJTToolBoxNS = new (function ($) {
 						*
 						*/
 						jToolbox : $(tbDOMElement),
-						
+
 						/**
 						* Every toolbox may has a position value added as a css class.
 						*
 						* CSS position class name schema is : cjtb-position-[POSITION].
-						* 
+						*
 						* @var string
-						*/						 
+						*/
 						position : 'default',
-						
+
 						/**
 						* Object options.
 						*
@@ -492,16 +637,16 @@ var CJTToolBoxNS = new (function ($) {
 							linkClass : 'cjt-tb-link',
 							loadingClass : 'cjttbs-loading'
 						},
-						
+
 						/**
 						* put your comment there...
-						* 
+						*
 						*/
 						add : function(name, data) {
 							// Get button class from type var.
 							var buttonType = (data.type != undefined) ? data.type : '';
 							var buttonClassName = 'Button' + buttonType;
-							var buttonClass = CJTToolBoxNS[buttonClassName];
+							var buttonClass = CJTToolBoxNS[ buttonClassName ];
 							// Create button object.
 							var button = CJTToolBox.buttons[name] = new buttonClass();
 							// If no params object passed create empty one.
@@ -513,10 +658,10 @@ var CJTToolBoxNS = new (function ($) {
 							button[buttonClassName](CJTToolBox, name, data.callback, data.params);
 							return button;
 						},
-						
+
 						/**
 						* Enable or Disable Toolbox user interactions.
-						* 
+						*
 						* @param enabled
 						*/
 						enable : function(enabled) {
@@ -528,7 +673,7 @@ var CJTToolBoxNS = new (function ($) {
 							// Chaining.
 							return this;
 						},
-						
+
 						/**
 						* Initialize Toolbox object.
 						*
@@ -551,9 +696,9 @@ var CJTToolBoxNS = new (function ($) {
 								}
 							)
 						},
-						
+
 						/**
-						* 
+						*
 						*/
 						remove : function(name) {
 							// Get button.
@@ -565,14 +710,14 @@ var CJTToolBoxNS = new (function ($) {
 							// Chaining.
 							return this;
 						}
-						
+
 					}; // End Toolbox class.
-					
+
 					// Construct new ToolBox object.
 					CJTToolBox.init();
 					// Store DOMNode CJTToolBox Reference.
 					this.CJTToolBox = CJTToolBox;
-					
+
 				} // end if(this.CJTToolBox == undefined)
 				else {
 					// Set options or dispatch methods.

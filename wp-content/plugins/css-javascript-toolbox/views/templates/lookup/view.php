@@ -17,6 +17,24 @@
 */
 class CJTTemplatesLookupView extends CJTView {
 
+    /**
+    * put your comment there...
+    * 
+    * @var mixed
+    */
+    protected static $displayNames = array
+    (
+
+        'css' => 'CSS',
+
+        'javascript' => 'JavaScript',
+
+        'html' => 'HTML',
+
+        'php' => 'PHP',
+
+    );
+    
 	/**
 	* put your comment there...
 	* 
@@ -42,7 +60,7 @@ class CJTTemplatesLookupView extends CJTView {
 	protected function enqueueScripts() {
 		// Get JQuery.
 		self::useScripts(__CLASS__,
-			'jquery-ui-accordion',
+			'jquery-ui-tabs',
 			'views:templates:lookup:public:js:{CJT_TEMPLATES-}lookup'
 		);
 	}

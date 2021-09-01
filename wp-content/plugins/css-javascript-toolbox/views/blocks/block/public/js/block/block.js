@@ -109,10 +109,10 @@ var CJTBlockBase;
 			// Initialize.
 			this.blockPlugin = blockPlugin;
 			this.box = $(element);
-			this.id = parseInt(this.box.find('input:hidden[name="blocks[]"]').val())
+			this.id = parseInt(this.box.find('input:hidden[name="blocks[]"]').val());
 			this.properties = {};
 			// Define base properties.
-			properties.name = {om : new CJTBlockPropertyHTMLNodeOM(), flags: 'rw', selector : 'input:hidden[name="cjtoolbox[{blockId}][name]"]'};
+			properties.name = {om : new CJTBlockPropertyHTMLNodeOM(), flags: 'rws', selector : 'input:text[name="cjtoolbox[{blockId}][name]"]'};
 			properties.location = {om : new CJTBlockPropertyHTMLNodeOM(), flags: 'rw', selector : 'input:hidden[name="cjtoolbox[{blockId}][location]"]'};
 			properties.state = {om : new CJTBlockPropertyHTMLNodeOM(), flags: 'rw', selector : 'input:hidden[name="cjtoolbox[{blockId}][state]"]'};
 			// Initialize ALL (BASE, DERIVDED) properties.

@@ -7,6 +7,11 @@
 .cjcodeblock {
 	margin-right: 0px !important; /* Override block.css style */
 }
-
+.cjpageblock {right: 13px; margin-top: 4px;}
 /** Editor toolbox */
 .editor-toolbox a.cjttbl-preview {background-image: url(../images/editor-toolbox/preview.png);}
+
+
+.postbox.cjt-block .postbox-header .hndle {
+    justify-content: initial !important;
+}

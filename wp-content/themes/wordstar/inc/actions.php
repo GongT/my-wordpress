@@ -24,7 +24,7 @@ add_action('after_setup_theme', function()
     add_theme_support('post-thumbnails');
     set_post_thumbnail_size(150, 150, true); 
     add_image_size('wordstar-post-medium', 400, 250, true);
-    add_image_size('wordstar-post-big', 850, 300, true);
+    add_image_size('wordstar-post-big', 850, 300, false);
     add_image_size('wordstar-post-wide', 1200, 500, true);
     add_theme_support('custom-logo',
          array(

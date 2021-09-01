@@ -37,6 +37,7 @@ class CJTBlockAjaxController extends CJTAjaxController {
 		$this->registryAction('restoreRevision');
 		$this->registryAction('loadUrl');
 		$this->registryAction('downloadCodeFile');
+        $this->registryAction('getAllAssignment');
 	}
 
 	/**
@@ -49,6 +50,14 @@ class CJTBlockAjaxController extends CJTAjaxController {
 		$this->redirect('block');
 	}
 
+    /**
+    * put your comment there...
+    * 
+    */
+    protected function getAllAssignmentAction() {
+        $this->redirect('block');
+    }
+    
 	/**
 	* put your comment there...
 	* 
@@ -68,7 +77,7 @@ class CJTBlockAjaxController extends CJTAjaxController {
 		// Pass to CJTBlockController!
 		$this->redirect('block');
 	}
-	
+    
 	/**
 	* put your comment there...
 	* 
@@ -143,7 +152,7 @@ class CJTBlockAjaxController extends CJTAjaxController {
 		$view = $this->getView('blocks/revisions');
 		// Push view vars.
 		$view->blockId = $blockId;
-		$view->revisions = $revisions;
+		$view->revisions = array_reverse($revisions);
 		// Set output header.
 		$this->httpContentType = 'text/html';
 		// Return view content.

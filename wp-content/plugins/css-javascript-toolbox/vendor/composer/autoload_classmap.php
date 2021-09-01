@@ -10,6 +10,7 @@ return array(
     'CJTAccessPointsDirectorySpider' => $baseDir . '/framework/access-points/directory-spider.class.php',
     'CJTAjaxController' => $baseDir . '/framework/mvc/controller-ajax.inc.php',
     'CJTAttributes' => $baseDir . '/framework/types/attributes.class.php',
+    'CJTBlocksCouplingHookAttacher' => $baseDir . '/framework/CouplingHookAttacher.php',
     'CJTController' => $baseDir . '/framework/mvc/controller.inc.php',
     'CJTDBFileInstaller' => $baseDir . '/framework/installer/dbfile.class.php',
     'CJTEEISubject' => $baseDir . '/framework/events/subjects/subject.interface.php',

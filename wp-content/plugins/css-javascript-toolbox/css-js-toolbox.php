@@ -3,7 +3,7 @@
 Plugin Name: CSS & JavaScript Toolbox
 Plugin URI: https://css-javascript-toolbox.com/
 Description: Easily add CSS, JavaScript, HTML and PHP code to unique CJT code blocks and assign them anywhere on your website.
-Version: 9.4
+Version: 11.4
 Author: Wipeout Media
 Author URI: https://css-javascript-toolbox.com
 License:
@@ -81,7 +81,7 @@ class CJTPlugin extends CJTHookableClass
 	/**
 	*
 	*/
-	const DB_VERSION = '1.6';
+	const DB_VERSION = '1.7';
 
     /**
     * put your comment there...
@@ -93,12 +93,12 @@ class CJTPlugin extends CJTHookableClass
 	/**
 	*
 	*/
-	const FW_Version = '4.0';
+	const FW_Version = '5.0';
 
 	/**
 	*
 	*/
-	const VERSION = '9.4';
+	const VERSION = '11';
 
 	/**
 	*
@@ -376,4 +376,41 @@ if ( ! CJTPlugin::isCompatibleEnvironment() )
 CJTPlugin::define( 'CJTPlugin', array( 'hookType' => CJTWordpressEvents::HOOK_FILTER ) );
 
 // Let's Go!
-CJTPlugin::getInstance();
+function deprecatedPHPCheck()
+{ ?>
+	<div class="notice notice-error">
+		<p><strong>CJT</strong>: CSS & JavaScript Toolbox need PHP version 7.3 or greater to operate properly. Please ask your hosting provider to update the PHP version.<br>
+		Current PHP Version: <strong><?php echo phpversion(); ?></strong>
+		</p>
+	</div>
+<?php }
+
+if ( version_compare( phpversion(), 7, '>=' ) ) {
+	CJTPlugin::getInstance();
+} else {
+	add_action( 'admin_notices', 'deprecatedPHPCheck' );
+}
+
+add_action( 'upgrader_process_complete', 'upgradeCheck',10, 2 );
+
+function upgradeCheck( $upgrader_object, $options ) {
+	$CJTPluginPath = plugin_basename( __FILE__ );
+
+	global $wpdb;
+	$table_name = $wpdb->base_prefix.'cjtoolbox_blocks';
+	$query = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table_name ) );
+	$preCheck = get_option( '__existing_cjt_user' );
+
+	if ( $options['action'] == 'update' && $options['type'] == 'plugin' ) {
+		foreach( $options['plugins'] as $each_plugin ) {
+			if ( $each_plugin == $CJTPluginPath ) {
+				$preCheck = get_option( '__existing_cjt_user' );
+
+				// Only create it once.
+				if ( empty( $preCheck ) ) {
+					update_option( '__existing_cjt_user', $wpdb->get_var( $query ) === $table_name ? 'true' : 'false' );
+				}
+			}
+		}
+	}
+}

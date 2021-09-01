@@ -82,12 +82,42 @@ var CJTBlocksPage;
 			return msg;
 		},
 		
+        /**
+        * put your comment there...
+        * 
+        */
+        _onmanagetemplates : function() {
+            var params = {width: '100%', height: '100%', TB_iframe : true};
+            var url = CJTBlocksPage.server.getRequestURL('templatesManager', 'display', params);
+            tb_show(CJTMetaboxI18N.manageTemplatesFormTitle, url);
+            // Get thickbox form element.
+            var thickboxForm = $('#TB_window');
+            // Style thickbox.
+            thickboxForm.css({
+                'position' : 'fixed', 
+                'left' : '0px',
+                'top' : '4px', 
+                'margin-left' : '5px',
+                'margin-top': '0px',
+                'width' : '99%',
+                'height' : ((jQuery(window).height() - 40) + 'px'),
+                'z-index' : 1000000
+            });
+            // Set Iframe style.
+            thickboxForm.find('iframe').css({
+                width : '100%',
+                height : '100%'
+            });
+        },
+        
 		/**
 		* put your comment there...
 		* 
 		*/
-		_onshowthickbox : function(event) {
+		_onshowthickbox : function() {
+            
 			var mediaUploadTbPosition = window.tb_position;
+            
 			// Use our custom method for positioning the Thickbox.
 			window.tb_position = function() {
 				// Call Thickbox original tb_position!
@@ -95,8 +125,7 @@ var CJTBlocksPage;
 				// Restore to media-upload tb_position.
 				window.tb_position = mediaUploadTbPosition;
 			};
-			// Call target function.
-			CJTBlocksPage.blocks.getBlocks().get(0).CJTBlock[this.event](event);
+            
 		},
 		
 		/**
@@ -117,9 +146,8 @@ var CJTBlocksPage;
 				id : block.get(0).CJTBlock.block.get('id'),
 				post : $('#post_ID').val()
 			};
+            
 			// Disable block while deleting and show Ajax loading progress.
-			this.metaboxBlockToolbox.buttons['delete'].loading(true);
-			this.metaboxBlockToolbox.enable(false);
 			block.get(0).CJTBlock.enable(false);
 			// Delete block.
 			this.server.send('metabox', 'delete', requestData)
@@ -139,11 +167,17 @@ var CJTBlocksPage;
 						function() {
 							// Localize loaded scripts
 							(new CJTWPScriptLocalizer(createMetaboxView.references.scripts)).localize();
+                            
 								// Make the new poxtbox toggle-able!
 								// Dont apply toggler twice for the exiss metaboxes.
 								var metaboxes = $('#normal-sortables .postbox').removeClass('postbox');
+                                
+                                // Delete all cjt metabox block related elements that comes out along with the block view
+                                metabox.parent().find('.cjttoolbox-metabox-block-view-element').not(metabox).remove();
+                                
 								// Replace post metabox with the recevied metabox content.
 								metabox.replaceWith(createMetaboxView.view);
+                                
 								// Apply toggler on the new metabox.
 								postboxes.add_postbox_toggles(pagenow);
 								// Reset things back so the other metaboxes has the correct CSS class.
@@ -192,14 +226,9 @@ var CJTBlocksPage;
 			CJTBlockCodeFileView.initialize();
 			
 			$( document ).trigger( 'cjtmanagerpreloadblocks', [ this.blocksForm, this.blocks.getBlocks() ] );
-			
+                                            
 			// Put CJT code block into actions!
 			var blocks = this.blocks.getBlocks().CJTBlock({calculatePinPoint : 0});
-			
-			// Fix thickbox issue caused by media-upload.js script.
-			this.metaboxBlockToolbox = blocks.get(0).CJTBlock.toolbox;
-			
-			this.metaboxBlockToolbox.buttons['info'].callback = $.proxy(this._onshowthickbox, {event : '_ongetinfo'});
 			
 			// Notify saving changes.
 			this.wpAutoSave.timer = window.setInterval($.proxy(this.detectWordpressAutoSaveAlertEvent, this), 100);

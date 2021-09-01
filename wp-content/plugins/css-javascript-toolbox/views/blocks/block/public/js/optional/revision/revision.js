@@ -1,41 +1,41 @@
 /**
-* 
+*
 */
 
 var CJTBlockOptionalRevisionBase = null;
 
 /**
-* 
+*
 */
 (function($) {
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	CJTBlockOptionalRevisionBase = function() {
-    
+
 		/**
 		* put your comment there...
-		* 
+		*
 		* @type Boolean
 		*/
 		this.block;
 
 		/**
-		* 
+		*
 		*/
 		this.original;
-		
+
 		/**
 		* put your comment there...
-		* 
+		*
 		* @type Boolean
 		*/
 		this.revision;
 
 		/**
-		* 
+		*
 		*/
 		this.state;
 
@@ -43,20 +43,20 @@ var CJTBlockOptionalRevisionBase = null;
 		* Switch state event
 		*/
 		this.onBeforeSwitchState;
-		
+
 		/**
 		* Switch state event
 		*/
 		this.onDoneRestore;
-	
+
 		/**
 		* Switch state event
 		*/
 		this.onSwitchState;
-		
+
 		/**
 		* put your comment there...
-		* 
+		*
 		*/
 		this.CJTBlockOptionalRevisionBase = function(block, revision) {
 			// Initialize instance.
@@ -71,13 +71,15 @@ var CJTBlockOptionalRevisionBase = null;
 		}
 
 		/**
-		* 
+		*
 		*/
-		this.cancel = function() {
+		this.cancel = function () {
 			// Initialize
 			var block = this.block;
 			var toolbox = block.toolbox;
-			var saveButton = toolbox.buttons['save'];
+            var editBlockToolbox = block.editBlockActionsToolbox;
+            var flaggedActionsToolbox = block.flaggedActionsToolbox;
+			var saveButton = editBlockToolbox.buttons['save'];
 			var mdlBlock = block.block;
 			var properties = block.features.restoreRevision.fields;
 			var pom;
@@ -93,10 +95,14 @@ var CJTBlockOptionalRevisionBase = null;
 				}, this)
 			);
 			// Remove cancel button.
-			toolbox.remove('cancel-restore');
+			editBlockToolbox.remove('cancel-restore');
+
 			// Enable block components.
 			block.enable(true);
 			toolbox.enable(true);
+            editBlockToolbox.enable(true);
+            flaggedActionsToolbox.enable(true);
+
 			// Set notification changes back.
 			block.changes = this.original.changes;
 			var isChanged = CJTBlocksPage.blocks.calculateChanges(block.changes, 0, false);
@@ -112,22 +118,29 @@ var CJTBlockOptionalRevisionBase = null;
 			// Notify blocks page.
 			CJTBlocksPage.blockContentChanged(block.block.id, isChanged);
 			// Change state / Enter revision mode.
-			this.onSwitchState(this.state = null);
+			this.onSwitchState( this.state = null );
 		}
-	
+
+		this.dem = function () {
+			// keep empty to keep revision window open
+		}
+
 		/**
-		* 
+		*
 		*/
 		this.display = function() {
 			// Initialize.
 			var block = this.block;
-			var toolbox = block.toolbox;
-			var saveButton = toolbox.buttons['save'];
+            var toolbox = block.toolbox;
+            var editBlockToolbox = block.editBlockActionsToolbox;
+            var flaggedActionsToolbox = block.flaggedActionsToolbox;
+			var saveButton = block.editBlockActionsToolbox.buttons['save'];
 			var mdlBlock = block.block;
 			var properties = block.features.restoreRevision.fields;
 			var pom;
+
 			// Before switch state event.
-			this.onBeforeSwitchState()
+			this.onBeforeSwitchState();
 			// Cache 'Changes' array, don't reference it from block.changes
 			// as both got the same variable reference.
 			this.original.changes = block.changes; block.changes = [];
@@ -146,8 +159,13 @@ var CJTBlockOptionalRevisionBase = null;
 			block.changes = [];
 			// Force Notification Changes to detect that current block has changes.
 			CJTBlocksPage.blockContentChanged(mdlBlock.get('id'), true);
+
 			// DISABLE-ALL toolbox buttons
-			toolbox.enable(false);
+			toolbox.enable(false); flaggedActionsToolbox.enable(false);
+
+            // Hide all Panel Windows and Display only Asisgnment panel window
+            block._onclosepanelwindow = this.dem;
+
 			// Except save button!
 			saveButton.enable(true);
 			saveButton._callback = saveButton.callback;
@@ -158,24 +176,25 @@ var CJTBlockOptionalRevisionBase = null;
 			// Reflect new style
 			.addClass('cjttblSW-restore');
 			// Add cancel restore button.
-			$('<a href="#" class="cjt-tb-link cjttbl-cancel-restore il-60x23"></a>')
-			.text('Cancel')
-			.insertBefore(saveButton.jButton);
-			toolbox.add('cancel-restore', {callback : $.proxy(this.cancel, this)});
+			if ( $( '.cjt-tb-link.cjttbl-cancel-restore.il-60x23' ).length <= 0 ) {
+				$('<a href="#" class="cjt-tb-link cjttbl-cancel-restore il-60x23"></a>')
+				.text('Cancel')
+				.insertBefore(saveButton.jButton);
+			}
+			editBlockToolbox.add('cancel-restore', {callback : $.proxy(this.cancel, this)});
 			// Disable block.
 			block.enable(false);
 			// Change state / Enter revision mode.
 			this.onSwitchState(this.state = 'revision');
 		}
-		
+
 		/**
-		* 
+		*
 		*/
 		this.restore = function() {
 			// Initialize.
 			var block = this.block;
-			var toolbox = block.toolbox;
-			var saveButton = toolbox.buttons['save'];			
+			var saveButton = block.editBlockActionsToolbox.buttons['save'];
 			var server = CJTBlocksPage.server;
 			var request = {rid : this.revision['id'], bid : block.block.get('id')};
 			// Restore revision via server.
@@ -206,7 +225,7 @@ var CJTBlockOptionalRevisionBase = null;
 				}, this)
 			);
 		}
-	
+
 	} // End Prototype.
 
 })(jQuery);

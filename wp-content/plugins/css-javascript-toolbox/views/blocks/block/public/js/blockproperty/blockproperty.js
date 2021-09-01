@@ -124,6 +124,12 @@ var CJTBlockPropertyACEEditor;
 		* 
 		*/
 		this.setValue = function(value) {
+            
+            if (value === null) {
+                
+                value = "";
+            }
+            
 			block.block.aceEditor.getSession().setValue(value);
 		};
 

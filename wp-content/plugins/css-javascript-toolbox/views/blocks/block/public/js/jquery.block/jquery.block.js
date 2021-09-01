@@ -9,6 +9,154 @@
 */
 (function($) {
 
+    /**
+    * put your comment there...
+    *
+    */
+    $.fn.CJTPLSHooksDropdown = function(arg) {
+
+        var result = this;
+        var args = arguments;
+
+        this.each(
+
+            function() {
+
+                // Initialize the Plugin only once for each element on the chain
+                if (this.CJTPLSHooksDropdown) {
+
+                    result = this.CJTPLSHooksDropdown[arg].call($this, args);
+
+                    return;
+                }
+
+                // Prepare PLugin vars
+                var $this = $(this);
+
+                options = arg;
+
+                // Initialize NEW Dropdown jQuery Plugin for the HTML element
+                this.CJTPLSHooksDropdown = new function() {
+
+                    // Initialize object vars
+                    var listValueElement;
+                    var listElement;
+                    var listElements;
+
+                    /**
+                    * put your comment there...
+                    *
+                    */
+                    var getItemValue = function(link) {
+
+                        var hookName = link.prop('href').match(/#(.+)/)[1];
+
+                        return hookName
+                    };
+
+                    /**
+                    * put your comment there...
+                    *
+                    */
+                    var init = function() {
+
+                        // Get list elements jQuery object
+                        listValueElement = $this.find('.value>a');
+                        listElement = $this.find('.hooks-dropdown-list');
+                        listElements = listElement.find('li:not(.cjt-promo-disabled)');
+
+                        listValueElement.click(
+
+                            function() {
+
+                                listElement.toggle();
+
+                                return false;
+                            }
+                        );
+
+                        // list elements click event
+                        listElements.find('a').click(
+
+                            function(event) {
+
+                                var link = $(this);
+
+                                // Reflect selected value
+                                var hookName = getItemValue(link);
+
+                                listValueElement.text(link.text());
+
+                                // Set selected value CSS
+                                listElements.removeClass('selected');
+                                link.parent().addClass('selected');
+
+                                // ITem selection event
+                                $this.trigger('change', [$this, hookName, link]);
+
+                                return false;
+                            }
+                        );
+
+                        // Initially select the selected element
+                        listValueElement.text(listElements.filter('.selected').find('a').text());
+
+                    };
+
+                    /**
+                    *
+                    */
+                    this.getOptions = function() {
+
+                        return options;
+                    };
+
+                    /**
+                    *
+                    */
+                    this.setValue = function(args) {
+
+                        listElements.find('a').each(
+
+                            function() {
+
+                                var link = $(this);
+                                var hookName = getItemValue(link);
+
+                                if (hookName == args[1]) {
+
+                                    listValueElement.text(link.text());
+
+                                    listElements.removeClass('selected');
+                                    link.parent().addClass('selected');
+
+                                    return false;
+                                }
+
+                            }
+
+                        );
+
+                    };
+
+                    this.toggle = function() {
+
+                        listElement.toggle();
+
+                    };
+
+                    // Initialize on construction
+                    init();
+
+                };
+
+            }
+        );
+
+        // Chaining
+        return result;
+    };
+
 	/**
 	*
 	*/
@@ -22,34 +170,48 @@
 		this.initDIFields = function() {
 			// Initialize notification saqve change singlton object.
 			block.changes = [];
+
 			// Initialize vars.
 			var model = block.block;
 			var aceEditor = model.aceEditor;
 			var fields = model.getDIFields();
-			// Create common interface for ace editor to
-			// be accessed like other HTML elements.
-			aceEditor.type = 'aceEditor'; // Required for _oncontentchanged to behave correctly.
+
 			/**
-			* Bind method for bind events like HTML Elements.
+            * Create common interface for ace editor to
+            * be accessed like other HTML elements.
+            *
+            *
+			* Bind method for bind events like HTML Elements +
+            * Method to get hash copy from stored content.
 			*/
+            aceEditor.type = 'aceEditor'; // Required for _oncontentchanged to behave correctly.
 			aceEditor.bind = function(e, h) {
+
 				this.getSession().doc.on(e, h);
 			}
-			/**
-			* Method to get hash copy from stored content.
-			*/
 			aceEditor.cjtSyncInputField = function() {
+
 				this.cjtBlockSyncValue = hex_md5(this.getSession().getValue());
 			}
+
 			// Hack jQuery Object by pushing
 			// ace Editor into fields list, increase length by 1.
 			fields[fields.length++] = aceEditor;
+
 			// For all fields call cjtSyncInputField and give a unique id.
 			$.each(fields, $.proxy(
+
 				function(index, field) {
+
 					this.initElement(field);
+
 				}, this)
+
 			);
+
+            // Notify Changes for Block name when key pressed
+            model.box.find('input:text.block-name').on('keyup', $.proxy(block._oncontentchanged, block));
+
 			// Chaining.
 			return this;
 		},
@@ -60,27 +222,42 @@
 		* @param element
 		*/
 		this.initElement = function(field) {
+
 			// Assign weight number used to identify the field.
 			field.cjtBlockFieldId = CJTBlocksPage.blocks.getUFI();
+
 			// Create default cjtSyncInputField method if not exists.
 			if (field.cjtSyncInputField == undefined) {
+
 				if (field.type == 'checkbox') {
-			  	field.cjtSyncInputField = function() {
-			  		this.cjtBlockSyncValue = $(this).prop('checked');
-			  	}
+
+			  	    field.cjtSyncInputField = function() {
+
+			  		    this.cjtBlockSyncValue = $(this).prop('checked');
+
+			  	    }
+
 				}
 				else {
-			  	field.cjtSyncInputField = function() {
-			  		this.cjtBlockSyncValue = this.value;
-			  	}
+
+			  	    field.cjtSyncInputField = function() {
+
+			  		    this.cjtBlockSyncValue = this.value;
+			  	    }
+
 				}
+
 				// Create interface to "bind" too.
 				field.bind = function(e, h) {
-			  	$(this).bind(e, h);
+
+			  	    $(this).bind(e, h);
 				}
+
 			}
+
 			// Sync field.
 			field.cjtSyncInputField();
+
 			// Bind to change event.
 			field.bind('change', $.proxy(block._oncontentchanged, block));
 		}
@@ -139,6 +316,11 @@
 		*/
 		this.defaultDocks;
 
+        /**
+        *
+        */
+        this.editBlockActionsToolbox;
+
 		/**
 		*
 		*/
@@ -163,6 +345,26 @@
 		*/
 		this.features;
 
+        /**
+        *
+        */
+        this.editorLangsToolbox;
+
+        /**
+        *
+        */
+        this.flaggedActionsToolbox;
+
+        /**
+        *
+        */
+        this.hooksDropdown;
+
+        /**
+        *
+        */
+        this.infoBar;
+
 		/**
 		*
 		*/
@@ -178,22 +380,25 @@
 		// Block Plugins
 		CJTBlockObjectPluginDockModule.plug(this);
 
-		/**
-		* Event handler for cancel edit block name.
-		*
-		* Cancel edit name can be done through two ways.
-		*		- Press Escape inside edit block name input.
-		*		- Click cancel edit name icon.
-		*/
-		this._oncanceleditname = function() {
-			var editName = this.elements.editBlockName;
-			// Hide edit block area.
-			editName.css('display', 'none')
-			// Unbind events that binded when the edit block name form is displayed.
-			.find('input.block-name').unbind('keydown.editName');
-			// Hide CodeFile Name.
-			this.block.box.find('.file').css({visibility : 'visible'});
-		}
+        /**
+        *
+        */
+        this._onclosepanelwindow = function(event) {
+
+            var assignPanel = this.block.box.find('.cjt-panel-item.cjt-panel-window-assignments');
+            var panelWnds = this.block.box.find('.cjt-panel-item');
+
+			// Make sure all panel windows are hidden
+            panelWnds.hide();
+
+            // Always display the assignment panel
+            assignPanel.show();
+
+            // Hide close button
+            $(event.target).hide();
+
+            return false;
+        };
 
 		/**
 		*
@@ -231,7 +436,7 @@
 			isFieldChanged = (newValue != syncValue);
 			isChanged = CJTBlocksPage.blocks.calculateChanges(this.changes, id, isFieldChanged);
 			// Enable button is there is a change not saved yet, disable it if not.
-			this.toolbox.buttons.save.enable(isChanged);
+			this.editBlockActionsToolbox.buttons.save.enable(isChanged);
 			// Notify blocks page.
 			CJTBlocksPage.blockContentChanged(this.block.id, isChanged);
 		}
@@ -249,8 +454,13 @@
 			confirmMessage = confirmMessage.replace('%s', this.block.get('name'));
 			// Confirm deletion!
 			if (confirm(confirmMessage)) {
+
+                this.block.box.trigger('BeforeDeleteBlock', [this]);
+
 				// Delete block.
 			  	CJTBlocksPage.deleteBlocks(this.block.box);
+
+                this.block.box.trigger('BlockDeleted', [this]);
 			}
 		}
 
@@ -260,7 +470,8 @@
 		*
 		*
 		*/
-		this._ondisplayrevisions = function() {
+		this._ondisplayrevisions = function(event) {
+
 			// Restore revision only when block is opened.
 			if (this.block.box.hasClass('closed')) {
 				return false;
@@ -268,125 +479,118 @@
 			// Initialize form request.
 			var revisionsFormParams = {
 				id : this.block.get('id'),
-				activeFileId : this.codeFile.file.activeFileId,
-				width : 300,
-				height : 250,
-				TB_iframe : true
+				activeFileId : this.codeFile.file.activeFileId
 			};
 			var url = CJTBlocksPage.server.getRequestURL('block', 'get_revisions', revisionsFormParams);
-			tb_show(CJTJqueryBlockI18N.blockRevisionsDialogTitle, url);
+
+            var genericPanelWindow = $('.cjpageblock .cjt-panel-genericwnd');
+
+            genericPanelWindow
+				.empty()
+            .append('<iframe style="width:100%;height:100%;" src="' + url + '"></iframe>');
+
+            this._onPaneledItems(event);
+
 			return false;
 		}
 
 		/**
-		* Event handler for start editing block name.
 		*
-		* The method display edit block name box and and associate all
-		* the required event for save or cancel editing.
+		*
+		*
 		*
 		*/
-		this._oneditname = function(event) {
-			// Initialize.
-			var editName = this.elements.editBlockName;
-			var inputText = editName.find('input.block-name');
-			// When block name clicked don't toggle postbox.
-			event.stopPropagation();
-			// Check if already in edit mode.
-			if (editName.css('display') == 'none') {
-				// Cancel or Save editing when ESCAPE or Enter button is pressed.
-				inputText.bind('keydown.editName', $.proxy(
-					function(event) {
-						if (event.keyCode == 27) {
-							// Cancel
-							this._oncanceleditname();
-						}
-						else if (event.keyCode == 13) {
-							// Save
-							this._onsavename();
-							event.preventDefault();
-						}
-					}, this)
-				);
-				// Put it exactly above the block name - padding.
-				editName.css({
-					'left' : ((this.elements.blockName.position().left - 2) + 'px'),
-					'background-color' : this.theme.backgroundColor
-				});
-				// Hide CodeFile Name.
-				this.block.box.find('.file').css({visibility : 'hidden'});
-				// Set input styles
-				var styles = {
-					'font-size' : this.elements.blockName.css('font-size'),
-					'font-family' : this.elements.blockName.css('font-family')
-				};
-				// Make the textbox wider in case the displayed name is
-				// wider than the text field.
-				var labelWidth = parseInt(this.elements.blockName.css('width'));
-				var textWidh = parseInt(inputText.css('width'));
-				if (labelWidth > textWidh) {
-					styles.width = (labelWidth + 100) + 'px';
-				}
-				inputText.css(styles);
-				// Display.
-				editName.css('display', 'block');
-				// When the input lost the focus cancel edit.
-				// Get name.
-				inputText.val(this.block.get('name'));
-				// Set focus.
-				inputText.focus();
-			}
-		}
+		this._ongetinfo = function(event) {
 
-		/**
-		*
-		*
-		*
-		*
-		*/
-		this._ongetinfo = function() {
+            var sections = {
+                'info' : 'info',
+                'assignment-info' : 'assignment'
+            };
+
+            var windowName = $(event.target).prop('href').match(/#(.+)/)[1];
+            var sectionName = sections[windowName];
+
 			// Server request.
 			var requestData = {
+
 				// Server paramerers.
 				id : this.block.get('id'),
-				// Thick box parameters.
-				width : 500,
-				height: 500
+                show_section : sectionName
 			};
+
 			var url = CJTBlocksPage.server.getRequestURL('block', 'get_info_view', requestData);
-			tb_show(CJTJqueryBlockI18N.blockInfoTitle, url);
+
+            this.showPanelGenericWindow(event, url);
 		};
 
 		/**
 		*
 		*/
-		this._onlookuptemplates = function(targetElement, tbButton) {
+		this._onlookuptemplates = function(event) {
+
 			// Initialize.
-			var frameHeight = parseInt(targetElement.css('height'));
+            var panelWnd = this.block.box.find('.cjt-panel-item.cjt-panel-window-templates-lookup');
+			var frameHeight = parseInt(panelWnd.css('height'));
 			var blockId = this.block.get('id');
+            var iframe = panelWnd.find('iframe');
+            var iframeHeight = frameHeight - 35
+
+            // Stay inactive if the toolbox is didsabled, as the toolbox
+            // has no class for enable/disable state we might use on of its buttons
+            if (this.toolbox.buttons['location-switch'].jButton.hasClass('cjttbs-disabled')) {
+
+                return;
+            }
+
+            this._onPaneledItems(event);
+
+            iframe.css('height', iframeHeight);
+
 			if (!CJTToolBox.forms.templatesLookupForm[blockId]) {
 				CJTToolBox.forms.templatesLookupForm[blockId] = {};
 			}
 			var lookupForm = CJTToolBox.forms.templatesLookupForm[blockId];
 			// This method will fired only once when the
 			// Templates popup button is hovered for the first time.
-			if (!targetElement.get(0).__cjt_loaded) {
+			if (!iframe.get(0).__cjt_loaded) {
 				var request = {blockId : blockId};
 				// Pass block object to the form when loaded.
-				lookupForm.inputs = {block : this.block, button : tbButton, height : frameHeight};
+				lookupForm.inputs = {blockPlugin : this, block : this.block, button : $(event.target), height : iframeHeight};
 				// Set frame Source to templates lookup view URL.
 				var templatesLookupViewURL = CJTBlocksPage.server.getRequestURL('templatesLookup', 'display', request);
-				targetElement.prop('src', templatesLookupViewURL);
+				iframe.prop('src', templatesLookupViewURL);
 				// Mark loaded.
-				targetElement.get(0).__cjt_loaded = true;
+				iframe.get(0).__cjt_loaded = true;
 			}
 			else {
 				// Pass frame height when refreshed.
-				lookupForm.inputs.height = frameHeight;
+				lookupForm.inputs.height = iframeHeight;
 				lookupForm.form.refresh();
 			}
 			/** @TODO Tell Block toolbox to deatach/unbind popup callback */
 			return true; // Tell CJTToolBox to Show Popup menu as normal.
 		}
+
+        /**
+        *
+        */
+        this._onPaneledItems = function(event) {
+
+            var link = $(event.target);
+            var windowName = link.prop('href').match(/#(.+)/)[1];
+            var panelWindow = this.block.box.find('.cjt-panel-item.cjt-panel-window-' + windowName);
+            var panelArea = this.block.box.find('.cjpageblock');
+
+            // Hide all panel windows
+            panelArea.find('.cjt-panel-item').hide();
+
+            // Display panel
+            panelWindow.show();
+
+            // Display Close button
+            panelArea.find('.close-panel-window').show();
+        };
+
 
 		/**
 		* Don't show popup menus if Block is minimized!
@@ -429,28 +633,45 @@
 		*
 		*/
 		this._onsavechanges = function() {
-			var saveButton = this.toolbox.buttons['save'];
+
+			var saveButton = this.editBlockActionsToolbox.buttons['save'];
+
 			// Dont save unless there is a change!
 			if (saveButton.jButton.hasClass('cjttbs-disabled')) {
 				// Return REsolved Dummy Object for standarizing sake!
 				return CJTBlocksPage.server.getDeferredObject().resolve().promise();
 			}
+
 			// Queue User Direct Interact fields (code, etc...).
 			var data = {calculatePinPoint : this.features.calculatePinPoint, createRevision : 1};
+
 			// Push DiFields inside Ajax queue.
 			this.block.queueDIFields();
+
 			// Add code file flags to the queue.
 			var queue = this.block.getOperationQueue('saveDIFields');
 			queue.add({id : this.block.get('id'), property : 'activeFileId', value : this.codeFile.file.activeFileId});
+
 			// But save button into load state (Inactive and Showing loading icon).
-			saveButton.loading(true);
-			this.enable(false);
+			if (this.block.get('name').match(/^[A-Za-z0-9\!\#\@\$\&\*\(\)\[\]\x20\-\_\+\?\:\;\.]{1,50}$/)) {
+				saveButton.loading(true);
+				this.enable(false);
+
+				this.block.box.trigger('PreSaveBlock', [this]);
+			}
+
 			// Send request to server.
 			return this.block.sync('saveDIFields', data)
+
 			.success($.proxy(
-				function() {
+
+				function(response) {
+
+                    var responseBlockData = response[this.block.get('id')];
+
 					// Stop loading effect and disable the button.
 					saveButton.loading(false, false);
+
 					// Sync fields with server value.
 					// This refrssh required for notifying saving
 					// change to detect changes.
@@ -462,52 +683,53 @@
 							this.cjtSyncInputField();
 						}
 					);
+
 					// Reset changes list.
 					this.changes = [];
+
 					// Tell blocks page that block is saved and has not changed yet.
 					CJTBlocksPage.blockContentChanged(this.block.id, false);
+
+                    // Reflect Info bar updated information
+                    this.infoBar.find('.block-info-name>strong').text(responseBlockData.name.value);
+                    this.infoBar.find('.block-shortcode > input:text').val('[cjtoolbox name="' + responseBlockData.name.value + '"]');
+
+                    var blockModifiedDate = new Date(responseBlockData.lastModified.value);
+
+                    this.infoBar.find('.block-modified-date>strong').text(
+                        blockModifiedDate.getDate().toString().padStart(2, 0) + '-' +
+                        (blockModifiedDate.getMonth() + 1).toString().padStart(2, 0) + '-' +
+                        blockModifiedDate.getFullYear() + ', ' +
+                        blockModifiedDate.getHours() + ':' +
+                        blockModifiedDate.getMinutes()
+                    );
+
 					// Fire BlockSaved event.
 					this.onBlockSaved();
+
+                    this.block.box.trigger('BlockSaved', [this]);
+
 				}, this)
 			)
 			.error($.proxy(
-				function() {
-					saveButton.loading(false);
-				}, this)
-			).complete($.proxy(
-				function() {
-					this.enable(true);
-				}, this)
-			);
-		}
 
-		/**
-		* Event handler for saveing block name.
-		*
-		* This method validate block name and send new block name to the server.
-		*/
-		this._onsavename = function () {
-			// Save only if new and old name are not same.
-			var blockName = this.elements.editBlockName.find('input.block-name').val();
-			// Name cannot be empty!
-			if (!blockName.match(/^[A-Za-z0-9\!\#\@\$\&\*\(\)\[\]\x20\-\_\+\?\:\;\.]{1,50}$/)) {
-				// Show message!
-				alert(CJTJqueryBlockI18N.invalidBlockName);
-			}
-			else { // Simply save!
-				// Change block name.
-				this.block.set('name', blockName)
-				.success($.proxy(
-					function(rName) {
-					// Update metabox title when sucess.
-					this.elements.blockName.text(rName.value);
-					}, this)
-				);
-				// Update on server.
-				this.block.sync('name');
-				// Hide edit name input field and tasks buttons.
-				this._oncanceleditname();
-			}
+				function() {
+
+					saveButton.loading(false);
+
+				}, this)
+
+			).complete($.proxy(
+
+				function(response) {
+
+                    // Enable block
+					this.enable(true);
+
+				}, this)
+
+			);
+
 		}
 
 		/**
@@ -517,30 +739,20 @@
 		*
 		*/
 		this._onswitcheditorlang = function(event, params) {
-			var cssMap = {
-				css : 'cjttbl-editor-language-css',
-				html : 'cjttbl-editor-language-html',
-				javascript : 'cjttbl-editor-language-javascript',
-				php : 'cjttbl-editor-language-php'
-			};
+
 			var jLanguageSwitcher = this.block.box.find('.cjttbl-switch-editor-language');
 			var languageSwitcher = jLanguageSwitcher.get(0);
+
 			// Note: Event and params parameter is passed but unused,
 			// we need only selectedValue.
 			// Set editor mode.
 			var editorMode = 'ace/mode/' + params.lang;
 			this.block.aceEditor.getSession().setMode(editorMode);
+
 			// Save editor language for block.
 			this.block.set('editorLang', params.lang);
-			/// Change switcher icon to the selected language ///
-			// If there is previously selected language remove its css class.
-			if (languageSwitcher.cjtbCurrentLangClass != undefined) {
-				jLanguageSwitcher.removeClass(languageSwitcher.cjtbCurrentLangClass);
-			}
-			// Add new class.
-			jLanguageSwitcher.addClass(cssMap[params.lang]);
-			// Store current selected language for later use.
-			languageSwitcher.cjtbCurrentLangClass = cssMap[params.lang];
+
+            jLanguageSwitcher.text(CJTJqueryBlockI18N['editorLang_' + params.lang]);
 		}
 
 		/**
@@ -550,11 +762,15 @@
 		* @param object Toolbox evenr parameters.
 		*/
 		this._onswitchflag = function(event, params) {
+
+            var promise;
 			var target = $(event.target);
 			var oldValue = this.block.get(params.flag);
-			var flagButton = this.toolbox.buttons[params.flag + '-switch'];
+			var flagButton = this.flaggedActionsToolbox.buttons[params.flag + '-switch'];
+
 			// Put the Flag button into load state (Inactive + loading icon).
 			flagButton.loading(true);
+
 			// Switch flag state.
 			this.block.switchFlag(params.flag, params.newValue).success($.proxy(
 				function(rState) {
@@ -565,13 +781,21 @@
 					.attr('title', CJTJqueryBlockI18N[params.flag + '_' + rState.value + 'Title']);
 				}, this)
 			);
+
 			// Update on server.
-			this.block.sync(params.flag)
+			promise = this.block.sync(params.flag)
+
 			.complete($.proxy(
+
 				function() {
+
 					flagButton.loading(false);
+
 				}, this)
+
 			);
+
+            return promise;
 		}
 
 		/**
@@ -581,7 +805,7 @@
 		*
 		*/
 		this.enable = function(state) {
-			var elements = this.block.box.find('input:checkbox, textarea, select');
+			var elements = this.block.box.find('input:checkbox,input:text, textarea, select');
 			switch (state) {
 				case true: // Enable block.
 					elements.removeAttr('disabled');
@@ -590,6 +814,11 @@
 					elements.attr('disabled', 'disabled');
 				break;
 			}
+
+            this.toolbox.enable(state);
+            this.flaggedActionsToolbox.enable(state);
+            this.editBlockActionsToolbox.buttons['delete'].enable(state);
+
 			// Enable or Disable ACEEditor.
 			// Enable = true then setReadnly = false and vise versa.
 			this.block.aceEditor.setReadOnly(!state);
@@ -610,11 +839,17 @@
 		*
 		*/
 		this.initCJTPluginBase = function(node, args) {
+
 			// Initialize object properties!
 			var model = this.block = new CJTBlock(this, node);
 			this.features = $.extend(defaultOptions, args);
+
 			// Initialize Events.
 			this.onBlockSaved = function() {};
+
+            // DOn't TOGGLE block when block name get/lost focus
+            model.box.find('input:text.block-name').click(function(event) {event.stopPropagation();});
+
 			// Load commonly used elements.
 			this.elements = {};
 			$.each(autoLoadElements, $.proxy(
@@ -622,69 +857,220 @@
 					this.elements[name] = this.block.box.find(selector);
 				}, this)
 			);
+
 			// Move edit-block-name edit area and tasks-bar outside Wordpress metabox "inside div".
 			this.elements.insideMetabox.before(model.box.find('.edit-block-name, .block-toolbox'));
-			var events = { // In-Place edit block name events.
-				'span.block-name' : $.proxy(this._oneditname, this),
-				'.edit-block-name a.save' : $.proxy(this._onsavename, this),
-				'.edit-block-name a.cancel' : $.proxy(this._oncanceleditname, this)
-			};
-			$.each(events, $.proxy(
-				function(selector, handler) {
-					model.box.find(selector).click(handler);
-				}, this)
-			);
+
+            /*  Info bar won't be exists if the block is initially closed
+            *   this is just for the code to avoid writing more IF conditions
+            *   block info item will be queried again on the load method
+            */
+            this.infoBar = this.block.box.find('.cjt-info-bar');
+
+            // HInitialize ooks dropdown list
+            this.hooksDropdown = model.box.find('.hooks-dropdown').CJTPLSHooksDropdown({})
+
+            /* Revert item value is failed to change location value */
+            /* Reflect Hooks icon and text values when successfully changes hook */
+            .on('change', $.proxy(
+
+                function(event, dropdown, hookName, jItem) {
+
+                    var currentHookName = model.get('location');
+
+                    model.set('location', hookName).error($.proxy(
+
+                        function() {
+
+                            dropdown.CJTPLSHooksDropdown('setValue', currentHookName);
+
+                        }), this)
+
+                        .done($.proxy(
+
+                            function() {
+
+                                // Reflect Hook button status when hook changed
+                                this.toolbox.buttons['location-switch'].jButton
+                                .removeClass('location-' + currentHookName)
+                                .addClass('location-' + hookName)
+
+                                .prop('title', jItem.prop('title'))
+                                .text(jItem.text())
+
+                                .removeClass('bad-location-specified')
+                                .prev().removeClass('bad-location-specified')
+
+                            }, this)
+                        );
+
+                    model.sync('location');
+
+                }, this)
+
+            ).get(0).CJTPLSHooksDropdown;
+
 			// Activate toolbox.
 			this.toolbox = model.box.find('.block-toolbox').CJTToolBox({
 				context : this,
 				handlers : {
-					'templates-lookup' : {
-						type : 'Popup',
-						callback : this._onlookuptemplates,
-						params : {
-								fitToScreen : true, /* Custom to be used inside this._onpopupmenu() method */
-							_type : {
-								onPopup : this._onpopupmenu,
-								targetElement : '.templates-lookup',
-								setTargetPosition : false
-							}
-						}
-					},
-					'switch-editor-language' : {
-						type : 'Popup',
-						params : {
-							// Parameters for PopupList type button.
-							_type : {
-								onPopup : this._onpopupmenu,
-								targetElement : '.editor-langs',
-								setTargetPosition : false
-							}
-						}
-					},
-					'link-external' : {callback : this._onlinkexternal},
-					'editor-language-css' : {callback : this._onswitcheditorlang, params : {lang : 'css'}},
-					'editor-language-html' : {callback : this._onswitcheditorlang, params : {lang : 'html'}},
-					'editor-language-javascript' : {callback : this._onswitcheditorlang, params : {lang : 'javascript'}},
-					'editor-language-php' : {callback : this._onswitcheditorlang, params : {lang : 'php'}},
-					'state-switch' : {callback : this._onswitchflag, params : {flag : 'state'}},
-					'save' : {callback : this._onsavechanges, params : {enable : false}},
-					'delete' : {callback : this._ondelete},
-					'location-switch' : {callback : this._onswitchflag, params : {flag : 'location'}},
-					'get-shortcode' : {callback : this._ongetshortcode},
-					'edit-name' : {callback : this._oneditname},
-					'info' : {callback : this._ongetinfo},
+
+                    'assignment-info' : {callback : this._ongetinfo},
+                    'block-info' : {callback : this._ongetinfo},
+
+                    'location-switch' : {
+                        type : 'Popup',
+                        params : {
+                            _type : {
+                                targetElement : '.hooks-dropdown',
+                                setTargetPosition : false
+                            }
+                        }
+                    },
+                    'templates' : {
+                        type : 'Popup',
+                        params : {
+                            _type : {
+                                onPopup : this._onpopupmenu,
+                                targetElement : '.templates',
+                                setTargetPosition : true
+                            }
+                        }
+                    },
+                    'templates-lookup' : {callback : this._onlookuptemplates},
+                    'templates-manager' : {callback : CJTBlocksPage._onmanagetemplates},
+                    'code-files' : {callback : function() {}} /* This is dummy unless updated by code file controller object on the load method */
 				}
 			}).get(0).CJTToolBox;
+
+            this.toolbox.buttons['templates'].jButton.click($.proxy(this._onlookuptemplates, this));
+
+            // Editor Language Toolbox
+            this.editorLangsToolbox = model.box.find('.cjt-toolbox.editor-langs-toolbox').CJTToolBox({
+
+                context : this,
+                handlers : {
+
+                    'switch-editor-language' : {
+                        type : 'Popup',
+                        params : {
+                            // Parameters for PopupList type button.
+                            _type : {
+                                onPopup : this._onpopupmenu,
+                                targetElement : '.editor-langs',
+                                setTargetPosition : false
+                            }
+                        }
+                    },
+
+                    'editor-language-css' : {callback : this._onswitcheditorlang, params : {lang : 'css'}},
+                    'editor-language-html' : {callback : this._onswitcheditorlang, params : {lang : 'html'}},
+                    'editor-language-javascript' : {callback : this._onswitcheditorlang, params : {lang : 'javascript'}},
+                    'editor-language-php' : {callback : this._onswitcheditorlang, params : {lang : 'php'}}
+
+                }
+
+            }).get(0).CJTToolBox;
+
+            // Disable Toolbox until block is loaded
+            this.toolbox.enable(false);
+            this.editorLangsToolbox.enable(false);
+
+            // Move State and Location buttons to be before block name
+            this.flaggedActionsToolbox = model.box.find('.cjt-toolbox.flagged-actions-toolbox')
+            .insertBefore(model.box.find('.hndle .block-name'))
+            .CJTToolBox({
+
+                context : this,
+                handlers : {
+                    'state-switch' : {callback : this._onswitchflag, params : {flag : 'state'}},
+                }
+
+            }).get(0).CJTToolBox;
+
+            // Move State and Location buttons to be before block name
+            this.editBlockActionsToolbox = model.box.find('.cjt-toolbox.edit-block-toolbox')
+            .insertAfter(model.box.find('.hndle .block-name'))
+            .CJTToolBox({
+
+                context : this,
+                handlers : {
+
+                    'save' : {callback : this._onsavechanges, params : {enable : false}},
+                    'delete' : {callback : this._ondelete},
+
+                }
+
+            }).get(0).CJTToolBox;
+
+            // Initialized-event (Regardless if loaded or not)
+            this.block.box.trigger('Initialized', [this]);
+
 			// If the code editor element is presented then
 			// the block is already opened and no need to load later.
 			if (model.box.find('.code-editor').length) {
-				this.load();
+
+                // Load nd Trigger Load events
+                this.loadTLE();
+
 			}
+
 			// Display block.
 			// !important: Blocks come from server response doesn't need this but the newly added blocks does.
 			// need sometime to be ready for display.
 			model.box.css({display : 'block'}).addClass('cjt-block');
 		}
+
+        /**
+        *
+        */
+        this.initInfoBar = function() {
+
+            this.infoBar = this.block.box.find('.cjt-info-bar');
+
+            // Copy Shortcode
+            this.infoBar.find('.block-shortcode .copyshortcode').click($.proxy(
+
+                function() {
+
+                    var shortcodeEle = this.infoBar.find('.block-shortcode input');
+
+                    shortcodeEle.focus();
+                    shortcodeEle.select();
+
+                    document.execCommand('copy');
+
+                    return false;
+
+                }, this)
+            );
+
+            // Update Assignment count whenever the block is saved
+            this.block.box.on('BlockSaved', $.proxy(
+
+                function() {
+
+                    CJTBlocksPage.server.send('block', 'getAllAssignment', {blockId : this.block.get('id')}).done($.proxy(
+
+                        function(response) {
+
+                            this.infoBar.find('.block-assignment-count .show-assignment-info').text(response);
+
+                        }, this)
+
+                    );
+
+                }, this)
+
+            );
+
+
+            // Editor Language
+            this.infoBar.find('.block-editor-lang strong').text(this.block.get('editorLang'));
+
+            // Allow info bar to be extensible
+            this.block.box.trigger('InitInfoBar', [this, this.infoBar]);
+        };
 
 		/**
 		*
@@ -698,14 +1084,16 @@
 			CJTBlocksPage.server.send('blocksPage', 'loadBlock', {blockId : model.get('id'), isLoading : true})
 			.success($.proxy(
 				function(blockContent) {
+
 					// Remove loading bloc progress.
 					loadingPro.remove();
-					// Add assignment panel at the most begning of the block.
-					this.elements.insideMetabox.prepend(blockContent.assignPanel);
-					// Add block content at the end.
+
+					// Add block content
 					this.elements.insideMetabox.append(blockContent.content);
+
 					// Load block.
-					this.load();
+					this.loadTLE();
+
 				}, this)
 			);
 		};
@@ -726,38 +1114,124 @@
 
 			// Editor default options.
 			this.block.aceEditor.setOptions({showPrintMargin : false});
+
+            // Initialize info bar
+            this.initInfoBar();
+
+            // Enable HEader button Toolbox
+            this.toolbox.enable(true);
+            this.editorLangsToolbox.enable(true);
+
 			// Initialize editor toolbox.
 			this.editorToolbox = model.box.find('.editor-toolbox').CJTToolBox({
 				context : this,
 				handlers : {}
 			}).get(0).CJTToolBox;
+
+
 			// Default to DOCK!!
-			this.defaultDocks = [{element : this.block.aceEditor.container, pixels : 7}];
+			this.defaultDocks = [
+                {
+                    element : $(this.block.aceEditor.container),
+                    pixels : 7
+                },
+                {
+                    element : this.block.box.find('.cjpageblock .cjt-panel-genericwnd'),
+                    pixels : 64
+                },
+                {
+                    element : this.block.box.find('.cjt-panel-item.cjt-panel-window-templates-lookup')
+
+                                .on('CJTDockedItemResized',
+
+                                    function(event, item) {
+
+                                        if (CJTToolBox.forms.templatesLookupForm[model.get('id')] !== undefined) {
+
+                                            item.height = item.height - 35;
+
+                                            item.element.find('iframe').css('height', item.height);
+                                            CJTToolBox.forms.templatesLookupForm[model.get('id')].inputs.height = item.height;
+                                            CJTToolBox.forms.templatesLookupForm[model.get('id')].form.refresh();
+
+                                        }
+
+                                    }
+                                )
+                                .on('CJTBlockExitFullScreen',
+
+                                    function(event, item) {
+
+                                        if (CJTToolBox.forms.templatesLookupForm[model.get('id')] !== undefined) {
+
+                                            var originalHeight = item.element.height();
+                                            var iframeHeight = originalHeight - 35;
+
+                                            item.element.css('height', originalHeight);
+                                            item.element.find('iframe').css('height', iframeHeight);
+
+                                            CJTToolBox.forms.templatesLookupForm[model.get('id')].inputs.height = iframeHeight;
+                                            CJTToolBox.forms.templatesLookupForm[model.get('id')].form.refresh();
+
+                                        }
+
+                                    }
+                                ),
+                    pixels : 27
+                }
+            ];
+
 			// Show hidden toolbox buttons.
-			this.toolbox.buttons['switch-editor-language'].jButton.removeClass('waitingToLoad');
-			this.toolbox.buttons['link-external'].jButton.removeClass('waitingToLoad');
-			this.toolbox.buttons['templates-lookup'].jButton.removeClass('waitingToLoad');
-			this.toolbox.buttons['save'].jButton.removeClass('waitingToLoad');
+			this.editorLangsToolbox.buttons['switch-editor-language'].jButton.removeClass('waitingToLoad');
+            this.block.box.find('.cjt-toolbox.block-toolbox').find('.waitingToLoad').removeClass('waitingToLoad');
+			this.editBlockActionsToolbox.buttons['save'].jButton.removeClass('waitingToLoad');
+
 			// Register COMMAND-KEYS.
 			this.registerCommands();
+
 			// Switch Block state if required, if state is empty nothing will happen.
 			// Until now only 'restore' state is supported to prevent saving restored block.
 			this.switchState(this.features.state);
+
 			// Prepare input elements for notifying user changes.
 			this.notifySaveChanges = (new notifySaveChangesProto(this)).initDIFields();
+
 			// Set theme object.
+
 			this.theme = {};
+
+            /*
 			this.theme.backgroundColor = 'white';
 			this.theme.color = 'black';
+            this.theme.altTextColor = 'snow';
+            */
 
 			// LOAD EVENT.
 			if (this.onLoad !== undefined) {
+
 				this.onLoad();
 			}
 
 			// Block Code File.
 			this.codeFile = new CJTBlockFile(this);
+
+            this.block.box.find('.cjpageblock a.close-panel-window').click($.proxy(this._onclosepanelwindow, this));
+
+            this.block.box.trigger( 'cjtBlockPostLoading', [ this ] );
 		}
+
+        /**
+        *
+        */
+        this.loadTLE = function() {
+
+            this.block.box.trigger('BlockBeforeLoadProc', [this]);
+
+            this.load();
+
+            this.block.box.trigger('BlockAfterLoadProc', [this]);
+
+        };
 
 		/**
 		*
@@ -795,6 +1269,28 @@
 		{
 			this.features = features;
 		};
+
+        /**
+        *
+        */
+        this.showPanelGenericWindow = function(event, url) {
+
+            var genericPanelWindow = $('.cjpageblock .cjt-panel-genericwnd');
+
+            $.get(url).done($.proxy(
+
+                function(content) {
+
+                    genericPanelWindow
+					.empty()
+                    .append(content);
+
+                    this._onPaneledItems(event);
+
+                }, this)
+
+            );
+        };
 
 		/*
 		*

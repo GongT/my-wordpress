@@ -136,11 +136,11 @@ class CJTBlockModel extends CJTModel {
 	public function __get( $property )
 	{
 		// Return default values
-		$value = 	( 	( $this->properties[ $property ] === null ) &&
+		$value = 	( isset( $this->properties[ $property ] ) && ( $this->properties[ $property ] === null ) &&
 									( isset( $this->propertiesMeta[ $property ][ 'default' ] ) ) ) ?
 
 							$this->propertiesMeta[ $property ][ 'default' ] :
-							$this->properties[ $property ];
+							( isset( $this->properties[ $property ] ) ? $this->properties[ $property ] : null );
 
 		return $value;
 	}

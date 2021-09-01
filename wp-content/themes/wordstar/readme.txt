@@ -3,7 +3,7 @@ Contributors: lineshjose
 Theme URI: http://linesh.com/projects/wordstar/
 Requires at least: WordPress 4
 Tested up to: WordPress 4.7
-Stable tag: 4.3
+Stable tag: 4.3.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: two-columns, right-sidebar, custom-background, custom-colors, custom-header, custom-menu, featured-images, microformats, post-formats, sticky-post, threaded-comments, rtl
@@ -60,6 +60,9 @@ Source: https://wordpress.org/themes/twentysixteen
 
 
 == Changelog ==
+= 4.3.1 =
+* Minor Bug fixes.
+
 = 4.2 =
 * Minor Bug fixes.
 

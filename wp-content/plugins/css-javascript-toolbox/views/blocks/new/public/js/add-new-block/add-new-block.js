@@ -6,7 +6,7 @@
 
 /**
 * jQuery Wrapper for Add New Block module.
-* 
+*
 *
 */
 (function($) {
@@ -17,10 +17,10 @@
 	* @var CJTBlocksPage
 	*/
 	CJTBlocksPage = window.parent.CJTBlocksPage;
-	
+
 	/**
 	* Server New Block view actions/events.
-	* 
+	*
 	* The rule of the module is to validate and submitting
 	* new block data to server, check the response and notify the user.
 	*
@@ -28,37 +28,37 @@
 	* @version 6
 	*/
 	CJTNewBlock = {
-	
+
 		/**
 		* put your comment there...
-		* 
+		*
 		*/
 		errors : null,
-		
+
 		/**
 		* New Block form element.
 		*
 		* @var jqObject
-		*/		
+		*/
 		form : null,
-		
+
 		/**
 		* Event handler for closing the form.
-		* 
+		*
 		* return void
 		*/
 		_oncancel : function() {
 			window.parent.tb_remove();
 		},
-		
+
 		/**
 		* Event handler for saving/adding the new block
-		* 
+		*
 		* Method doesn't validate form data, form validation
 		* should be done before this event is triggered.
 		*
 		* Method submit the data to the server and notify user based
-		* on the response.  
+		* on the response.
 		*
 		* return void
 		*/
@@ -87,7 +87,7 @@
 							// Enable new form.
 							this.form.find('input, select').prop('disabled', false);
 					  }, this)
-					);	
+					);
 			  }, this)
 			).fail($.proxy(
 				function() {
@@ -95,10 +95,10 @@
 				}, this)
 			);
 		},
-	
+
 		/**
 		* Initialize New Block object when the document is ready.
-		* 
+		*
 		* return void
 		*/
 		init : function()	{
@@ -113,10 +113,10 @@
 				}, this)
 			);
 		},
-		
+
 		/**
 		* Is the form data is valid for submission!
-		* 
+		*
 		* @returns boolean
 		*/
 		isValid : function() {
@@ -153,10 +153,10 @@
 			}
 			return promising;
 		}
-		
+
 	} // End class.
-	
+
 	// Bind when documet ready.
 	$($.proxy(CJTNewBlock.init, CJTNewBlock));
-	
+
 })(jQuery);

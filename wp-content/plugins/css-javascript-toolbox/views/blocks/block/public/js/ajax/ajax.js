@@ -17,10 +17,10 @@ var CJTBlocksServerQueue;
 	*
 	*/
 	CJTBlocksServerQueue = function(controller, action, key) {
-	
+
 	  // Initialize base class.
 		this._init(controller, action, key);
-		
+
 		/**
 		*
 		*
@@ -41,7 +41,7 @@ var CJTBlocksServerQueue;
 									if (queue.type == 'queue') {
 										var partialBlock = queue.data;
 										blocks[partialBlock.id] = (blocks[partialBlock.id] != undefined) ? blocks[partialBlock.id] : {};
-										blocks[partialBlock.id][partialBlock.property] = partialBlock.value;									
+										blocks[partialBlock.id][partialBlock.property] = partialBlock.value;
 									}
 								}
 							)
@@ -52,7 +52,7 @@ var CJTBlocksServerQueue;
 			}
 			return data;
 		}
-		
+
 		/**
 		*
 		*
@@ -75,10 +75,10 @@ var CJTBlocksServerQueue;
 			}
 			return params;
 		}
-		
+
 	} // End class.
-	
+
 	// Extend CJTServerQueue.
 	CJTBlocksServerQueue.prototype = new CJTServerQueue();
-	
+
 })(jQuery);

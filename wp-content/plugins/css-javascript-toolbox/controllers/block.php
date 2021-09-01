@@ -37,6 +37,8 @@ class CJTBlockController extends CJTAjaxController {
 		$this->registryAction('loadUrl');
 		$this->registryAction('getCode');
 		$this->registryAction('downloadCodeFile');
+        $this->registryAction('getAllAssignment');
+        $this->registryAction('getCodeFilesCount');
 	}
 
 	/**
@@ -75,6 +77,35 @@ class CJTBlockController extends CJTAjaxController {
 		$this->response = $codeFile->code;
 	}
 
+    
+    /**
+    * put your comment there...
+    * 
+    */
+    public function getAllAssignmentAction() {
+        
+        $blockId = isset($_GET['blockId']) ? $_GET['blockId'] : null;
+        
+        try {
+            
+            if (!$blockId) {
+                
+                throw new Exception('Invalid Request parameters');
+            }
+            
+            $blocks = new CJTBlocksModel();
+            
+            $block = $blocks->getBlock($blockId);
+            
+            $this->response = count(CJTBlocksModel::getAllAssignments($block));
+        }
+        catch (Exception $exception) {
+
+            
+        }
+        
+    }
+    
 	/**
 	* Query single block based on the provided criteria!
 	*
@@ -89,6 +120,32 @@ class CJTBlockController extends CJTAjaxController {
 		$this->response = array_intersect_key((array) $this->model->getBlockBy(), $returns);
 	}
 
+    /**
+    * put your comment there...
+    * 
+    */
+    protected function getCodeFilesCountAction() {
+        
+        
+        $blockId = isset($_GET['blockId']) ? $_GET['blockId'] : null;
+        
+        try {
+            
+            if (!$blockId) {
+                
+                throw new Exception('Invalid Request parameters');
+            }
+            
+            $this->response = count(CJTBlocksModel::getCodeFilesCount($blockId));
+        }
+        catch (Exception $exception) {
+
+            
+        }
+        
+        
+    }
+    
 	/**
 	* Get assigment panel objects page.
 	*

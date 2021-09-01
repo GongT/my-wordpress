@@ -29,14 +29,14 @@ var CJTBlocksPage;
 		*
 		*/
 		blocksContainer : null,
-				
+
 		/*
 		*
 		*
 		*
 		*/
 		blocksForm : null,
-		
+
 		/*
 		*
 		*
@@ -52,26 +52,26 @@ var CJTBlocksPage;
 		*
 		*/
 		changes : [],
-		
+
 		/*
 		*
 		*
 		*
-		*/		
+		*/
 		deletedBlocks : [],
-		
+
 		/*
 		*
 		*
 		*
 		*/
 		loadingElement : null,
-		
+
 		/*
 		*
 		*
 		*
-		*/		
+		*/
 		loadingImage : null,
 
 		/**
@@ -80,28 +80,28 @@ var CJTBlocksPage;
 		*
 		*/
 		pageId : 'cjtoolbox',
-		
+
 		/**
 		*
 		*
 		*
 		*/
 		server : null,
-		
+
 		/**
 		*
 		*
 		*
 		*/
 		toolboxes : {
-		
+
 			/**
 			*
 			*
 			*
 			*/
 			toolboxes : null,
-			
+
 			/*
 			*
 			*
@@ -114,16 +114,16 @@ var CJTBlocksPage;
 					}
 				);
 			},
-			
+
 			/**
 			* put your comment there...
-			* 
+			*
 			*/
 			getIButton : function(buttonName, method, params) {
 				var dispatcher = {
 					/**
 					* put your comment there...
-					* 
+					*
 					*/
 					dispatch : function(params) {
 						var result = {};
@@ -145,7 +145,7 @@ var CJTBlocksPage;
 				// Return dispatched handle object.
 				return dispatcher;
 			},
-			
+
 			/**
 			*
 			*
@@ -159,7 +159,7 @@ var CJTBlocksPage;
 					}
 				);
 			},
-			
+
 			/**
 			*
 			*
@@ -175,7 +175,7 @@ var CJTBlocksPage;
 				);
 				return isEnabled;
 			},
-			
+
 			/*
 			*
 			*
@@ -210,7 +210,7 @@ var CJTBlocksPage;
 				this.css('visibility', 'visible');
 			}
 		},
-				
+
 		/**
 		*
 		*
@@ -231,28 +231,28 @@ var CJTBlocksPage;
 			// Popup form.
 			tb_show(CJTBlocksPageI18N.addNewBlockDialogTitle, url);
 		},
-		
+
 		/**
 		* put your comment there...
-		* 
+		*
 		*/
 		_oncancelrestore : function() {
 			window.location.href = window.location.href.replace(/&backupId=\d+/, '');
 		},
-		
+
 		/**
 		* put your comment there...
-		* 
+		*
 		*/
 		_onmanagesettings : function() {
 			var params = {width: 700, height: 600,TB_iframe : true};
 			var settingsFormURL = CJTBlocksPage.server.getRequestURL('settings', 'manageForm', params);
 			tb_show(CJTBlocksPageI18N.settingsFormTitle, settingsFormURL);
 		},
-		
+
 		/**
 		* put your comment there...
-		* 
+		*
 		*/
 		_onmanagetemplates : function() {
 			var params = {width: '100%', height: '100%', TB_iframe : true};
@@ -262,9 +262,9 @@ var CJTBlocksPage;
 			var thickboxForm = $('#TB_window');
 			// Style thickbox.
 			thickboxForm.css({
-				'position' : 'fixed', 
+				'position' : 'fixed',
 				'left' : '0px',
-				'top' : '4px', 
+				'top' : '4px',
 				'margin-left' : '5px',
 				'margin-top': '0px',
 				'width' : '99%',
@@ -277,7 +277,7 @@ var CJTBlocksPage;
 				height : '100%'
 			});
 		},
-		
+
 		/**
 		*
 		*
@@ -295,10 +295,10 @@ var CJTBlocksPage;
 			var url = CJTBlocksPage.server.getRequestURL('blocksBackups', 'list', requestData);
 			tb_show(CJTBlocksPageI18N.manageBackupsDialogTitle, url);
 		},
-		
+
 		/**
 		* put your comment there...
-		* 
+		*
 		*/
 		_onrestore : function() {
 			// Confirm restore.
@@ -328,7 +328,7 @@ var CJTBlocksPage;
 				);
 			}
 		},
-		
+
 		/**
 		*
 		*
@@ -356,10 +356,10 @@ var CJTBlocksPage;
 				}
 			)
 		},
-		
+
 		/**
 		* put your comment there...
-		* 
+		*
 		*/
 		_onupdateorder : function() {
 			var container = CJTBlocksPage.blocksContainer;
@@ -369,7 +369,7 @@ var CJTBlocksPage;
 			// Notify changes!
 			CJTBlocksPage.blockContentChanged(0, isChanged);
 		},
-		
+
 		/**
 		*
 		*
@@ -388,7 +388,7 @@ var CJTBlocksPage;
 			}
 			return CJTBlocksPageI18N.confirmNotSavedChanges;
 		},
-		
+
 		/**
 		*
 		*
@@ -446,7 +446,7 @@ var CJTBlocksPage;
 			// Enable/Disable save button in all Toolboxes.
 			CJTBlocksPage.toolboxes.enable('save-changes', enable);
 		},
-		
+
 		/**
 		*
 		*
@@ -459,10 +459,9 @@ var CJTBlocksPage;
 					var blockPlg = block.CJTBlock;
 					var blockId = blockPlg.block.get('id');
 					CJTBlocksPage.deletedBlocks.push(blockId);
-					// Notify Menu and Code Files Manager.
+					// Notify Code Files Manager.
 					// Only for Loaded Blocks.
-					blockPlg.menu && blockPlg.menu.ondeleteblock();
-					blockPlg.codeFile && blockPlg.codeFile.ondeleteblock();	
+					blockPlg.codeFile && blockPlg.codeFile.ondeleteblock();
 					$(block).remove();
 					// Notify save change.
 					CJTBlocksPage.blockContentChanged(blockId, true);
@@ -477,17 +476,17 @@ var CJTBlocksPage;
 				CJTBlocksPage.blocks.hasBlocks(false);
 			}
 		},
-		
+
 		/*
 		*
 		*
 		*
-		*/		
+		*/
 		getStateName : function() {
 			var stateName = this.isRestore() ? 'restore' : '';
 			return stateName;
 		},
-		
+
 		/*
 		*
 		*
@@ -530,18 +529,18 @@ var CJTBlocksPage;
 					'manage-backups' : {callback : CJTBlocksPage._onmanagebackups},
 					'templates-manager' : {callback : CJTBlocksPage._onmanagetemplates},
 					'global-settings' : {callback : CJTBlocksPage._onmanagesettings},
-				} 
+				}
 			});
-			
+
 			$( document ).trigger( 'cjtmanagertoolboxloaded', [ CJTBlocksPage ] );
-			
+
 			var jBlocks = CJTBlocksPage.blocks.getBlocks();
-			
+
 			$( document ).trigger( 'cjtmanagerpreloadblocks', [ CJTBlocksPage.blocksForm, jBlocks ] );
-			
+
 			// Activate blocks.
 			jBlocks.CJTBlock({state : CJTBlocksPage.getStateName()});
-			
+
 			// Hide loading image. #cjt-blocks-loader will be used for other loading later.
 			CJTBlocksPage.loadingImage = CJTBlocksPage.blocksForm.find('#cjt-blocks-loader');
 			CJTBlocksPage.loadingImage.find('.loading-text').remove();
@@ -560,7 +559,7 @@ var CJTBlocksPage;
 			// Cache blocks order to detect order change!
 			CJTBlocksPage.blocksContainer.data('cjtOrders', CJTBlocksPage.blocksContainer.sortable('toArray'));
 			// Detect order change.
-			CJTBlocksPage.blocksContainer.sortable('option', {update: CJTBlocksPage._onupdateorder});				
+			CJTBlocksPage.blocksContainer.sortable('option', {update: CJTBlocksPage._onupdateorder});
 			// Stop auto save order, orders should be saved only with "Save All Changes" button.
 			// Move it to another method that allow us to save order later manually.
 			postboxes.manual_save_order = postboxes.save_order;
@@ -579,7 +578,7 @@ var CJTBlocksPage;
 		*
 		*
 		*
-		*/		
+		*/
 		isRestore : function() {
 			// If there is backupId parameter then this is a restore state.
 			var regEx = /backupId=(\d+)/;
@@ -589,7 +588,7 @@ var CJTBlocksPage;
 			}
 			return backupId;
 		},
-		
+
 		/*
 		*
 		*
@@ -626,9 +625,9 @@ var CJTBlocksPage;
 			// Initialize CJTBlocks page vars and ui.
 			jQuery(document).ready(CJTBlocksPage.init);
 		},
-		
+
 		/**
-		* 
+		*
 		*/
 		saveCustomOrder : function(order) {
 			// Override jquery sortable plugin!!
@@ -646,7 +645,7 @@ var CJTBlocksPage;
 			 // Reset original sortable!
 			 $.fn.sortable = originalSortable;
 		},
-		
+
 		/**
 		*
 		*
@@ -665,7 +664,7 @@ var CJTBlocksPage;
 				}, this)
 			);
 		},
-		
+
 		/*
 		*
 		*
@@ -675,10 +674,10 @@ var CJTBlocksPage;
 			// For now only toolboxes need to switch state.
 			CJTBlocksPage.toolboxes.switchState(state);
 		}
-		
+
 	} // End class.
-	
+
 	// This is the entry point to all Javascript codes.
 	CJTBlocksPage.main();
-	
+
 })(jQuery); // Dont wait for document to be loaded.

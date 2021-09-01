@@ -71,18 +71,29 @@ var CJTBlocksPage;
 						// Load Javascript files required for metabox-block to work.
 						// After all metabox scripts are loaded display the view.
 						(new ScriptsLoader(blockView.references.scripts)).loadAll().done($.proxy(
+                        
 							function() {
+                                
 								 // Make the new poxtbox toggle-able!
 								// Dont apply toggler twice for the extsis metaboxes.
 								var metaboxes = $('#normal-sortables .postbox').removeClass('postbox');
+                                                                
+                                // Mark all CJT elements that comes along with Metabox Block View
+                                blockView.view = $('<div>' + blockView.view + '</div>');
+                                blockView.view.children().addClass('cjttoolbox-metabox-block-view-element');
+            
 								// Replace post metabox with the recevied metabox content.
-								metabox.replaceWith(blockView.view);
+								metabox.replaceWith(blockView.view.children());
+                                
 								// Apply toggler on the new metabox.
 								postboxes.add_postbox_toggles(pagenow);
+                                
 								// Reset things back so the other metaboxes has the correct CSS class.
 								metaboxes.addClass('postbox');
+                                
 								// Reset tb_position to the one created by media-handler script.
 								window.tb_position = mediaHandlerTBPosition;
+                                
 							}, this)
 						);
 					}, this)

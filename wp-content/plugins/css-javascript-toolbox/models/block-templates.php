@@ -11,6 +11,27 @@ defined('ABSPATH') or die('Access denied');
 */
 class CJTBlockTemplatesModel extends CJTHookableClass {
 
+    
+    /**
+    * put your comment there...
+    * 
+    * @param mixed $blockId
+    */
+    public static function getLinkedTemplatesCount($blockId) {
+        
+        global $wpdb;
+        
+        $query = "  SELECT count(*)
+                    FROM {$wpdb->prefix}cjtoolbox_block_templates
+                    WHERE blockId = %d;";
+                    
+        $query = $wpdb->prepare($query, $blockId);
+        
+        $count = $wpdb->get_var($query);
+        
+        return $count;
+    }
+    
 	/**
 	* Check weather a template is linked to specific block.
 	* 

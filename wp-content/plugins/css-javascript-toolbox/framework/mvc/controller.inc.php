@@ -12,99 +12,99 @@ defined('ABSPATH') or die("Access denied");
 * CJT controller base class.
 */
 abstract class CJTController extends CJTHookableClass {
-	
+
 	/**  */
 	const NONCE_ACTION = 'cjtoolbox';
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $action;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $controllerInfo = null;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $defaultAction = 'index';
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $request;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $model = null;
 
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $oncallback = array('parameters' => array('callback', 'action', 'args'));
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $ongetactionname = array('parameters' => array('action'));
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected static $ongetclassname = array('parameters' => array('class', 'name', 'type'));
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $ongetviewname = array('parameters' => array('view'));
-		
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected static $onloadcontroller = array('parameters' => array('file', 'name'));
-		
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @var mixed
 	*/
 	protected $view = null;
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $hasView
 	* @param mixed $request
 	* @param mixed $overrideControllerPath
 	* @param mixed $overrideContollerPrefix
 	* @return CJTController
 	*/
-	public function __construct($hasView = null, 
-															$request = null, 
-															$overrideControllerPath = null, 
+	public function __construct($hasView = null,
+															$request = null,
+															$overrideControllerPath = null,
 															$overrideContollerPrefix = null) {
 		// Initialize hookable!
 		parent::__construct();
@@ -116,8 +116,8 @@ abstract class CJTController extends CJTHookableClass {
 			if (!isset($this->controllerInfo['model_file'])) {
 				$this->controllerInfo['model_file'] = null;
 			}
-			$this->model = CJTModel::create($this->controllerInfo['model'], 
-																			$this->request, 
+			$this->model = CJTModel::create($this->controllerInfo['model'],
+																			$this->request,
 																			$this->controllerInfo['model_file'],
 																			dirname($overrideControllerPath),
 																			$overrideContollerPrefix);
@@ -129,8 +129,8 @@ abstract class CJTController extends CJTHookableClass {
 																												(isset($this->controllerInfo['view']) ? $this->controllerInfo['view'] : null)
 			);
 			if ($view) {
-				$this->view  = self::getView($view, 
-																		 null, 
+				$this->view  = self::getView($view,
+																		 null,
 																		 dirname($overrideControllerPath),
 																		 $overrideContollerPrefix)
 				// Push data into view.
@@ -139,15 +139,15 @@ abstract class CJTController extends CJTHookableClass {
 			}
 		}
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public function _doAction() {
 		// Force use of internal action untless its empty
 		// then look for submitted action or get the default!
-		$action = $this->action ? $this->action : 
+		$action = $this->action ? $this->action :
 													(isset($_GET['action']) ? $_GET['action'] : $this->defaultAction);
 		// filter action name!
 		$action = $this->ongetactionname($action);
@@ -159,19 +159,19 @@ abstract class CJTController extends CJTHookableClass {
 			call_user_func($callback);
 		}
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $name
 	* @param mixed $hasView
 	* @param mixed $request
 	* @param mixed $overrideControllersPath
 	* @param mixed $overrideControllersPrefix
 	*/
-	public static function create($name, 
-																$hasView = null, 
-																$request = null, 
+	public static function create($name,
+																$hasView = null,
+																$request = null,
 																$overrideControllersPath = null,
 																$overrideControllersPrefix = null) {
 		// Import controller file.
@@ -183,10 +183,10 @@ abstract class CJTController extends CJTHookableClass {
 		// Instantiate controller class.
 		return new $class($hasView, $request, $overrideControllersPath, $overrideControllersPrefix);
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @deprecated Use cssJSToolbox::createSecurityToken
 	*/
 	public function createSecurityToken() {
@@ -195,7 +195,7 @@ abstract class CJTController extends CJTHookableClass {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	protected function displayAction() {
 		// Get view layout!
@@ -208,27 +208,27 @@ abstract class CJTController extends CJTHookableClass {
 
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $name
 	* @param mixed $hasView
 	* @param mixed $request
 	* @param mixed $overrideControllersPath
 	*/
 	public static function getInstance($name,
-																		 $hasView = null, 
-																		 $request = null, 
+																		 $hasView = null,
+																		 $request = null,
 																		 $overrideControllersPath = null,
 																		 $overrideControllersPrefix = null) {
 		return self::create($name, $hasView, $request, $overrideControllersPath, $overrideControllersPrefix);
 	}
-	
+
 	/**
 	* Use CJTModel::create instead.
-	* 
+	*
 	* @deprecated No longer used.
 	*/
-	public static function getModel($name, 
-																	$params = array(), 
+	public static function getModel($name,
+																	$params = array(),
 																	$file = null,
 																	$overrideModelsPath = null,
 																	$overrideModelsPrefix = null) {
@@ -248,7 +248,7 @@ abstract class CJTController extends CJTHookableClass {
 		$model = new $modelClass($params);
 		return $model;
 	}
-	
+
 	/**
 	* @deprecated No longer used.
 	*/
@@ -267,25 +267,25 @@ abstract class CJTController extends CJTHookableClass {
 		$className = self::trigger('CJTController.getclassname', "{$prefix}{$sanitizedName}", $name, $type);
 		return $className;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $name
 	*/
 	public function getRequestParameter($name) {
-		return isset($this->request[$name]) ? $this->request[$name] : null;	
+		return isset($this->request[$name]) ? $this->request[$name] : null;
 	}
-	
+
 	/**
-	* 
+	*
 	* Use CJTView:create instrad.
-	* 
+	*
 	* @deprecated
 	*/
-	public static function getView($path, 
-																 $params = null, 
-																 $overrideViewsPath = null, 
+	public static function getView($path,
+																 $params = null,
+																 $overrideViewsPath = null,
 																 $overrideViewsPrefix = null) {
 		$view = null;
 		// Import view file.
@@ -297,14 +297,14 @@ abstract class CJTController extends CJTHookableClass {
 		$view = new $viewClass($viewInfo, $params);
 		return $view;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	*/
 	public static function getViewInfo($path, $overrideViewsPath = null, $overrideViewsPrefix = null) {
 		// Plugin views Url
-		$viewsUrl = $overrideViewsPath ? 
+		$viewsUrl = $overrideViewsPath ?
 								WP_PLUGIN_URL . '/' . basename(dirname($overrideViewsPath)) :
 								CJTOOLBOX_VIEWS_URL;
 		// Path to views dir.
@@ -322,20 +322,20 @@ abstract class CJTController extends CJTHookableClass {
 		);
 		return $viewInfo;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $action
 	*/
 	public function setAction($action) {
 		$this->action = $action;
 		return $this;
 	}
-	
+
 	/**
 	* put your comment there...
-	* 
+	*
 	* @param mixed $name
 	* @param mixed $value
 	*/
@@ -343,7 +343,7 @@ abstract class CJTController extends CJTHookableClass {
 		$this->request[$name]	= $value;
 		return $this;
 	}
-	
+
 } // End class.
 
 // Hookable!

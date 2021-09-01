@@ -9,14 +9,24 @@
 *
 * Localization text for backups script.
 */
-return array(
+$locals = array(
+
 	'blockRevisionsDialogTitle' => cssJSToolbox::getText('Block revisions'),
 	'blockInfoTitle' => cssJSToolbox::getText('CJT-Block Info'),
 	'confirmDelete' => cssJSToolbox::getText('Are you sure you want to delete this (%s) code block?'),
+    
 	'state_activeTitle' => cssJSToolbox::getText('Deactivate (turn off) code block'),
 	'state_inactiveTitle' => cssJSToolbox::getText('Activate (turn on) code block'),
-	'location_headerTitle' => cssJSToolbox::getText('Set output location hook to footer'),
-	'location_footerTitle' => cssJSToolbox::getText('Set output location hook to header'),
+    'state_active' => cssJSToolbox::getText('On'),
+    'state_inactive' => cssJSToolbox::getText('Off'),
+    
 	'invalidBlockName' => cssJSToolbox::getText('Invalid block name'),
 	'loadingBlock' => cssJSToolbox::getText('Loading'),
+    
+    'editorLang_css' => cssJSToolbox::getText('CSS'),
+    'editorLang_html' => cssJSToolbox::getText('HTML'),
+    'editorLang_php' => cssJSToolbox::getText('PHP'),
+    'editorLang_javascript' => cssJSToolbox::getText('Javascript'),
 );
+
+return $locals;

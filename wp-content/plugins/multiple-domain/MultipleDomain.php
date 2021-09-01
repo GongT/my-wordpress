@@ -5,14 +5,17 @@
  *
  * Core features.
  *
+ * Contributors:
+ *
+ *  - Clay Allsopp <https://github.com/clayallsopp>
+ *  - Alexander Nosov <https://github.com/cyberaleks>
+ *  - João Faria <https://github.com/jffaria>
+ *  - Raphael Stäbler <https://github.com/blazer82>
+ *  - Tobias Keller <https://github.com/Tobias-Keller>
+ *  - Maxime Granier <https://github.com/maxgranier>
+ *
  * @author  Gustavo Straube <https://github.com/straube>
- * @author  Vivek Athalye <https://github.com/vnathalye>
- * @author  Clay Allsopp <https://github.com/clayallsopp>
- * @author  Alexander Nosov <https://github.com/cyberaleks>
- * @author  João Faria <https://github.com/jffaria>
- * @author  Raphael Stäbler <https://github.com/blazer82>
- * @author  Tobias Keller <https://github.com/Tobias-Keller>
- * @version 1.0.5
+ * @version 1.0.6
  * @package multiple-domain
  */
 class MultipleDomain
@@ -24,7 +27,7 @@ class MultipleDomain
      * @var   string
      * @since 0.3
      */
-    const VERSION = '1.0.5';
+    const VERSION = '1.0.6';
 
     /**
      * The number of the default HTTP port.
@@ -255,6 +258,9 @@ class MultipleDomain
 
         // Add body class based on domain
         add_filter('body_class', [ $this, 'addDomainBodyClass' ]);
+
+        // Stop WP built in Canonical URL if this plugin has 'Add canonical links' enabled
+        add_filter('get_canonical_url', [ $this, 'getCanonicalUrl' ]);
     }
 
     /**
@@ -649,7 +655,7 @@ class MultipleDomain
          */
         global $wp;
 
-        $uri = '/' . ltrim(add_query_arg([], $wp->request), '/');
+        $uri = home_url(add_query_arg([], $wp->request), 'relative') . '/';
         $currentProtocol = $this->getCurrentProtocol();
 
         $protocol = $this->getDomainProtocol($this->originalDomain);
@@ -897,5 +903,20 @@ class MultipleDomain
     {
         $url = htmlentities($url);
         printf('<link rel="canonical" href="%s" />', $url);
+    }
+
+    /**
+     * Filter override WordPress built-in canonical tag generation if using the this plugin's canonical tag feature
+     *
+     * @param $url
+     * @return string
+     */
+    public function getCanonicalUrl($url)
+    {
+        // If *not* using the plugin's canonical tags, then return this URL. Otherwise, don't
+        if (!$this->shouldAddCanonical()) {
+            return $url;
+        }
+        return '';
     }
 }

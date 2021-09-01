@@ -54,6 +54,14 @@ class CJTExtensions extends CJTHookableClass {
 	*/
 	protected $incompatibilies;
 
+    /**
+    * put your comment there...
+    *
+    * @var mixed
+    */
+    protected $incompatibleAddons = array();
+
+
 	/**
 	* put your comment there...
 	*
@@ -147,6 +155,7 @@ class CJTExtensions extends CJTHookableClass {
 	* @param mixed $className
 	*/
 	 public function _autoload($className) {
+
 		// Load only classed defined on the list!
 		if (isset($this->extensions[$className])) {
 			$classFile = $this->onautoload($this->extensions[$className]['runtime']['classFile'], $className);
@@ -165,6 +174,32 @@ class CJTExtensions extends CJTHookableClass {
 	public function __construct($prefix = self::PREFIXS, $loadMethod = self::LOAD_METHOD) {
 		// Hookable!
 		parent::__construct();
+
+        // Initialize incomapiblt addons meta data
+        $this->incompatibleAddons = array(
+
+            'css-javascript-toolbox-plus' => array(
+                '9.4',
+                '<',
+                'Aborted',
+
+                function() {
+
+                    ob_start();
+
+                    require CJTOOLBOX_PATH . DIRECTORY_SEPARATOR . 'includes' .
+                            DIRECTORY_SEPARATOR . 'html' . DIRECTORY_SEPARATOR .
+                            'incompatible_cjtplus_version.html.php';
+
+                    $content = ob_get_clean();
+
+                    return $content;
+                }
+
+            ),
+
+        );
+
 		// Initializing!
 		$this->prefix = explode( ',', $prefix );
 		$this->loadMethod = $loadMethod;
@@ -247,10 +282,13 @@ class CJTExtensions extends CJTHookableClass {
 	*
 	*/
 	public function load() {
+
 		// Initialize.
 		$frameworkVersion = new CJT_Framework_Version_Version(CJTPlugin::FW_Version);
+
 		// Auto load CJT extensions files when requested.
 		spl_autoload_register($this->ontregisterautoload(array($this, '_autoload')));
+
 		// Load all CJT extensions!
 		foreach ($this->getExtensions() as $class => $extension) {
 			// Filters!
@@ -279,6 +317,31 @@ class CJTExtensions extends CJTHookableClass {
 			$callback = $this->onloadcallback($callback);
 			// If auto load is speicifd then import class file and bind events.
 			if ($extension['definition']['primary']['loadMethod'] == 'auto') {
+
+                // Don't load Incompatible extensions/addons
+                if (isset($this->incompatibleAddons[$extension['name']])) {
+
+                    require_once    ABSPATH . DIRECTORY_SEPARATOR . 'wp-admin' .
+                                    DIRECTORY_SEPARATOR . 'includes' .
+                                    DIRECTORY_SEPARATOR . 'plugin.php';
+
+					$incomapatibleAddon = $this->incompatibleAddons[$extension['name']];
+                    $addonVersion = get_plugin_data($extension['pluginFile'], false, false)['Version'];
+					$currentVersion = get_plugin_data( CJTOOLBOX_PLUGIN_FILE )['Version'];
+
+					// Only show notice if addon version is less than 11.
+					if ( $addonVersion < 11) {
+
+                        $extension['incompatibleMessage']['flag'] = $incomapatibleAddon[2];
+                        $extension['incompatibleMessage']['msg'] = $incomapatibleAddon[3];
+
+                        $this->incompatibilies[$pluginPath] = $extension;
+
+                        continue;
+                    }
+
+                }
+
 				// If frameworkVersion is not provided assume its 0 (Older version)
 				// before frameworkversion chech even supported.
 				// otherwise compare it with current frameworkversion
@@ -358,6 +421,8 @@ class CJTExtensions extends CJTHookableClass {
 	* @TODO: REMOVE HTML-MARKUP. CJT PLUGIN NEVER WRITE MARKUP IMIXED WITH HTML. ITS VERY BAD PROGRAMMING PRACTICE. THIS WILL BE REMOVED NEXT TIME AS WE IN RUSH!!!
 	*/
 	public function processIncompatibles() {
+		global $current_screen;
+
 		// Proces only if in CJT page.
 		if (!preg_match('/\/plugins\.php|page\=cjtoolbox/', $_SERVER['REQUEST_URI'])) {
 			return;
@@ -374,14 +439,22 @@ class CJTExtensions extends CJTHookableClass {
 			// Show details.
 			$pluginInfo = get_plugin_data($extension['pluginFile']);
 			// List item Markup
-			$list .= "<li><a target='_blank' href='{$pluginInfo['PluginURI']}'>{$pluginInfo['Name']}</a> (Status: {$extension['incompatibleMessage']['flag']}, Message: {$extension['incompatibleMessage']['msg']})</li>\n";
+			$list .=    is_callable($extension['incompatibleMessage']['msg']) ?
+                        "<li style='list-style-type:none'>{$extension['incompatibleMessage']['msg']()}</li>" :
+                        "<li><a target='_blank' href='{$pluginInfo['PluginURI']}'>{$pluginInfo['Name']}</a> (Status: {$extension['incompatibleMessage']['flag']}, Message: {$extension['incompatibleMessage']['msg']})</li>\n";
 		}
+
+		$noticeClasses = 'cjt-incomaptible-extensions-notice notice notice-error';
+
+		if ( $current_screen->id !== 'toplevel_page_cjtoolbox' ) {
+			$noticeClasses .= ' is-dismissible';
+		}
+
 		// Output full message.
 		// TODO: BAD PRACTICE1!!!!! NEVER MIX HTML WITH PHP, JUST TEMPORARY1!!!
-		echo "<div class='cjt-incomaptible-extensions-notice updated' style='font-size:14px;font-weight:bold;padding-top:11px'>
-						<span>{$message}</span>
-						<ul style='list-style-type: circle;padding-left: 27px;font-size: 12px;'>{$list}</ul>
-					</div>";
+		echo "<div class='$noticeClasses' style='font-size:14px;font-weight:bold;margin-top: 20px;'>
+		         <ul style='list-style-type: circle;font-size: 12px;'>{$list}</ul>
+		      </div>";
 	}
 
 } // End class.

@@ -46,16 +46,25 @@ class CJTBlocksCjtBlockView extends CJTView {
 	* @return CJTBlocksCjtBlock
 	*/
 	public function __construct($viewInfo) {
+        
 		parent::__construct($viewInfo);
+        
 		// Aggregate block view object!
 		$this->blockView = self::create('blocks/block');
+        
 		// Register actions.
 		add_action('admin_print_scripts', array(__CLASS__, 'enqueueScripts'));
 		add_action('admin_print_styles', array(__CLASS__, 'enqueueStyles'));
+        
 		// Read input params.
 		$this->isLoading = isset($_REQUEST['isLoading']) ? true : false;
+        
+        // Inject Assignment Panel into THE BLOCK VIEW
+        $this->blockView->setOption('isLoading', $this->isLoading)
+                        ->setOption('assignPanelBlock', $this);
+        
 	}
-	
+    
 	/**
 	* put your comment there...
 	* 

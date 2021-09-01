@@ -14,4 +14,5 @@ return array(
 	'noSelection' => cssJSToolbox::getText('Nothing selected!'),
 	'nameIsNull' => cssJSToolbox::getText('Name cannot be null. Code File must has a unique name for each Block.'),
 	'nameAlreadyExists' => cssJSToolbox::getText('Code File name is currently taken. Please choose another name.'),
+    'codeFilesDialogTitle' => cssJSToolbox::getText('Code Files'),
 );

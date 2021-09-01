@@ -38,7 +38,7 @@ class CJTInstallerAccessPoint extends CJTAccessPoint {
 			add_action('admin_notices', array(&$this, 'notInstalledAdminNotice'));
 		}
 
-		if ( class_exists( 'CJTPlus' ) && $this->isOldCJTPlus()) add_action( 'admin_notices', [ $this, '_oldCJTPlusDetected' ] );
+		//if ( class_exists( 'CJTPlus' ) && $this->isOldCJTPlus()) add_action( 'admin_notices', [ $this, '_oldCJTPlusDetected' ] );
 	}
 
 	protected function isOldCJTPlus()

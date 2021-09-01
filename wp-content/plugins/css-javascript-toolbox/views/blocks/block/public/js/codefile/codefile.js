@@ -26,16 +26,34 @@
 		*/
 		this.file = {};
 		
+        /**
+        * put your comment there...
+        * 
+        * @param event
+        * @param block
+        */
+        var _onbeforedeleteblock = function(event, block) {
+            
+            if (block === CJTBlockCodeFileView.block) {
+                
+                CJTBlockCodeFileView.deattach();
+            }
+            
+        };
+        
 		/**
 		* put your comment there...
 		* 
 		* 
 		*/
-		var _onclickfilename = function(event) {
+		var _onopencodefiledialog = function(event) {
+            
 			// Switch Code Files Managed to current block.
-			CJTBlockCodeFileView.switchTo(block);
-			// Don't close or show Menu.
-			event.stopPropagation();
+            CJTBlockCodeFileView.switchTo(block);
+            
+            block._onPaneledItems(event);
+            
+            return false;
 		};
 		
 		/**
@@ -112,9 +130,7 @@
 					// Make sure to recalculate changes after force ace editor to be unchanged.
 					var isChanged = CJTBlocksPage.blocks.calculateChanges(block.changes, model.aceEditor.cjtBlockFieldId, false);
 					CJTBlocksPage.blockContentChanged(blockId, isChanged);
-					block.toolbox.buttons.save.enable(isChanged);
-					// Chage Current File Name.
-					this.currentFileName.text(this.file.name);
+					block.editBlockActionsToolbox.buttons.save.enable(isChanged);
 					// Reflect View State.
 					promise.resolve(blockId, rCodeFile.id);
 				}, this)
@@ -136,13 +152,12 @@
 		fileInputs.remove();
 		
 		// Switch editor language.
-		block._onswitcheditorlang(undefined, {lang : this.file.type ? this.file.type : block.block.get('editorLang', 'css')});
-		/// Load block file related features ///
-		// File name and files list.
-		this.currentFileName = $('<a>').addClass('file').text(this.file.name)
-		.insertAfter(block.elements.blockName)
-		.before($('<span class="name-file-separator">|</span>'))
-		.click($.proxy(_onclickfilename, this));
+        block._onswitcheditorlang({}, {lang : this.file.type ? this.file.type : block.block.get('editorLang', 'css')});		
+        
+        block.toolbox.buttons['code-files'].callback = _onopencodefiledialog;
+        
+        // Block Events
+        block.block.box.on('BeforeDeleteBlock', _onbeforedeleteblock);
 	};
 	
 })(jQuery);

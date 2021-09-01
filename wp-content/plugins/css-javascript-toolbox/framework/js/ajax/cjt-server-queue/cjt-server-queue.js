@@ -1,40 +1,40 @@
 /**
 * @version $ Id; cjtserverqueue.js 21-03-2012 03:22:10 Ahmed Said $
-* 
+*
 * CJTServerQueue class.
 */
 
 /*
 * Put CJTServerQueue class at global scope.
-* 
+*
 * @var CJTServerQueue
 */
 var CJTServerQueue;
 
 /*
 * JQuery wrapper for the CJTServerQueue object.
-*/ 
+*/
 (function($) {
 
 	/*
 	*	Abstract base class for Ajax Queue classes.
-	* 
+	*
 	* This is a prototype and cannot be used without a derivided class.
 	* There is two abstract method must be implemented in the child class.
 	*
 	* Abstracts:
 	* 	- getData() : This method get called when this.send method is called right before
-	* 								sending the request to the server. The purpose of the method is to Encapsulate the 
+	* 								sending the request to the server. The purpose of the method is to Encapsulate the
 	*									queues data and prepare it for sending.
 	*		- getResponseParameters(response, data): This method called when server response. The method will be called
 	*									for every added queue. The purpose of the method is to de-encapsulate response object
 	*									to pass for every queue.
-	* 
+	*
 	* @author Ahmed Said
 	* @version 6
 	*/
 	CJTServerQueue = function() {
-	
+
 		/*
 		* Operation Action.
 		*
@@ -50,13 +50,13 @@ var CJTServerQueue;
 		this.controller = null;
 
 		/*
-		* Queue object unique identifier. 
-		* 
-		* @internal 
+		* Queue object unique identifier.
+		*
+		* @internal
 		* @var string
 		*/
 		this.key = '';
-		
+
 		/*
 		* Lock or Unlock queue object allow and disallow sending
 		* the request to the server when .send() method is called.
@@ -64,23 +64,25 @@ var CJTServerQueue;
 		* @var boolean
 		*/
 		this.locked = false;
-		
+
 		/*
 		* Operations queue.
-		* 
+		*
 		* All queued operations are stored here waiting
 		* for sending.
 		*
 		* @var object
 		*/
-   	this.queue = [];
-   	
+		this.queue = [];
+
+		this.errors = [];
+
 		/*
 		* Derived classed constructor.
-		* 
+		*
 		* Call this from child classes for initialize objects.
-		* 
-		* @param string Controller map name. 
+		*
+		* @param string Controller map name.
 		* @param string Action name.
 		* @param string Queue key.
 		* @return void
@@ -93,10 +95,10 @@ var CJTServerQueue;
 			this.queue = [];
 			this.locked = false;
    	}
-   	
+
 		/*
 		* Add request to the queue.
-		* 
+		*
 		* The method push the new data to the queue list.
 		*
 		* The returned object is jQuery Ajax-Like object that has .success and .error
@@ -109,46 +111,61 @@ var CJTServerQueue;
 		* endpoint is extension to send method when the object is locked.
 		* This allow dispatch method to call deferred methods added through send method
 		* when the object was locked.
-		* 
+		*
 		* @param object Data to add to queue.
 		* @param mixed context to be used for deferred callbacks (e.g success, error).
 		* @param string Queue type.
 		* @return CJTServer.getDeferredObject.promise()
 		*/
-		this.add = function(data, context, type) {
-			var queue = {
-				deferred : CJTServer.getDeferredObject(),
-				data : data,
-				context : context,
-				type : ((type == undefined) ? 'queue' : type)
-			};
-			var promise = queue.deferred.promise();
-			// Add queue object to the queue.
-			this.queue.push(queue);
-			return promise;
+		this.add = function (data, context, type) {
+			// Check for special characters in block name.
+			if (data.property === 'name') {
+				if (!data.value.match(/^[A-Za-z0-9\!\#\@\$\&\*\(\)\[\]\x20\-\_\+\?\:\;\.]{1,50}$/)) {
+					alert('The block name cannot contain special characters. Please use A-Z, 0-9, -, _ and space characters only.')
+
+					this.errors = data.value
+				} else {
+					this.errors = []
+				}
+			}
+
+			if (this.errors.length <= 0) {
+				var queue = {
+					deferred: CJTServer.getDeferredObject(),
+					data: data,
+					context: context,
+					type: ((type == undefined) ? 'queue' : type)
+				};
+				var promise = queue.deferred.promise();
+				// Add queue object to the queue.
+				this.queue.push(queue);
+				return promise;
+			} else {
+				return CJTServer.getDeferredObject().promise()
+			}
 		}
-		
+
 		/*
 		* Clear queues list.
-		* 
+		*
 		* The method quietly clear queue list.
 		*
 		* No callbacks called when queue is cleared.
-		* 
+		*
 		* @return void
 		*/
 		this.clear = function() {
 			this.queue = [];
 		}
-		
+
 		/*
 		* Dispatch callbacks associated for the all the available queues.
-		* 
+		*
 		* @internal
-		* 
+		*
 		* state parameter possible values are:
 		* 	- resolve
-		*		- reject 
+		*		- reject
 		*
 		* @param string jQuery.Deferred states.
 		* @param object Response Object to pass to the callbacks.
@@ -181,11 +198,11 @@ var CJTServerQueue;
 
 		/*
 		* Don't send the queue when send method is called.
-		* 
-		* This method is great when an operation need to control the behavior of 
+		*
+		* This method is great when an operation need to control the behavior of
 		* another operation. An operation may prevent the queue from sending the request
 		* and do that in alternative ways.
-		* 
+		*
 		* @return void
 		*/
 		this.lock = function() {
@@ -197,14 +214,14 @@ var CJTServerQueue;
 		*
 		* @param CJTServerQueue Queue object to merge to this queue.
 		* @return void
-		*/		
+		*/
 		this.merge = function(serverQueue) {
 			this.queue = $.merge(this.queue, serverQueue.queue);
 		}
-		
+
 		/*
 		* Send queue data to server.
-		* 
+		*
 		* If the object is locked nothing will happen at all.
 		* If the object is unlocked a call to CJTServer.send method will be
 		* processed with the data returned from the abstract method .getData().
@@ -216,7 +233,8 @@ var CJTServerQueue;
 		this.send = function(method, data) {
 			var ajaxPromise = null;
 			// Process only of not locked.
-			if (!this.locked) {
+
+			if (!this.locked && this.errors.length <= 0) {
 				var queue = this; // To be used inside .each().
 				// Merge data param with derived class data for the final request.
 				// But first mask usre data param is passed.
@@ -241,16 +259,16 @@ var CJTServerQueue;
 			}
 			return ajaxPromise;
 		}
-		
+
 		/*
 		* Unlock queue object.
-		* 
+		*
 		* @return void
-		*/		
+		*/
 		this.unlock = function() {
 			this.locked = false;
 		}
-		
+
 	} // End class.
-	
+
 })(jQuery);
